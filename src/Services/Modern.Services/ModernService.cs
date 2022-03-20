@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
-using Modern.Cache.Abstractions;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Exceptions;
@@ -9,7 +8,8 @@ using Modern.Services.Abstractions;
 namespace Modern.Services;
 
 /// <summary>
-/// Represents an <see cref="IModernCrudService{TEntity,TId}"/> and <see cref="IModernQueryService{TEntity,TId}"/> implementation using cache and generic repository
+/// Represents an <see cref="IModernCrudService{TEntity,TId}"/> and <see cref="IModernQueryService{TEntity,TId}"/> implementation
+/// with data access through generic repository
 /// </summary>
 /// <typeparam name="TEntity">The type of entity</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
@@ -19,14 +19,13 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
     where TId : IEquatable<TId>
     where TRepository : class, IModernQueryRepository<TEntity, TId>, IModernCrudRepository<TEntity, TId>
 {
+    private readonly string _entityName = typeof(TEntity).Name;
     private readonly string _serviceName = $"{typeof(TEntity).Name}Service";
 
     /// <summary>
     /// The repository instance
     /// </summary>
     protected readonly TRepository Repository;
-
-    private readonly IModernCache<TEntity, TId> _cache;
 
     /// <summary>
     /// The repository instance
@@ -37,26 +36,23 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="repository">The generic repository</param>
-    /// <param name="cache">The cache of entities</param>
     /// <param name="logger">The logger</param>
-    protected ModernService(TRepository repository, IModernCache<TEntity, TId> cache, ILogger logger)
+    protected ModernService(TRepository repository, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
         Repository = repository;
-        _cache = cache;
         Logger = logger;
     }
 
     /// <summary>
-    /// Returns standardizes service exception
+    /// Returns standardized service exception
     /// </summary>
     /// <param name="ex">Original exception</param>
     /// <returns>Repository exception which holds original exception as InnerException</returns>
     protected virtual Exception CreateProperException(Exception ex)
-    {
-        return ex switch
+        => ex switch
         {
             ArgumentException _ => ex,
             EntityConcurrentUpdateException _ => ex,
@@ -65,7 +61,6 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
             EntityNotModifiedException _ => ex,
             _ => new RepositoryErrorException(ex.Message, ex)
         };
-    }
 
     /// <summary>
     /// <inheritdoc cref="IModernQueryService{TEntity,TId}.GetByIdAsync"/>
@@ -78,16 +73,14 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
 
             if (Logger.IsEnabled(LogLevel.Trace))
             {
-                // TODO: logging
-                Logger.LogTrace($"{_serviceName}.{nameof(GetByIdAsync)} id: {{@id}}", id);
+                Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(GetByIdAsync), id);
             }
 
             return await Repository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            // TODO: logging
-            Logger.LogError(ex, $"Could not get entity by id: {{@id}} (cause: {ex.Message})", id);
+            Logger.LogError(ex, "Could not get {name} entity by id '{id}': {reason}", _entityName, id, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -103,14 +96,14 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
 
             if (Logger.IsEnabled(LogLevel.Trace))
             {
-                Logger.LogTrace($"{_serviceName}.{nameof(TryGetByIdAsync)} id: {{@id}}", id);
+                Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(TryGetByIdAsync), id);
             }
 
             return await Repository.TryGetByIdAsync(id, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, $"Could not get entity by id: {{@id}} (cause: {ex.Message})", id);
+            Logger.LogError(ex, "Could not get {name} entity by id '{id}': {reason}", _entityName, id, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -122,16 +115,13 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
     {
         try
         {
-            if (Logger.IsEnabled(LogLevel.Trace))
-            {
-                Logger.LogTrace($"{_serviceName}.{nameof(GetAllAsync)}");
-            }
+            LogMethod(nameof(GetAllAsync));
 
             return await Repository.GetAllAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, $"Could not get all entities: {{@id}} (cause: {ex.Message})");
+            Logger.LogError(ex, "Could not get all {name} entities: {reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -145,14 +135,14 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
         {
             if (Logger.IsEnabled(LogLevel.Trace))
             {
-                Logger.LogTrace($"{_serviceName}.{nameof(CountAsync)} of all entities");
+                Logger.LogTrace("{serviceName}.{method} of all entities", _serviceName, nameof(CountAsync));
             }
 
             return await Repository.CountAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, ex.Message);
+            Logger.LogError(ex, "Could not get count of all {name} entities: {reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -165,17 +155,13 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
-
-            if (Logger.IsEnabled(LogLevel.Trace))
-            {
-                Logger.LogTrace($"{_serviceName}.{nameof(CountAsync)}");
-            }
+            LogMethod(nameof(CountAsync));
 
             return await Repository.CountAsync(predicate, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, $"Could not get entities count with predicate: {{predicate}} (cause: {ex.Message})", predicate);
+            Logger.LogError(ex, "Could not get {name} entities count by the given predicate: {reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -188,17 +174,13 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
-
-            if (Logger.IsEnabled(LogLevel.Trace))
-            {
-                Logger.LogTrace($"{_serviceName}.{nameof(ExistsAsync)}");
-            }
+            LogMethod(nameof(ExistsAsync));
 
             return await Repository.ExistsAsync(predicate, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, $"Could not check entity existence with predicate: {{predicate}} (cause: {ex.Message})", predicate);
+            Logger.LogError(ex, "Could not check {name} entity existence by the given predicate: {reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -211,17 +193,13 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
-
-            if (Logger.IsEnabled(LogLevel.Trace))
-            {
-                Logger.LogTrace($"{_serviceName}.{nameof(FirstOrDefaultAsync)}");
-            }
+            LogMethod(nameof(FirstOrDefaultAsync));
 
             return await Repository.FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, $"Could not get first entity with predicate: {{predicate}} (cause: {ex.Message})", predicate);
+            Logger.LogError(ex, "Could not get first {name} entity by the given predicate: {reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -234,17 +212,13 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
-
-            if (Logger.IsEnabled(LogLevel.Trace))
-            {
-                Logger.LogTrace($"{_serviceName}.{nameof(SingleOrDefaultAsync)}");
-            }
+            LogMethod(nameof(SingleOrDefaultAsync));
 
             return await Repository.SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, $"Could not get single entity with predicate: {{predicate}} (cause: {ex.Message})", predicate);
+            Logger.LogError(ex, "Could not get single {name} entity by the given predicate: {reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -257,17 +231,13 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
-
-            if (Logger.IsEnabled(LogLevel.Trace))
-            {
-                Logger.LogTrace($"{_serviceName}.{nameof(WhereAsync)}");
-            }
+            LogMethod(nameof(WhereAsync));
 
             return await Repository.WhereAsync(predicate, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, $"Could not get entities with predicate: {{predicate}} (cause: {ex.Message})", predicate);
+            Logger.LogError(ex, "Could not get {name} entities by the given predicate: {reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -279,16 +249,13 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
     {
         try
         {
-            if (Logger.IsEnabled(LogLevel.Trace))
-            {
-                Logger.LogTrace($"{_serviceName}.{nameof(AsQueryable)}");
-            }
+            LogMethod(nameof(AsQueryable));
 
             return Repository.AsQueryable();
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, ex.Message);
+            Logger.LogError(ex, "Could not get {name} entities as Queryable: {reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -301,8 +268,7 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
         try
         {
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
-
-            Logger.LogInformation($"{_serviceName}.{nameof(CreateAsync)}: {{@entity}}", entity);
+            Logger.LogTrace("{serviceName}.{method} entity: {@entity}", _serviceName, nameof(CreateAsync), entity);
 
             // TODO: TEntity in service should be DTO or DBO ?!
 
@@ -310,15 +276,15 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
 
             // TODO: Service with and without cache
 
-            Logger.LogInformation("Creating entity in db...");
+            Logger.LogDebug("Creating {name} entity in db...", _entityName);
             var dboEntity = await Repository.CreateAsync(entity, cancellationToken).ConfigureAwait(false);
-            Logger.LogInformation("Created. {@dboEntity}", dboEntity);
+            Logger.LogDebug("Created {name} entity. {@dboEntity}", _entityName, dboEntity);
 
             //var dboEntity = MapDtoToDbo(entity);
 
-            //Logger.LogInformation("Creating entity in db...");
+            //Logger.LogDebug("Creating entity in db...");
             //await Repository.CreateAsync(dboEntity, cancellationToken).ConfigureAwait(false);
-            //Logger.LogInformation($"Created. Id: {dboEntity.Id}");
+            //Logger.LogDebug($"Created. Id: {dboEntity.Id}");
 
             //Logger.LogDebug("Adding entity to cache...");
             //var entityDto = MapDtoToDbo(dboEntity);
@@ -327,66 +293,177 @@ public abstract class ModernService<TEntity, TId, TRepository> : IModernCrudServ
 
             return dboEntity;
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Logger.LogError($"Unable to create a new entity. {e.Message}", e, entity);
-            throw CreateProperException(e);
+            Logger.LogError(ex, "Unable to create a new {name} entity: {reason}. {@entity}", _entityName, ex.Message, entity);
+            throw CreateProperException(ex);
         }
     }
 
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.CreateAsync(List{TEntity},CancellationToken)"/>
     /// </summary>
-    public Task<List<TEntity>> CreateAsync(List<TEntity> entities, CancellationToken cancellationToken = default)
+    public async Task<List<TEntity>> CreateAsync(List<TEntity> entities, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        try
+        {
+            ArgumentNullException.ThrowIfNull(entities, nameof(entities));
+            Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(CreateAsync), entities);
+
+            Logger.LogDebug("Creating {name} entities in db...", _entityName);
+            var dboEntities = await Repository.CreateAsync(entities, cancellationToken).ConfigureAwait(false);
+            Logger.LogDebug("Created many {name} entities. {@dboEntity}", _entityName, dboEntities);
+
+            return dboEntities;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Unable to create new {name} entities: {reason}. {@entities}", _entityName, ex.Message, entities);
+            throw CreateProperException(ex);
+        }
     }
 
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(TId,TEntity,CancellationToken)"/>
     /// </summary>
-    public Task<TEntity> UpdateAsync(TId id, TEntity entity, CancellationToken cancellationToken = default)
+    public async Task<TEntity> UpdateAsync(TId id, TEntity entity, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        try
+        {
+            ArgumentNullException.ThrowIfNull(id, nameof(id));
+            ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+            Logger.LogTrace("{serviceName}.{method} id: {id}, entity: {@entity}", _serviceName, nameof(UpdateAsync), id, entity);
+
+            Logger.LogDebug("Updating {name} entity with id '{id}' in db...", _entityName, id);
+            var dboEntity = await Repository.UpdateAsync(id, entity, cancellationToken).ConfigureAwait(false);
+            Logger.LogDebug("Updated {name} entity with id {id}. {@dboEntity}", _entityName, id, dboEntity);
+
+            return dboEntity;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Unable to update a {name} entity by id '{id}': {reason}. {@entity}", _entityName, id, ex.Message, entity);
+            throw CreateProperException(ex);
+        }
     }
 
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(List{TEntity},CancellationToken)"/>
     /// </summary>
-    public Task<List<TEntity>> UpdateAsync(List<TEntity> entities, CancellationToken cancellationToken = default)
+    public async Task<List<TEntity>> UpdateAsync(List<TEntity> entities, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        try
+        {
+            ArgumentNullException.ThrowIfNull(entities, nameof(entities));
+            Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(UpdateAsync), entities);
+
+            Logger.LogDebug("Updating entity in db...");
+            var dboEntities = await Repository.UpdateAsync(entities, cancellationToken).ConfigureAwait(false);
+            Logger.LogDebug("Updated many {name} entities. {@dboEntities}", _entityName, dboEntities);
+
+            return dboEntities;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Unable to update many {name} entities: {reason}. {@entities}", _entityName, ex.Message, entities);
+            throw CreateProperException(ex);
+        }
     }
 
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(TId,Action{TEntity},CancellationToken)"/>
     /// </summary>
-    public Task<TEntity> UpdateAsync(TId id, Action<TEntity> update, CancellationToken cancellationToken = default)
+    public async Task<TEntity> UpdateAsync(TId id, Action<TEntity> update, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        try
+        {
+            ArgumentNullException.ThrowIfNull(id, nameof(id));
+            ArgumentNullException.ThrowIfNull(update, nameof(update));
+            Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(UpdateAsync), id);
+
+            Logger.LogDebug("Updating {name} entity with id '{id}' in db...", _entityName, id);
+            var dboEntity = await Repository.UpdateAsync(id, update, cancellationToken).ConfigureAwait(false);
+            Logger.LogDebug("Updated {name} entity with id {id}. {@dboEntity}", _entityName, id, dboEntity);
+
+            return dboEntity;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Unable to update a {name} entity by id '{id}': {reason}", _entityName, id, ex.Message);
+            throw CreateProperException(ex);
+        }
     }
 
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAsync(TId,CancellationToken)"/>
     /// </summary>
-    public Task DeleteAsync(TId id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(TId id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        try
+        {
+            ArgumentNullException.ThrowIfNull(id, nameof(id));
+            Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(DeleteAsync), id);
+
+            Logger.LogDebug("Deleting {name} entity with id '{id}' in db...", _entityName, id);
+            await Repository.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
+            Logger.LogDebug("Deleted {name} entity with id {id}", _entityName, id);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Unable to delete a {name} entity by id '{id}': {reason}", _entityName, id, ex.Message);
+            throw CreateProperException(ex);
+        }
     }
 
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAsync(List{TId},CancellationToken)"/>
     /// </summary>
-    public Task DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        try
+        {
+            ArgumentNullException.ThrowIfNull(ids, nameof(ids));
+            Logger.LogTrace("{serviceName}.{method} ids: {@ids}", _serviceName, nameof(DeleteAsync), ids);
+
+            Logger.LogDebug("Updating {name} entities in db...", _entityName);
+            await Repository.DeleteAsync(ids, cancellationToken).ConfigureAwait(false);
+            Logger.LogDebug("Deleted many {name} entites with ids: {@ids}", _entityName, ids);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Unable to delete many {name} entities by ids '{@ids}': {reason}", _entityName, ids, ex.Message);
+            throw CreateProperException(ex);
+        }
     }
 
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAndReturnAsync"/>
     /// </summary>
-    public Task<TEntity> DeleteAndReturnAsync(TId id, CancellationToken cancellationToken = default)
+    public async Task<TEntity> DeleteAndReturnAsync(TId id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        try
+        {
+            ArgumentNullException.ThrowIfNull(id, nameof(id));
+            Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(DeleteAndReturnAsync), id);
+
+            Logger.LogDebug("Deleting {name} entity with id '{id}' in db...", _entityName, id);
+            var dboEntity = await Repository.DeleteAndReturnAsync(id, cancellationToken).ConfigureAwait(false);
+            Logger.LogDebug("Deleted {name} entity with id {id}. {@dboEntity}", _entityName, id, dboEntity);
+
+            return dboEntity;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Unable to delete a {name} entity by id '{id}': {reason}", _entityName, id, ex.Message);
+            throw CreateProperException(ex);
+        }
+    }
+
+    private void LogMethod(string methodName)
+    {
+        if (Logger.IsEnabled(LogLevel.Trace))
+        {
+            Logger.LogTrace("{serviceName}.{method}", _serviceName, methodName);
+        }
     }
 }

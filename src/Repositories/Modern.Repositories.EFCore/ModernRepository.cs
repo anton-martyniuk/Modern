@@ -464,7 +464,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// Returns standardizes repository exception
+    /// Returns standardized repository exception
     /// </summary>
     /// <param name="ex">Original exception</param>
     /// <returns>Repository exception which holds original exception as InnerException</returns>
