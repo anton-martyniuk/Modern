@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using System.Linq.Expressions;
+using Modern.Cache.Abstractions;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Exceptions;
@@ -9,15 +9,15 @@ using Modern.Services.Abstractions.Query;
 namespace Modern.Services;
 
 /// <summary>
-/// Represents an <see cref="IModernEntityService{TEntityDto, TEntityDbo, TId, TRepository}"/> implementation
-/// with data access through generic repository
+/// Represents an <see cref="IModernCachedService{TEntityDto, TEntityDbo, TId, TRepository}"/> implementation
+/// with data access with caching and through generic repository
 /// </summary>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
 /// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
-    IModernEntityService<TEntityDto, TEntityDbo, TId, TRepository>
+public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
+    IModernCachedService<TEntityDto, TEntityDbo, TId, TRepository>
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
@@ -32,6 +32,11 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     protected readonly TRepository Repository;
 
     /// <summary>
+    /// The service cache
+    /// </summary>
+    protected readonly IModernCache<TEntityDto, TId> Cache;
+
+    /// <summary>
     /// The repository instance
     /// </summary>
     protected readonly ILogger Logger;
@@ -40,13 +45,15 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="repository">The generic repository</param>
+    /// <param name="cache">The cache of entities</param>
     /// <param name="logger">The logger</param>
-    protected ModernService(TRepository repository, ILogger logger)
+    protected ModernCachedService(TRepository repository, IModernCache<TEntityDto, TId> cache, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
         Repository = repository;
+        Cache = cache;
         Logger = logger;
     }
 
@@ -65,6 +72,13 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     protected abstract TEntityDto MapToDto(TEntityDbo entityDbo);
 
     /// <summary>
+    /// Returns entity id of type <typeparamref name="TId"/>
+    /// </summary>
+    /// <param name="entityDto">Entity Dto</param>
+    /// <returns>Entity id</returns>
+    protected abstract TId GetEntityId(TEntityDto entityDto);
+
+    /// <summary>
     /// Returns standardized service exception
     /// </summary>
     /// <param name="ex">Original exception</param>
@@ -81,7 +95,7 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         };
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.GetByIdAsync"/>
+    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.GetByIdAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
@@ -94,8 +108,9 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
                 Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(GetByIdAsync), id);
             }
 
-            var entityDbo = await Repository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
-            return MapToDto(entityDbo);
+            // TODO: await Cache ?
+            await Task.CompletedTask;
+            return Cache.GetById(id);
         }
         catch (Exception ex)
         {
@@ -105,7 +120,7 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.TryGetByIdAsync"/>
+    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.TryGetByIdAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto?> TryGetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
@@ -118,8 +133,8 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
                 Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(TryGetByIdAsync), id);
             }
 
-            var entityDbo = await Repository.TryGetByIdAsync(id, cancellationToken).ConfigureAwait(false);
-            return entityDbo is not null ? MapToDto(entityDbo) : null;
+            await Task.CompletedTask;
+            return Cache.TryGetById(id);
         }
         catch (Exception ex)
         {
@@ -129,7 +144,7 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.GetAllAsync"/>
+    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.GetAllAsync"/>
     /// </summary>
     public virtual async Task<List<TEntityDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
@@ -137,8 +152,8 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         {
             LogMethod(nameof(GetAllAsync));
 
-            var entitiesDbo = await Repository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-            return entitiesDbo.ConvertAll(MapToDto);
+            await Task.CompletedTask;
+            return Cache.GetAll().ToList();
         }
         catch (Exception ex)
         {
@@ -148,7 +163,7 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.CountAsync(CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.CountAsync(CancellationToken)"/>
     /// </summary>
     public virtual async Task<int> CountAsync(CancellationToken cancellationToken = default)
     {
@@ -159,7 +174,8 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
                 Logger.LogTrace("{serviceName}.{method} of all entities", _serviceName, nameof(CountAsync));
             }
 
-            return await Repository.CountAsync(cancellationToken).ConfigureAwait(false);
+            await Task.CompletedTask;
+            return Cache.Count();
         }
         catch (Exception ex)
         {
@@ -169,16 +185,17 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.CountAsync(Expression{Func{TEntityDbo, bool}},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.CountAsync(Func{TEntityDto, bool},CancellationToken)"/>
     /// </summary>
-    public virtual async Task<int> CountAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<int> CountAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             LogMethod(nameof(CountAsync));
 
-            return await Repository.CountAsync(predicate, cancellationToken).ConfigureAwait(false);
+            await Task.CompletedTask;
+            return Cache.Count(predicate);
         }
         catch (Exception ex)
         {
@@ -188,16 +205,17 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.ExistsAsync"/>
+    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.ExistsAsync"/>
     /// </summary>
-    public virtual async Task<bool> ExistsAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<bool> ExistsAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             LogMethod(nameof(ExistsAsync));
 
-            return await Repository.ExistsAsync(predicate, cancellationToken).ConfigureAwait(false);
+            await Task.CompletedTask;
+            return Cache.Exists(predicate);
         }
         catch (Exception ex)
         {
@@ -207,17 +225,17 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.FirstOrDefaultAsync"/>
+    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.FirstOrDefaultAsync"/>
     /// </summary>
-    public virtual async Task<TEntityDto?> FirstOrDefaultAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntityDto?> FirstOrDefaultAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             LogMethod(nameof(FirstOrDefaultAsync));
 
-            var entityDbo = await Repository.FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
-            return entityDbo is not null ? MapToDto(entityDbo) : null;
+            await Task.CompletedTask;
+            return Cache.FirstOrDefault(predicate);
         }
         catch (Exception ex)
         {
@@ -227,17 +245,17 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.SingleOrDefaultAsync"/>
+    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.SingleOrDefaultAsync"/>
     /// </summary>
-    public virtual async Task<TEntityDto?> SingleOrDefaultAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntityDto?> SingleOrDefaultAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             LogMethod(nameof(SingleOrDefaultAsync));
 
-            var entityDbo = await Repository.SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
-            return entityDbo is not null ? MapToDto(entityDbo) : null;
+            await Task.CompletedTask;
+            return Cache.SingleOrDefault(predicate);
         }
         catch (Exception ex)
         {
@@ -247,17 +265,17 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.WhereAsync"/>
+    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.WhereAsync"/>
     /// </summary>
-    public virtual async Task<List<TEntityDto>> WhereAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<List<TEntityDto>> WhereAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             LogMethod(nameof(WhereAsync));
 
-            var entitiesDbo = await Repository.WhereAsync(predicate, cancellationToken).ConfigureAwait(false);
-            return entitiesDbo.ConvertAll(MapToDto);
+            await Task.CompletedTask;
+            return Cache.Where(predicate).ToList();
         }
         catch (Exception ex)
         {
@@ -267,7 +285,25 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.AsQueryable"/>
+    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.AsQueryable"/>
+    /// </summary>
+    public virtual IEnumerable<TEntityDto> AsEnumerable()
+    {
+        try
+        {
+            LogMethod(nameof(AsEnumerable));
+
+            return Cache.GetAll();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Could not get {name} entities as Enumerable: {reason}", _entityName, ex.Message);
+            throw CreateProperException(ex);
+        }
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.AsQueryable"/>
     /// </summary>
     public virtual IQueryable<TEntityDbo> AsQueryable()
     {
@@ -294,12 +330,20 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
             Logger.LogTrace("{serviceName}.{method} entity: {@entity}", _serviceName, nameof(CreateAsync), entity);
 
-            Logger.LogDebug("Creating {name} entity in db...", _entityName);
             var entityDbo = MapToDbo(entity);
+
+            Logger.LogDebug("Creating {name} entity in db...", _entityName);
             entityDbo = await Repository.CreateAsync(entityDbo, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Created {name} entity. {@entityDbo}", _entityName, entityDbo);
 
-            return MapToDto(entityDbo);
+            var entityDto = MapToDto(entityDbo);
+            var entityId = GetEntityId(entityDto);
+
+            Logger.LogDebug("Creating {name} entity with id '{id}' in cache...", _entityName, entityId);
+            Cache.AddOrUpdate(entityId, entityDto);
+            Logger.LogDebug("Created {name} entity with id '{id}'. {@entityDto}", _entityName, entityId, entityDto);
+
+            return entityDto;
         }
         catch (Exception ex)
         {
@@ -318,12 +362,23 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             ArgumentNullException.ThrowIfNull(entities, nameof(entities));
             Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(CreateAsync), entities);
 
-            Logger.LogDebug("Creating {name} entities in db...", _entityName);
             var entitiesDbo = entities.ConvertAll(MapToDbo);
-            entitiesDbo = await Repository.CreateAsync(entitiesDbo, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Created many {name} entities. {@entityDbo}", _entityName, entitiesDbo);
 
-            return entitiesDbo.ConvertAll(MapToDto);
+            Logger.LogDebug("Creating {name} entities in db...", _entityName);
+            entitiesDbo = await Repository.CreateAsync(entitiesDbo, cancellationToken).ConfigureAwait(false);
+            Logger.LogDebug("Created many {name} entities. {@entitiesDbo}", _entityName, entitiesDbo);
+
+            var entitiesDto = entitiesDbo.ConvertAll(MapToDto);
+            foreach (var entityDto in entitiesDto)
+            {
+                var entityId = GetEntityId(entityDto);
+
+                Logger.LogDebug("Creating {name} entity with id '{id}' in cache...", _entityName, entityId);
+                Cache.AddOrUpdate(entityId, entityDto);
+                Logger.LogDebug("Created many {name} entities with id '{id}'. {@entityDto}", _entityName, entityId, entityDto);
+            }
+
+            return entitiesDto;
         }
         catch (Exception ex)
         {
@@ -349,7 +404,14 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             entityDbo = await Repository.UpdateAsync(id, entityDbo, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Updated {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDbo);
 
-            return MapToDto(entityDbo);
+            var entityDto = MapToDto(entityDbo);
+            var entityId = GetEntityId(entityDto);
+
+            Logger.LogDebug("Updating {name} entity with id '{id}' in cache...", _entityName, entityId);
+            Cache.AddOrUpdate(entityId, entityDto);
+            Logger.LogDebug("Updated {name} entity with id '{id}'. {@entityDto}", _entityName, entityId, entityDto);
+
+            return entityDto;
         }
         catch (Exception ex)
         {
@@ -374,7 +436,17 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             entitiesDbo = await Repository.UpdateAsync(entitiesDbo, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Updated many {name} entities. {@entitiesDbo}", _entityName, entitiesDbo);
 
-            return entitiesDbo.ConvertAll(MapToDto);
+            var entitiesDto = entitiesDbo.ConvertAll(MapToDto);
+            foreach (var entityDto in entitiesDto)
+            {
+                var entityId = GetEntityId(entityDto);
+
+                Logger.LogDebug("Updating {name} entity with id '{id}' in cache...", _entityName, entityId);
+                Cache.AddOrUpdate(entityId, entityDto);
+                Logger.LogDebug("Updated {name} entities with id '{id}'. {@entityDto}", _entityName, entityId, entityDto);
+            }
+
+            return entitiesDto;
         }
         catch (Exception ex)
         {
@@ -386,7 +458,7 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(TId,Action{TEntity},CancellationToken)"/>
     /// </summary>
-    public virtual async Task<TEntityDto> UpdateAsync(TId id, Action<TEntityDbo> update, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntityDto> UpdateAsync(TId id, Action<TEntityDto> update, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -394,11 +466,20 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             ArgumentNullException.ThrowIfNull(update, nameof(update));
             Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(UpdateAsync), id);
 
+            var entityDto = Cache.GetById(id);
+            update(entityDto);
+
+            Logger.LogDebug("Updating {name} entity with id '{id}' in cache...", _entityName, id);
+            Cache.AddOrUpdate(id, entityDto);
+            Logger.LogDebug("Updated {name} entity with id '{id}'. {@entityDto}", _entityName, id, entityDto);
+
+            var entityDbo = MapToDbo(entityDto);
+
             Logger.LogDebug("Updating {name} entity with id '{id}' in db...", _entityName, id);
-            var entityDbo = await Repository.UpdateAsync(id, update, cancellationToken).ConfigureAwait(false);
+            entityDbo = await Repository.UpdateAsync(id, entityDbo, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Updated {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDbo);
 
-            return MapToDto(entityDbo);
+            return entityDto;
         }
         catch (Exception ex)
         {
@@ -420,6 +501,10 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             Logger.LogDebug("Deleting {name} entity with id '{id}' in db...", _entityName, id);
             await Repository.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Deleted {name} entity with id {id}", _entityName, id);
+
+            Logger.LogDebug("Deleting {name} entity with id '{id}' from cache...", _entityName, id);
+            Cache.Delete(id);
+            Logger.LogDebug("Deleted {name} entity with id '{id}'", _entityName, id);
         }
         catch (Exception ex)
         {
@@ -441,6 +526,13 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             Logger.LogDebug("Updating {name} entities in db...", _entityName);
             await Repository.DeleteAsync(ids, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Deleted many {name} entites with ids: {@ids}", _entityName, ids);
+
+            foreach (var id in ids)
+            {
+                Logger.LogDebug("Deleting {name} entity with id '{id}' from cache...", _entityName, id);
+                Cache.Delete(id);
+                Logger.LogDebug("Deleted {name} entity with id '{id}'", _entityName, id);
+            }
         }
         catch (Exception ex)
         {
@@ -459,11 +551,20 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(DeleteAndReturnAsync), id);
 
+            // Check if entity exists in cache. If not - exception will be thrown.
+            Cache.GetById(id);
+
             Logger.LogDebug("Deleting {name} entity with id '{id}' in db...", _entityName, id);
             var entityDbo = await Repository.DeleteAndReturnAsync(id, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Deleted {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDbo);
 
-            return MapToDto(entityDbo);
+            var entityDto = Cache.GetById(id);
+
+            Logger.LogDebug("Deleting {name} entity with id '{id}' from cache...", _entityName, id);
+            Cache.Delete(id);
+            Logger.LogDebug("Deleted {name} entity with id '{id}'", _entityName, id);
+
+            return entityDto;
         }
         catch (Exception ex)
         {

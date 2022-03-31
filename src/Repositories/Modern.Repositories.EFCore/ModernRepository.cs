@@ -86,7 +86,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.CreateAsync(List{TEntity},CancellationToken)"/>
     /// </summary>
-    public async Task<List<TEntity>> CreateAsync(List<TEntity> entities, CancellationToken cancellationToken = default)
+    public virtual async Task<List<TEntity>> CreateAsync(List<TEntity> entities, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -118,7 +118,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(TId,TEntity,CancellationToken)"/>
     /// </summary>
-    public async Task<TEntity> UpdateAsync(TId id, TEntity entity, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntity> UpdateAsync(TId id, TEntity entity, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -147,7 +147,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(List{TEntity},CancellationToken)"/>
     /// </summary>
-    public async Task<List<TEntity>> UpdateAsync(List<TEntity> entities, CancellationToken cancellationToken = default)
+    public virtual async Task<List<TEntity>> UpdateAsync(List<TEntity> entities, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -204,7 +204,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAsync(TId,CancellationToken)"/>
     /// </summary>
-    public async Task DeleteAsync(TId id, CancellationToken cancellationToken = default)
+    public virtual async Task DeleteAsync(TId id, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -232,7 +232,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAsync(List{TId},CancellationToken)"/>
     /// </summary>
-    public async Task DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default)
+    public virtual async Task DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -415,7 +415,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.SingleOrDefaultAsync(Expression{Func{TEntity, bool}},CancellationToken)"/>
     /// </summary>
-    public async Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
     {
         try
         {

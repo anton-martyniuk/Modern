@@ -1,27 +1,28 @@
 ﻿using Modern.Exceptions;
-using Modern.Repositories.Abstractions.Exceptions;
 
-namespace Modern.Repositories.Abstractions;
+namespace Modern.Services.Abstractions.Crud;
 
 /// <summary>
-/// The generic repository definition for CRUD operations
+/// The generic service definition for CRUD operations
 /// </summary>
-/// <typeparam name="TEntity">The type of entity contained in the data store</typeparam>
+/// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
+/// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of the entity's identifier (mainly primary key)</typeparam>
-public interface IModernCrudRepository<TEntity, TId>
-    where TEntity : class
+public interface IModernCrudService<TEntityDto, TEntityDbo, TId>
+    where TEntityDto : class
+    where TEntityDbo : class
     where TId : IEquatable<TId>
 {
     /// <summary>
-    /// Creates the new entity in the data store
+    /// Creates the new entity
     /// </summary>
     /// <param name="entity">The entity to add to the data store</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <exception cref="ArgumentNullException">Thrown if provided entity is null</exception>
     /// <exception cref="EntityAlreadyExistsException">Thrown if an entity already exists in the data store</exception>
-    /// <exception cref="RepositoryErrorException">Thrown if an error occurred while saving the entity in the data store</exception>
+    /// <exception cref="InternalErrorException">Thrown if an error occurred while saving the entity in the data store</exception>
     /// <returns>Updated entity by the data store (primary key, for example)</returns>
-    Task<TEntity> CreateAsync(TEntity entity, CancellationToken cancellationToken = default);
+    Task<TEntityDto> CreateAsync(TEntityDto entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Creates a list of new entities in the data store
@@ -30,8 +31,8 @@ public interface IModernCrudRepository<TEntity, TId>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <returns>Updated entity by the data store (primary key, for example)</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided list of entities is null</exception>
-    /// <exception cref="RepositoryErrorException">Thrown if an error occurred while saving the entities in the data store</exception>
-    Task<List<TEntity>> CreateAsync(List<TEntity> entities, CancellationToken cancellationToken = default);
+    /// <exception cref="InternalErrorException">Thrown if an error occurred while saving the entities in the data store</exception>
+    Task<List<TEntityDto>> CreateAsync(List<TEntityDto> entities, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Updates the entity in the data store with the given <paramref name="id"/>
@@ -46,8 +47,8 @@ public interface IModernCrudRepository<TEntity, TId>
     /// <exception cref="ArgumentNullException">Thrown if provided id or entity is null</exception>
     /// <exception cref="EntityNotFoundException">Thrown if an entity does not exist in the data store</exception>
     /// <exception cref="EntityConcurrentUpdateException">If an entity concurrent update occurred</exception>
-    /// <exception cref="RepositoryErrorException">Thrown if an error occurred while updating the entity in the data store</exception>
-    Task<TEntity> UpdateAsync(TId id, TEntity entity, CancellationToken cancellationToken = default);
+    /// <exception cref="InternalErrorException">Thrown if an error occurred while updating the entity in the data store</exception>
+    Task<TEntityDto> UpdateAsync(TId id, TEntityDto entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Updates the list of entities in the data store with the given list of <paramref name="entities"/>.<br/>
@@ -58,11 +59,11 @@ public interface IModernCrudRepository<TEntity, TId>
     /// </summary>
     /// <param name="entities">The list of entities which should be updated in the data store</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>List of updated entities</returns>
+    /// <returns>List of updated entites</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided list of entities is null or has no entities in the list</exception>
     /// <exception cref="EntityConcurrentUpdateException">If an entity concurrent update occurred</exception>
-    /// <exception cref="RepositoryErrorException">Thrown if an error occurred while updating the entities in the data store</exception>
-    Task<List<TEntity>> UpdateAsync(List<TEntity> entities, CancellationToken cancellationToken = default);
+    /// <exception cref="InternalErrorException">Thrown if an error occurred while updating the entities in the data store</exception>
+    Task<List<TEntityDto>> UpdateAsync(List<TEntityDto> entities, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Updates the entity in the data store with the given <paramref name="id"/>
@@ -78,8 +79,8 @@ public interface IModernCrudRepository<TEntity, TId>
     /// <exception cref="ArgumentNullException">Thrown if provided id or entity is null</exception>
     /// <exception cref="EntityNotFoundException">Thrown if an entity does not exist in the data store</exception>
     /// <exception cref="EntityConcurrentUpdateException">If an entity concurrent update occurred</exception>
-    /// <exception cref="RepositoryErrorException">Thrown if an error occurred while updating the entity in the data store</exception>
-    Task<TEntity> UpdateAsync(TId id, Action<TEntity> update, CancellationToken cancellationToken = default);
+    /// <exception cref="InternalErrorException">Thrown if an error occurred while updating the entity in the data store</exception>
+    Task<TEntityDto> UpdateAsync(TId id, Action<TEntityDbo> update, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes the entity in the data store with the given <paramref name="id"/>.<br/>
@@ -88,7 +89,7 @@ public interface IModernCrudRepository<TEntity, TId>
     /// <param name="id">The entity id</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
-    /// <exception cref="RepositoryErrorException">Thrown if an error occurred while deleting the entity in the data store</exception>
+    /// <exception cref="InternalErrorException">Thrown if an error occurred while deleting the entity in the data store</exception>
     Task DeleteAsync(TId id, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -99,7 +100,7 @@ public interface IModernCrudRepository<TEntity, TId>
     /// <param name="ids">The list of entity ids</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <exception cref="ArgumentNullException">Thrown if provided list of entities is null or has no entities in the list</exception>
-    /// <exception cref="RepositoryErrorException">Thrown if an error occurred while deleting the entities in the data store</exception>
+    /// <exception cref="InternalErrorException">Thrown if an error occurred while deleting the entities in the data store</exception>
     Task DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -111,6 +112,6 @@ public interface IModernCrudRepository<TEntity, TId>
     /// <returns>Deleted entity</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
     /// <exception cref="EntityNotFoundException">Thrown if an entity does not exist in the data store</exception>
-    /// <exception cref="RepositoryErrorException">Thrown if an error occurred while deleting the entity in the data store</exception>
-    Task<TEntity> DeleteAndReturnAsync(TId id, CancellationToken cancellationToken = default);
+    /// <exception cref="InternalErrorException">Thrown if an error occurred while deleting the entity in the data store</exception>
+    Task<TEntityDto> DeleteAndReturnAsync(TId id, CancellationToken cancellationToken = default);
 }

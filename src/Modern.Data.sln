@@ -25,7 +25,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cache", "Cache", "{0A73C50F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Cache.Abstractions", "Cache\Modern.Cache.Abstractions\Modern.Cache.Abstractions.csproj", "{F0154CCA-F9CD-4B2E-BBD0-7981D281CD5F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Services.Cache.Concrete", "Cache\Modern.Cache.InMemory\Modern.Cache.InMemory.csproj", "{E28ADC46-957D-4EEF-A748-3E4A7ECD1D93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Cache.InMemory", "Cache\Modern.Cache.InMemory\Modern.Cache.InMemory.csproj", "{E28ADC46-957D-4EEF-A748-3E4A7ECD1D93}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApi", "WebApi", "{88AE7017-A15C-462D-8A0B-8EE426BE4C52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers", "WebApi\Modern.Controllers\Modern.Controllers.csproj", "{DE8307CF-B9BA-4059-B8DB-E96CE540C593}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Application.Host", "Host\Modern.Application.Host\Modern.Application.Host.csproj", "{7F44CB25-5A78-4ADF-A6C5-C865797968F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +71,14 @@ Global
 		{E28ADC46-957D-4EEF-A748-3E4A7ECD1D93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E28ADC46-957D-4EEF-A748-3E4A7ECD1D93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E28ADC46-957D-4EEF-A748-3E4A7ECD1D93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE8307CF-B9BA-4059-B8DB-E96CE540C593}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE8307CF-B9BA-4059-B8DB-E96CE540C593}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE8307CF-B9BA-4059-B8DB-E96CE540C593}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE8307CF-B9BA-4059-B8DB-E96CE540C593}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F44CB25-5A78-4ADF-A6C5-C865797968F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F44CB25-5A78-4ADF-A6C5-C865797968F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F44CB25-5A78-4ADF-A6C5-C865797968F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F44CB25-5A78-4ADF-A6C5-C865797968F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,6 +92,7 @@ Global
 		{E5A29F25-7A16-49A5-A94F-B71FA4BCAEC5} = {13870957-6CA2-4621-BB55-D4B9A0F25BDA}
 		{F0154CCA-F9CD-4B2E-BBD0-7981D281CD5F} = {0A73C50F-EB6D-4A46-9D14-7A745ADCDC8B}
 		{E28ADC46-957D-4EEF-A748-3E4A7ECD1D93} = {0A73C50F-EB6D-4A46-9D14-7A745ADCDC8B}
+		{DE8307CF-B9BA-4059-B8DB-E96CE540C593} = {88AE7017-A15C-462D-8A0B-8EE426BE4C52}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94D244EE-259E-401A-A55F-7D833CA4DC5E}
