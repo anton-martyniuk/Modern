@@ -3,25 +3,28 @@ using Modern.Repositories.EFCore.Configuration;
 using System.Data;
 using System.Linq.Expressions;
 using Ardalis.GuardClauses;
+using Microsoft.Extensions.Options;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Exceptions;
-using Modern.Repositories.EFCore.Extensions;
+using Modern.Repositories.Abstractions.Infrastracture;
 using Modern.Repositories.EFCore.Query;
 
 namespace Modern.Repositories.EFCore;
 
 /// <summary>
-/// Represents an <see cref="IModernCrudRepository{TEntity,TId}"/> and <see cref="IModernQueryRepository{TEntity,TId}"/> implementation using EFCore
+/// Represents an <see cref="IModernCrudRepository{TEntity, TId}"/> and <see cref="IModernQueryRepository{TEntity, TId}"/> implementation using EFCore
 /// </summary>
 /// <typeparam name="TDbContext">The type of EF Core DbContext</typeparam>
 /// <typeparam name="TEntity">The type of entity</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
-public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<TEntity, TId>, IModernQueryRepository<TEntity, TId>
+public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<TEntity, TId>, IModernQueryRepository<TEntity, TId>
     where TDbContext : DbContext
     where TEntity : class
     where TId : IEquatable<TId>
 {
+    private readonly string _entityName = typeof(TEntity).Name;
+
     private readonly EfCoreRepositoryConfiguration? _configuration;
 
     /// <summary>
@@ -45,15 +48,39 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     /// </summary>
     /// <param name="dbContextFactory">The <see cref="IDbContextFactory{TDbContext}"/> implementation</param>
     /// <param name="configuration">Repository configuration</param>
-    public ModernRepository(IDbContextFactory<TDbContext> dbContextFactory, EfCoreRepositoryConfiguration? configuration = null)
+    protected ModernRepository(IDbContextFactory<TDbContext> dbContextFactory, IOptions<EfCoreRepositoryConfiguration?> configuration)
     {
-        // TODO: use IOptions or Snapshot
         DbContextFactory = dbContextFactory;
-        _configuration = configuration;
+        _configuration = configuration.Value;
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.CreateAsync(TEntity,CancellationToken)"/>
+    /// Returns entity id of type <typeparamref name="TId"/>
+    /// </summary>
+    /// <param name="entity">Entity</param>
+    /// <returns>Entity id</returns>
+    protected abstract TId GetEntityId(TEntity entity);
+
+    /// <summary>
+    /// Returns standardized repository exception
+    /// </summary>
+    /// <param name="ex">Original exception</param>
+    /// <returns>Repository exception which holds original exception as InnerException</returns>
+    protected virtual Exception CreateProperException(Exception ex)
+    {
+        return ex switch
+        {
+            ArgumentException _ => ex,
+            DbUpdateConcurrencyException _ => new EntityConcurrentUpdateException(ex.Message, ex),
+            EntityAlreadyExistsException _ => ex,
+            EntityNotFoundException _ => ex,
+            EntityNotModifiedException _ => ex,
+            _ => new RepositoryErrorException(ex.Message, ex)
+        };
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="IModernCrudRepository{TEntity, TId}.CreateAsync(TEntity,CancellationToken)"/>
     /// </summary>
     public virtual async Task<TEntity> CreateAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
@@ -84,7 +111,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.CreateAsync(List{TEntity},CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudRepository{TEntity, TId}.CreateAsync(List{TEntity},CancellationToken)"/>
     /// </summary>
     public virtual async Task<List<TEntity>> CreateAsync(List<TEntity> entities, CancellationToken cancellationToken = default)
     {
@@ -116,7 +143,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(TId,TEntity,CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudRepository{TEntity, TId}.UpdateAsync(TId,TEntity,CancellationToken)"/>
     /// </summary>
     public virtual async Task<TEntity> UpdateAsync(TId id, TEntity entity, CancellationToken cancellationToken = default)
     {
@@ -145,7 +172,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(List{TEntity},CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudRepository{TEntity, TId}.UpdateAsync(List{TEntity},CancellationToken)"/>
     /// </summary>
     public virtual async Task<List<TEntity>> UpdateAsync(List<TEntity> entities, CancellationToken cancellationToken = default)
     {
@@ -174,7 +201,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(TId, Action{TEntity}, CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudRepository{TEntity, TId}.UpdateAsync(TId, Action{TEntity}, CancellationToken)"/>
     /// </summary>
     public virtual async Task<TEntity> UpdateAsync(TId id, Action<TEntity> update, CancellationToken cancellationToken = default)
     {
@@ -202,7 +229,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAsync(TId,CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudRepository{TEntity, TId}.DeleteAsync(TId,CancellationToken)"/>
     /// </summary>
     public virtual async Task DeleteAsync(TId id, CancellationToken cancellationToken = default)
     {
@@ -230,7 +257,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAsync(List{TId},CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudRepository{TEntity, TId}.DeleteAsync(List{TId},CancellationToken)"/>
     /// </summary>
     public virtual async Task DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default)
     {
@@ -258,7 +285,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
         }
     }
 
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAndReturnAsync"/>
+    /// <inheritdoc cref="IModernCrudRepository{TEntity, TId}.DeleteAndReturnAsync"/>
     public virtual async Task<TEntity> DeleteAndReturnAsync(TId id, CancellationToken cancellationToken = default)
     {
         try
@@ -285,19 +312,28 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.GetByIdAsync"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.GetByIdAsync"/>
     /// </summary>
-    public virtual async Task<TEntity> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntity> GetByIdAsync(TId id, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
-            var entity = await context.Set<TEntity>().FindAsync(new object?[] { id }, cancellationToken).ConfigureAwait(false);
+
+            var query = context.Set<TEntity>().AsQueryable();
+            if (includeQuery is not null)
+            {
+                query = includeQuery(query);
+            }
+
+            var idName = GetEntityIdColumnOrThrow(context);
+            //var entity = await query.FindAsync(new object?[] { id }, cancellationToken).ConfigureAwait(false);
+            var entity = await query.SingleOrDefaultAsync(x => id.Equals(EF.Property<TId>(x, idName)), cancellationToken).ConfigureAwait(false);
             if (entity is null)
             {
-                throw new EntityNotFoundException($"Entity with id '{id}' not found");
+                throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
             }
 
             return entity;
@@ -309,7 +345,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.TryGetByIdAsync"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.TryGetByIdAsync"/>
     /// </summary>
     public virtual async Task<TEntity?> TryGetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
@@ -327,7 +363,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.GetAllAsync"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.GetAllAsync"/>
     /// </summary>
     public virtual async Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
     {
@@ -343,7 +379,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.CountAsync(CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.CountAsync(CancellationToken)"/>
     /// </summary>
     public virtual async Task<int> CountAsync(CancellationToken cancellationToken = default)
     {
@@ -359,7 +395,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.CountAsync(Expression{Func{TEntity, bool}},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.CountAsync(Expression{Func{TEntity, bool}},CancellationToken)"/>
     /// </summary>
     public virtual async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
     {
@@ -377,7 +413,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.ExistsAsync(Expression{Func{TEntity, bool}},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.ExistsAsync(Expression{Func{TEntity, bool}},CancellationToken)"/>
     /// </summary>
     public virtual async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
     {
@@ -395,7 +431,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.FirstOrDefaultAsync(Expression{Func{TEntity, bool}},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.FirstOrDefaultAsync(Expression{Func{TEntity, bool}},CancellationToken)"/>
     /// </summary>
     public virtual async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
     {
@@ -413,7 +449,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.SingleOrDefaultAsync(Expression{Func{TEntity, bool}},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.SingleOrDefaultAsync(Expression{Func{TEntity, bool}},CancellationToken)"/>
     /// </summary>
     public virtual async Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
     {
@@ -431,7 +467,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.WhereAsync"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.WhereAsync"/>
     /// </summary>
     public virtual async Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
     {
@@ -448,8 +484,10 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
         }
     }
 
+    // TODO: delete AsQueryable ?!
+
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.AsQueryable"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.AsQueryable"/>
     /// </summary>
     public virtual IQueryable<TEntity> AsQueryable()
     {
@@ -464,24 +502,6 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     }
 
     /// <summary>
-    /// Returns standardized repository exception
-    /// </summary>
-    /// <param name="ex">Original exception</param>
-    /// <returns>Repository exception which holds original exception as InnerException</returns>
-    protected virtual Exception CreateProperException(Exception ex)
-    {
-        return ex switch
-        {
-            ArgumentException _ => ex,
-            DbUpdateConcurrencyException _ => new EntityConcurrentUpdateException(ex.Message, ex),
-            EntityAlreadyExistsException _ => ex,
-            EntityNotFoundException _ => ex,
-            EntityNotModifiedException _ => ex,
-            _ => new RepositoryErrorException(ex.Message, ex)
-        };
-    }
-
-    /// <summary>
     /// Performs update operation
     /// </summary>
     /// <param name="context">DbContext</param>
@@ -489,12 +509,12 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     /// <param name="entity">Entity which should be updated</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <returns>Updated entity</returns>
-    private static async Task<TEntity> PerformUpdateAsync(TDbContext context, TId id, TEntity entity, CancellationToken cancellationToken)
+    private async Task<TEntity> PerformUpdateAsync(TDbContext context, TId id, TEntity entity, CancellationToken cancellationToken)
     {
         var existingEntity = await context.Set<TEntity>().FindAsync(new object?[] { id }, cancellationToken).ConfigureAwait(false);
         if (existingEntity is null)
         {
-            throw new EntityNotFoundException($"Entity with id '{id}' not found");
+            throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
         }
 
         context.Entry(existingEntity).CurrentValues.SetValues(entity);
@@ -511,19 +531,20 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <returns>Updated entity</returns>
     /// <exception cref="ArgumentException">Thrown when entity does not have any primary key defined</exception>
-    private static async Task<List<TEntity>> PerformUpdateAsync(TDbContext context, List<TEntity> entities, CancellationToken cancellationToken)
+    private async Task<List<TEntity>> PerformUpdateAsync(TDbContext context, List<TEntity> entities, CancellationToken cancellationToken)
     {
-        var entityType = context.Set<TEntity>().EntityType;
-        var keyName = entityType.FindPrimaryKey()?.Properties.Select(x => x.Name).SingleOrDefault();
-        if (keyName is null)
-        {
-            throw new ArgumentException("Entity does not have any primary key defined", nameof(entityType));
-        }
+        var idName = GetEntityIdColumnOrThrow(context);
+        //var entityType = context.Set<TEntity>().EntityType;
+        //var keyName = entityType.FindPrimaryKey()?.Properties.Select(x => x.Name).SingleOrDefault();
 
         foreach (var entity in entities)
         {
-            var id = entity.GetType().GetProperty(keyName)?.GetValue(entity, null);
-            await context.Set<TEntity>().WhereIdEquals(entityType, id).UpdateFromQueryAsync(_ => entity, cancellationToken).ConfigureAwait(false);
+            //var id = entity.GetType().GetProperty(idName)?.GetValue(entity, null);
+            //await context.Set<TEntity>().WhereIdEquals(entityType, id).UpdateFromQueryAsync(_ => entity, cancellationToken).ConfigureAwait(false);
+            //await context.Set<TEntity>().Where(x => GetEntityId(x, entity)).UpdateFromQueryAsync(_ => entity, cancellationToken).ConfigureAwait(false);
+
+            var entityId = GetEntityId(entity);
+            await context.Set<TEntity>().Where(x => entityId.Equals(EF.Property<TId>(x, idName))).UpdateFromQueryAsync(_ => entity, cancellationToken).ConfigureAwait(false);
         }
 
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -560,10 +581,13 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     /// <param name="id">Entity id</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <returns>Deleted entity</returns>
-    private static async Task PerformDeleteAsync(TDbContext context, TId id, CancellationToken cancellationToken)
+    private async Task PerformDeleteAsync(TDbContext context, TId id, CancellationToken cancellationToken)
     {
-        var entityType = context.Set<TEntity>().EntityType;
-        await context.Set<TEntity>().WhereIdEquals(entityType, id).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
+        //var entityType = context.Set<TEntity>().EntityType;
+        //await context.Set<TEntity>().WhereIdEquals(entityType, id).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
+
+        var idName = GetEntityIdColumnOrThrow(context);
+        await context.Set<TEntity>().Where(x => id.Equals(EF.Property<TId>(x, idName))).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -574,10 +598,13 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <exception cref="ArgumentException">Thrown when entity does not have any primary key defined</exception>
     /// <returns>Deleted entity</returns>
-    private static async Task PerformDeleteAsync(TDbContext context, List<TId> ids, CancellationToken cancellationToken)
+    private async Task PerformDeleteAsync(TDbContext context, List<TId> ids, CancellationToken cancellationToken)
     {
-        var entityType = context.Set<TEntity>().EntityType;
-        await context.Set<TEntity>().WhereIdEquals(entityType, ids).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
+        //var entityType = context.Set<TEntity>().EntityType;
+        //await context.Set<TEntity>().WhereIdEquals(entityType, ids).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
+
+        var idName = GetEntityIdColumnOrThrow(context);
+        await context.Set<TEntity>().Where(x => ids.Contains(EF.Property<TId>(x, idName))).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -587,16 +614,33 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<
     /// <param name="id">Entity id</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <returns>Deleted entity</returns>
-    private static async Task<TEntity> PerformDeleteAndReturnAsync(TDbContext context, TId id, CancellationToken cancellationToken)
+    private async Task<TEntity> PerformDeleteAndReturnAsync(TDbContext context, TId id, CancellationToken cancellationToken)
     {
         var entity = await context.Set<TEntity>().FindAsync(new object?[] { id }, cancellationToken).ConfigureAwait(false);
         if (entity is null)
         {
-            throw new EntityNotFoundException($"Entity with id '{id}' not found");
+            throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
         }
 
         context.Set<TEntity>().Remove(entity);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return entity;
+    }
+
+    /// <summary>
+    /// Return entity id column name or throws exception if entity does not have any primary key defined
+    /// </summary>
+    /// <param name="context">DbContext</param>
+    /// <exception cref="ArgumentException">Thrown when entity does not have any primary key defined</exception>
+    /// <returns>Entity id column name</returns>
+    private string GetEntityIdColumnOrThrow(TDbContext context)
+    {
+        var idName = context.Model.FindEntityType(typeof(TEntity))?.FindPrimaryKey()?.Properties.SingleOrDefault()?.Name;
+        if (idName is null)
+        {
+            throw new ArgumentException($"{_entityName} entity does not have any primary key defined", _entityName);
+        }
+
+        return idName;
     }
 }

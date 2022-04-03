@@ -6,11 +6,9 @@ namespace Modern.Services.Abstractions.Crud;
 /// The generic service definition for CRUD cached operations
 /// </summary>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
-/// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of the entity's identifier (mainly primary key)</typeparam>
-public interface IModernCrudCachedService<TEntityDto, TEntityDbo, TId>
+public interface IModernCrudCachedService<TEntityDto, TId>
     where TEntityDto : class
-    where TEntityDbo : class
     where TId : IEquatable<TId>
 {
     /// <summary>

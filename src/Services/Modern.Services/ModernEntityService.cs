@@ -9,15 +9,15 @@ using Modern.Services.Abstractions.Query;
 namespace Modern.Services;
 
 /// <summary>
-/// Represents an <see cref="IModernEntityService{TEntityDto, TEntityDbo, TId, TRepository}"/> implementation
+/// Represents an <see cref="IModernEntityService{TEntityDto, TEntityDbo, TId}"/> implementation
 /// with data access through generic repository
 /// </summary>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
 /// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
-    IModernEntityService<TEntityDto, TEntityDbo, TId, TRepository>
+public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TRepository> :
+    IModernEntityService<TEntityDto, TEntityDbo, TId>
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
@@ -41,7 +41,7 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// </summary>
     /// <param name="repository">The generic repository</param>
     /// <param name="logger">The logger</param>
-    protected ModernService(TRepository repository, ILogger logger)
+    protected ModernEntityService(TRepository repository, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
@@ -83,7 +83,7 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// <summary>
     /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.GetByIdAsync"/>
     /// </summary>
-    public virtual async Task<TEntityDto> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntityDto> GetByIdAsync(TId id, Func<IQueryable<TEntityDbo>, IQueryable<TEntityDbo>>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -94,7 +94,7 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
                 Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(GetByIdAsync), id);
             }
 
-            var entityDbo = await Repository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
+            var entityDbo = await Repository.GetByIdAsync(id, includeQuery, cancellationToken).ConfigureAwait(false);
             return MapToDto(entityDbo);
         }
         catch (Exception ex)
@@ -440,7 +440,7 @@ public abstract class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             Logger.LogDebug("Updating {name} entities in db...", _entityName);
             await Repository.DeleteAsync(ids, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Deleted many {name} entites with ids: {@ids}", _entityName, ids);
+            Logger.LogDebug("Deleted many {name} entities with ids: {@ids}", _entityName, ids);
         }
         catch (Exception ex)
         {

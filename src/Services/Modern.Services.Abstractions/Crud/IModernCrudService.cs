@@ -8,7 +8,7 @@ namespace Modern.Services.Abstractions.Crud;
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of the entity's identifier (mainly primary key)</typeparam>
-public interface IModernCrudService<TEntityDto, TEntityDbo, TId>
+public interface IModernCrudService<TEntityDto, out TEntityDbo, TId>
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
@@ -59,7 +59,7 @@ public interface IModernCrudService<TEntityDto, TEntityDbo, TId>
     /// </summary>
     /// <param name="entities">The list of entities which should be updated in the data store</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>List of updated entites</returns>
+    /// <returns>List of updated entities</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided list of entities is null or has no entities in the list</exception>
     /// <exception cref="EntityConcurrentUpdateException">If an entity concurrent update occurred</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while updating the entities in the data store</exception>

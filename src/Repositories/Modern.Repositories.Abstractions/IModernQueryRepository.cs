@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions.Exceptions;
+using Modern.Repositories.Abstractions.Infrastracture;
 
 namespace Modern.Repositories.Abstractions;
 
@@ -17,12 +18,13 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// Returns an entity from the data store with the given <paramref name="id"/>
     /// </summary>
     /// <param name="id">The entity id</param>
+    /// <param name="includeQuery">Expression that describes included entities</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <returns>Found entity</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
     /// <exception cref="EntityNotFoundException">Thrown if an entity does is not found in the data store</exception>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
-    Task<TEntity> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
+    Task<TEntity> GetByIdAsync(TId id, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeQuery = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Tries to return an entity from the data store with the given <paramref name="id"/>; otherwise, <see langword="null"/>

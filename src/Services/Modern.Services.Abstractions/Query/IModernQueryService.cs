@@ -3,8 +3,6 @@ using Modern.Exceptions;
 
 namespace Modern.Services.Abstractions.Query;
 
-// TODO: TEntity → TEntityDbo
-
 /// <summary>
 /// The generic service definition for querying operations
 /// </summary>
@@ -20,12 +18,13 @@ public interface IModernQueryService<TEntityDto, TEntityDbo, in TId>
     /// Returns an entity with the given <paramref name="id"/>
     /// </summary>
     /// <param name="id">The entity id</param>
+    /// <param name="includeQuery">Expression that describes included entities</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <returns>The entity</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
     /// <exception cref="EntityNotFoundException">Thrown if an entity does is not found</exception>
     /// <exception cref="InternalErrorException">If a service internal error occurred</exception>
-    Task<TEntityDto> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
+    Task<TEntityDto> GetByIdAsync(TId id, Func<IQueryable<TEntityDbo>, IQueryable<TEntityDbo>>? includeQuery = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Tries to return an entity with the given <paramref name="id"/>; otherwise, <see langword="null"/>

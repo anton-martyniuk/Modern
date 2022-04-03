@@ -9,7 +9,7 @@ using Modern.Services.Abstractions.Query;
 namespace Modern.Services;
 
 /// <summary>
-/// Represents an <see cref="IModernCachedService{TEntityDto, TEntityDbo, TId, TRepository}"/> implementation
+/// Represents an <see cref="IModernCachedService{TEntityDto,TEntityDbo,TId}"/> implementation
 /// with data access with caching and through generic repository
 /// </summary>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
@@ -17,7 +17,7 @@ namespace Modern.Services;
 /// <typeparam name="TId">The type of entity identifier</typeparam>
 /// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
 public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
-    IModernCachedService<TEntityDto, TEntityDbo, TId, TRepository>
+    IModernCachedService<TEntityDto, TEntityDbo, TId>
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
@@ -525,7 +525,7 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
 
             Logger.LogDebug("Updating {name} entities in db...", _entityName);
             await Repository.DeleteAsync(ids, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Deleted many {name} entites with ids: {@ids}", _entityName, ids);
+            Logger.LogDebug("Deleted many {name} entities with ids: {@ids}", _entityName, ids);
 
             foreach (var id in ids)
             {
