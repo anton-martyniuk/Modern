@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq.Expressions;
 using Ardalis.GuardClauses;
 using Microsoft.Extensions.Options;
+using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Exceptions;
@@ -87,6 +88,7 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
         try
         {
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.CreateConfiguration?.NeedExecuteInTransaction is not true)
@@ -119,6 +121,7 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
         {
             ArgumentNullException.ThrowIfNull(entities, nameof(entities));
             Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.CreateConfiguration?.NeedExecuteInTransaction is not true)
@@ -151,6 +154,7 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.UpdateConfiguration?.NeedExecuteInTransaction is not true)
@@ -180,6 +184,7 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
         {
             ArgumentNullException.ThrowIfNull(entities, nameof(entities));
             Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.UpdateConfiguration?.NeedExecuteInTransaction is not true)
@@ -208,6 +213,7 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
         try
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.UpdateConfiguration?.NeedExecuteInTransaction is not true)
@@ -236,6 +242,7 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
         try
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.DeleteConfiguration?.NeedExecuteInTransaction != true)
@@ -265,6 +272,7 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
         {
             ArgumentNullException.ThrowIfNull(ids, nameof(ids));
             Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.DeleteConfiguration?.NeedExecuteInTransaction != true)
@@ -291,6 +299,7 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
         try
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.DeleteConfiguration?.NeedExecuteInTransaction != true)
@@ -314,28 +323,20 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.GetByIdAsync"/>
     /// </summary>
-    public virtual async Task<TEntity> GetByIdAsync(TId id, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeQuery = null, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntity> GetByIdAsync(TId id, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
-            var query = context.Set<TEntity>().AsQueryable();
-            if (includeQuery is not null)
-            {
-                query = includeQuery(query);
-            }
-
-            var idName = GetEntityIdColumnOrThrow(context);
-            //var entity = await query.FindAsync(new object?[] { id }, cancellationToken).ConfigureAwait(false);
-            var entity = await query.SingleOrDefaultAsync(x => id.Equals(EF.Property<TId>(x, idName)), cancellationToken).ConfigureAwait(false);
+            var entity = await GetEntityByIdImpl(context, id, includeQuery, cancellationToken).ConfigureAwait(false);
             if (entity is null)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
             }
-
             return entity;
         }
         catch (Exception ex)
@@ -347,14 +348,15 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.TryGetByIdAsync"/>
     /// </summary>
-    public virtual async Task<TEntity?> TryGetByIdAsync(TId id, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntity?> TryGetByIdAsync(TId id, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
-            return await context.Set<TEntity>().FindAsync(new object?[] { id }, cancellationToken).ConfigureAwait(false);
+            return await GetEntityByIdImpl(context, id, includeQuery, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -365,12 +367,22 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.GetAllAsync"/>
     /// </summary>
-    public virtual async Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
+    public virtual async Task<List<TEntity>> GetAllAsync(EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
-            return await context.Set<TEntity>().AsNoTracking().ToListAsync(cancellationToken).ConfigureAwait(false);
+
+            if (includeQuery is null)
+            {
+                return await context.Set<TEntity>().ToListAsync(cancellationToken).ConfigureAwait(false);
+            }
+
+            var query = context.Set<TEntity>().AsNoTracking();
+            query = includeQuery.GetExpression(query);
+            return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -385,6 +397,8 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
     {
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
             return await context.Set<TEntity>().AsNoTracking().CountAsync(cancellationToken).ConfigureAwait(false);
         }
@@ -395,16 +409,25 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.CountAsync(Expression{Func{TEntity, bool}},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.CountAsync(Expression{Func{TEntity, bool}},EntityIncludeQuery{TEntity},CancellationToken)"/>
     /// </summary>
-    public virtual async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
-            return await context.Set<TEntity>().AsNoTracking().CountAsync(predicate, cancellationToken).ConfigureAwait(false);
+
+            if (includeQuery is null)
+            {
+                return await context.Set<TEntity>().AsNoTracking().CountAsync(predicate, cancellationToken).ConfigureAwait(false);
+            }
+
+            var query = context.Set<TEntity>().AsNoTracking();
+            query = includeQuery.GetExpression(query);
+            return await query.CountAsync(predicate, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -413,16 +436,25 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.ExistsAsync(Expression{Func{TEntity, bool}},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.ExistsAsync(Expression{Func{TEntity, bool}},EntityIncludeQuery{TEntity},CancellationToken)"/>
     /// </summary>
-    public virtual async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
-            return await context.Set<TEntity>().AsNoTracking().AnyAsync(predicate, cancellationToken).ConfigureAwait(false);
+
+            if (includeQuery is null)
+            {
+                return await context.Set<TEntity>().AsNoTracking().AnyAsync(predicate, cancellationToken).ConfigureAwait(false);
+            }
+
+            var query = context.Set<TEntity>().AsNoTracking();
+            query = includeQuery.GetExpression(query);
+            return await query.AnyAsync(predicate, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -431,16 +463,25 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.FirstOrDefaultAsync(Expression{Func{TEntity, bool}},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.FirstOrDefaultAsync(Expression{Func{TEntity, bool}},EntityIncludeQuery{TEntity},CancellationToken)"/>
     /// </summary>
-    public virtual async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
-            return await context.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+
+            if (includeQuery is null)
+            {
+                return await context.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+            }
+
+            var query = context.Set<TEntity>().AsNoTracking();
+            query = includeQuery.GetExpression(query);
+            return await query.FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -449,16 +490,25 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.SingleOrDefaultAsync(Expression{Func{TEntity, bool}},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.SingleOrDefaultAsync(Expression{Func{TEntity, bool}},EntityIncludeQuery{TEntity},CancellationToken)"/>
     /// </summary>
-    public virtual async Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
-            return await context.Set<TEntity>().AsNoTracking().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+
+            if (includeQuery is null)
+            {
+                return await context.Set<TEntity>().AsNoTracking().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+            }
+
+            var query = context.Set<TEntity>().AsNoTracking();
+            query = includeQuery.GetExpression(query);
+            return await query.SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -467,16 +517,62 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.WhereAsync"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.WhereAsync(Expression{Func{TEntity, bool}},EntityIncludeQuery{TEntity},CancellationToken)"/>
     /// </summary>
-    public virtual async Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
-            return await context.Set<TEntity>().AsNoTracking().Where(predicate).ToListAsync(cancellationToken).ConfigureAwait(false);
+
+            if (includeQuery is null)
+            {
+                return await context.Set<TEntity>().AsNoTracking().Where(predicate).ToListAsync(cancellationToken).ConfigureAwait(false);
+            }
+
+            var query = context.Set<TEntity>().AsNoTracking();
+            query = includeQuery.GetExpression(query);
+            return await query.Where(predicate).ToListAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            throw CreateProperException(ex);
+        }
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.WhereAsync(Expression{Func{TEntity, bool}},int,int,EntityIncludeQuery{TEntity},CancellationToken)"/>
+    /// </summary>
+    public async Task<PagedResult<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, int pageNumber, int pageSize, EntityIncludeQuery<TEntity>? includeQuery = null,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
+
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
+
+            var pagedResult = new PagedResult<TEntity>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = await context.Set<TEntity>().AsNoTracking().CountAsync(predicate, cancellationToken).ConfigureAwait(false)
+            };
+
+            var query = context.Set<TEntity>().AsNoTracking();
+            query = includeQuery is null ? query : includeQuery.GetExpression(query);
+
+            pagedResult.Items = await query
+                .Where(predicate)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken).ConfigureAwait(false);
+            
+            return pagedResult;
         }
         catch (Exception ex)
         {
@@ -485,6 +581,8 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
     }
 
     // TODO: delete AsQueryable ?!
+
+    // TODO: AsQueryable works only in NON async mode!
 
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.AsQueryable"/>
@@ -543,7 +641,7 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
             //await context.Set<TEntity>().WhereIdEquals(entityType, id).UpdateFromQueryAsync(_ => entity, cancellationToken).ConfigureAwait(false);
             //await context.Set<TEntity>().Where(x => GetEntityId(x, entity)).UpdateFromQueryAsync(_ => entity, cancellationToken).ConfigureAwait(false);
 
-            var entityId = GetEntityId(entity);
+            var entityId = GetEntityId(entity); // TODO: is this needed?
             await context.Set<TEntity>().Where(x => entityId.Equals(EF.Property<TId>(x, idName))).UpdateFromQueryAsync(_ => entity, cancellationToken).ConfigureAwait(false);
         }
 
@@ -583,9 +681,6 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
     /// <returns>Deleted entity</returns>
     private async Task PerformDeleteAsync(TDbContext context, TId id, CancellationToken cancellationToken)
     {
-        //var entityType = context.Set<TEntity>().EntityType;
-        //await context.Set<TEntity>().WhereIdEquals(entityType, id).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
-
         var idName = GetEntityIdColumnOrThrow(context);
         await context.Set<TEntity>().Where(x => id.Equals(EF.Property<TId>(x, idName))).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -600,9 +695,6 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
     /// <returns>Deleted entity</returns>
     private async Task PerformDeleteAsync(TDbContext context, List<TId> ids, CancellationToken cancellationToken)
     {
-        //var entityType = context.Set<TEntity>().EntityType;
-        //await context.Set<TEntity>().WhereIdEquals(entityType, ids).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
-
         var idName = GetEntityIdColumnOrThrow(context);
         await context.Set<TEntity>().Where(x => ids.Contains(EF.Property<TId>(x, idName))).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -625,6 +717,28 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
         context.Set<TEntity>().Remove(entity);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return entity;
+    }
+
+    /// <summary>
+    /// Returns entity by id
+    /// </summary>
+    /// <param name="context">DbContext</param>
+    /// <param name="id">Entity id</param>
+    /// <param name="includeQuery">Expression that describes included entities</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
+    /// <returns>Entity</returns>
+    private async Task<TEntity?> GetEntityByIdImpl(TDbContext context, TId id, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
+    {
+        if (includeQuery is null)
+        {
+            return await context.Set<TEntity>().FindAsync(new object?[] { id }, cancellationToken).ConfigureAwait(false);
+        }
+
+        var query = context.Set<TEntity>().AsQueryable();
+        query = includeQuery.GetExpression(query);
+
+        var idName = GetEntityIdColumnOrThrow(context);
+        return await query.SingleOrDefaultAsync(x => id.Equals(EF.Property<TId>(x, idName)), cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>

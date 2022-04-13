@@ -60,6 +60,28 @@ public abstract class ModernCachedController<TEntityDto, TEntityDbo, TId> : Cont
     }
 
     /// <summary>
+    /// Returns all entities
+    /// </summary>
+    /// <returns>List of entities</returns>
+    /// <response code="200">Entities was found and returned</response>
+    /// <response code="404">Entities was not found in the data store</response>
+    /// <response code="500">Error occurred while retrieving entities</response>
+    [HttpGet("get")]
+    //[ProducesResponseType(typeof(TEntityDto), (int)HttpStatusCode.OK)]
+    public virtual async Task<IActionResult> GetAll()
+    {
+        try
+        {
+            var entities = await _service.GetAllAsync().ConfigureAwait(false);
+            return Ok(entities);
+        }
+        catch (EntityNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
+    /// <summary>
     /// Creates the new entity in the data store
     /// </summary>
     /// <param name="entity">The entity to add to the data store</param>

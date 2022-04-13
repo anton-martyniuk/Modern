@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
+using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Exceptions;
@@ -83,18 +84,19 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
     /// <summary>
     /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.GetByIdAsync"/>
     /// </summary>
-    public virtual async Task<TEntityDto> GetByIdAsync(TId id, Func<IQueryable<TEntityDbo>, IQueryable<TEntityDbo>>? includeQuery = null, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntityDto> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
+            cancellationToken.ThrowIfCancellationRequested();
 
             if (Logger.IsEnabled(LogLevel.Trace))
             {
                 Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(GetByIdAsync), id);
             }
 
-            var entityDbo = await Repository.GetByIdAsync(id, includeQuery, cancellationToken).ConfigureAwait(false);
+            var entityDbo = await Repository.GetByIdAsync(id, null, cancellationToken).ConfigureAwait(false);
             return MapToDto(entityDbo);
         }
         catch (Exception ex)
@@ -112,13 +114,14 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
+            cancellationToken.ThrowIfCancellationRequested();
 
             if (Logger.IsEnabled(LogLevel.Trace))
             {
                 Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(TryGetByIdAsync), id);
             }
 
-            var entityDbo = await Repository.TryGetByIdAsync(id, cancellationToken).ConfigureAwait(false);
+            var entityDbo = await Repository.TryGetByIdAsync(id, null, cancellationToken).ConfigureAwait(false);
             return entityDbo is not null ? MapToDto(entityDbo) : null;
         }
         catch (Exception ex)
@@ -135,9 +138,11 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
     {
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             LogMethod(nameof(GetAllAsync));
 
-            var entitiesDbo = await Repository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+            var entitiesDbo = await Repository.GetAllAsync(null, cancellationToken).ConfigureAwait(false);
             return entitiesDbo.ConvertAll(MapToDto);
         }
         catch (Exception ex)
@@ -154,6 +159,8 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
     {
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (Logger.IsEnabled(LogLevel.Trace))
             {
                 Logger.LogTrace("{serviceName}.{method} of all entities", _serviceName, nameof(CountAsync));
@@ -176,9 +183,11 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
+
             LogMethod(nameof(CountAsync));
 
-            return await Repository.CountAsync(predicate, cancellationToken).ConfigureAwait(false);
+            return await Repository.CountAsync(predicate, null, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -195,9 +204,11 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
+
             LogMethod(nameof(ExistsAsync));
 
-            return await Repository.ExistsAsync(predicate, cancellationToken).ConfigureAwait(false);
+            return await Repository.ExistsAsync(predicate, null, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -214,9 +225,11 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
+
             LogMethod(nameof(FirstOrDefaultAsync));
 
-            var entityDbo = await Repository.FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+            var entityDbo = await Repository.FirstOrDefaultAsync(predicate, null, cancellationToken).ConfigureAwait(false);
             return entityDbo is not null ? MapToDto(entityDbo) : null;
         }
         catch (Exception ex)
@@ -234,9 +247,11 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
+
             LogMethod(nameof(SingleOrDefaultAsync));
 
-            var entityDbo = await Repository.SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+            var entityDbo = await Repository.SingleOrDefaultAsync(predicate, null, cancellationToken).ConfigureAwait(false);
             return entityDbo is not null ? MapToDto(entityDbo) : null;
         }
         catch (Exception ex)
@@ -247,17 +262,47 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.WhereAsync"/>
+    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.WhereAsync(Expression{Func{TEntityDbo, bool}},CancellationToken)"/>
     /// </summary>
     public virtual async Task<List<TEntityDto>> WhereAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
+
             LogMethod(nameof(WhereAsync));
 
-            var entitiesDbo = await Repository.WhereAsync(predicate, cancellationToken).ConfigureAwait(false);
+            var entitiesDbo = await Repository.WhereAsync(predicate, null, cancellationToken).ConfigureAwait(false);
             return entitiesDbo.ConvertAll(MapToDto);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Could not get {name} entities by the given predicate: {reason}", _entityName, ex.Message);
+            throw CreateProperException(ex);
+        }
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.WhereAsync(Expression{Func{TEntityDbo, bool}},int,int,CancellationToken)"/>
+    /// </summary>
+    public virtual async Task<PagedResult<TEntityDto>> WhereAsync(Expression<Func<TEntityDbo, bool>> predicate, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
+
+            LogMethod(nameof(WhereAsync));
+
+            var pagedResult = await Repository.WhereAsync(predicate, pageNumber, pageSize, null, cancellationToken).ConfigureAwait(false);
+            return new PagedResult<TEntityDto>
+            {
+                PageNumber = pagedResult.PageNumber,
+                PageSize = pagedResult.PageSize,
+                TotalCount = pagedResult.TotalCount,
+                Items = pagedResult.Items.ToList().ConvertAll(MapToDto)
+            };
         }
         catch (Exception ex)
         {
@@ -292,6 +337,8 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} entity: {@entity}", _serviceName, nameof(CreateAsync), entity);
 
             Logger.LogDebug("Creating {name} entity in db...", _entityName);
@@ -316,6 +363,8 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(entities, nameof(entities));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(CreateAsync), entities);
 
             Logger.LogDebug("Creating {name} entities in db...", _entityName);
@@ -341,6 +390,8 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} id: {id}, entity: {@entity}", _serviceName, nameof(UpdateAsync), id, entity);
 
             var entityDbo = MapToDbo(entity);
@@ -366,6 +417,8 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(entities, nameof(entities));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(UpdateAsync), entities);
 
             var entitiesDbo = entities.ConvertAll(MapToDbo);
@@ -392,6 +445,8 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             ArgumentNullException.ThrowIfNull(update, nameof(update));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(UpdateAsync), id);
 
             Logger.LogDebug("Updating {name} entity with id '{id}' in db...", _entityName, id);
@@ -415,6 +470,8 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(DeleteAsync), id);
 
             Logger.LogDebug("Deleting {name} entity with id '{id}' in db...", _entityName, id);
@@ -436,6 +493,8 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(ids, nameof(ids));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} ids: {@ids}", _serviceName, nameof(DeleteAsync), ids);
 
             Logger.LogDebug("Updating {name} entities in db...", _entityName);
@@ -457,6 +516,8 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(DeleteAndReturnAsync), id);
 
             Logger.LogDebug("Deleting {name} entity with id '{id}' in db...", _entityName, id);

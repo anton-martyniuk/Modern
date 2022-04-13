@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Modern.Cache.Abstractions;
+using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Exceptions;
@@ -102,6 +103,7 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
+            cancellationToken.ThrowIfCancellationRequested();
 
             if (Logger.IsEnabled(LogLevel.Trace))
             {
@@ -127,6 +129,7 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
+            cancellationToken.ThrowIfCancellationRequested();
 
             if (Logger.IsEnabled(LogLevel.Trace))
             {
@@ -150,6 +153,8 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
     {
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             LogMethod(nameof(GetAllAsync));
 
             await Task.CompletedTask;
@@ -169,6 +174,8 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
     {
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (Logger.IsEnabled(LogLevel.Trace))
             {
                 Logger.LogTrace("{serviceName}.{method} of all entities", _serviceName, nameof(CountAsync));
@@ -192,6 +199,8 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
+
             LogMethod(nameof(CountAsync));
 
             await Task.CompletedTask;
@@ -212,6 +221,8 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
+
             LogMethod(nameof(ExistsAsync));
 
             await Task.CompletedTask;
@@ -232,6 +243,8 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
+
             LogMethod(nameof(FirstOrDefaultAsync));
 
             await Task.CompletedTask;
@@ -252,6 +265,8 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
+
             LogMethod(nameof(SingleOrDefaultAsync));
 
             await Task.CompletedTask;
@@ -265,17 +280,48 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.WhereAsync"/>
+    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.WhereAsync(Func{TEntityDto, bool},CancellationToken)"/>
     /// </summary>
     public virtual async Task<List<TEntityDto>> WhereAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
+
             LogMethod(nameof(WhereAsync));
 
             await Task.CompletedTask;
             return Cache.Where(predicate).ToList();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Could not get {name} entities by the given predicate: {reason}", _entityName, ex.Message);
+            throw CreateProperException(ex);
+        }
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo,TId}.WhereAsync(Func{TEntityDto, bool},int,int,CancellationToken)"/>
+    /// </summary>
+    public virtual async Task<PagedResult<TEntityDto>> WhereAsync(Func<TEntityDto, bool> predicate, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            cancellationToken.ThrowIfCancellationRequested();
+
+            LogMethod(nameof(WhereAsync));
+
+            await Task.CompletedTask;
+            var pagedResult = new PagedResult<TEntityDto>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = Cache.Count(predicate),
+                Items = Cache.Where(predicate).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList()
+            };
+            return pagedResult;
         }
         catch (Exception ex)
         {
@@ -328,6 +374,8 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} entity: {@entity}", _serviceName, nameof(CreateAsync), entity);
 
             var entityDbo = MapToDbo(entity);
@@ -360,6 +408,8 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(entities, nameof(entities));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(CreateAsync), entities);
 
             var entitiesDbo = entities.ConvertAll(MapToDbo);
@@ -396,6 +446,8 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} id: {id}, entity: {@entity}", _serviceName, nameof(UpdateAsync), id, entity);
 
             var entityDbo = MapToDbo(entity);
@@ -428,6 +480,8 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(entities, nameof(entities));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(UpdateAsync), entities);
 
             var entitiesDbo = entities.ConvertAll(MapToDbo);
@@ -464,6 +518,8 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             ArgumentNullException.ThrowIfNull(update, nameof(update));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(UpdateAsync), id);
 
             var entityDto = Cache.GetById(id);
@@ -496,6 +552,8 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(DeleteAsync), id);
 
             Logger.LogDebug("Deleting {name} entity with id '{id}' in db...", _entityName, id);
@@ -521,6 +579,8 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(ids, nameof(ids));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} ids: {@ids}", _serviceName, nameof(DeleteAsync), ids);
 
             Logger.LogDebug("Updating {name} entities in db...", _entityName);
@@ -549,6 +609,8 @@ public abstract class ModernCachedService<TEntityDto, TEntityDbo, TId, TReposito
         try
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
+            cancellationToken.ThrowIfCancellationRequested();
+
             Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(DeleteAndReturnAsync), id);
 
             // Check if entity exists in cache. If not - exception will be thrown.

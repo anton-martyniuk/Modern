@@ -1,4 +1,5 @@
-﻿using Modern.Exceptions;
+﻿using Modern.Data.Paging;
+using Modern.Exceptions;
 
 namespace Modern.Services.Abstractions.Query;
 
@@ -102,6 +103,18 @@ public interface IModernQueryCachedService<TEntityDto, out TEntityDbo, in TId>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
     Task<List<TEntityDto>> WhereAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns certain amount of paged entities from the data store that match the given <paramref name="predicate"/>
+    /// </summary>
+    /// <param name="predicate">The filtering predicate</param>
+    /// <param name="pageNumber">Page number. Entities to skip = (pageNumber - 1) * pageSize</param>
+    /// <param name="pageSize">The total number of items to select</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
+    /// <returns>A list of entities that match the condition</returns>
+    /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
+    /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    Task<PagedResult<TEntityDto>> WhereAsync(Func<TEntityDto, bool> predicate, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns <see cref="IEnumerable{TEntity}"/> implementation with data from the cache

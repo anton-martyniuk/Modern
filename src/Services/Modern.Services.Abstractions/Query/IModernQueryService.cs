@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Modern.Data.Paging;
 using Modern.Exceptions;
 
 namespace Modern.Services.Abstractions.Query;
@@ -18,13 +19,12 @@ public interface IModernQueryService<TEntityDto, TEntityDbo, in TId>
     /// Returns an entity with the given <paramref name="id"/>
     /// </summary>
     /// <param name="id">The entity id</param>
-    /// <param name="includeQuery">Expression that describes included entities</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <returns>The entity</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
     /// <exception cref="EntityNotFoundException">Thrown if an entity does is not found</exception>
     /// <exception cref="InternalErrorException">If a service internal error occurred</exception>
-    Task<TEntityDto> GetByIdAsync(TId id, Func<IQueryable<TEntityDbo>, IQueryable<TEntityDbo>>? includeQuery = null, CancellationToken cancellationToken = default);
+    Task<TEntityDto> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Tries to return an entity with the given <paramref name="id"/>; otherwise, <see langword="null"/>
@@ -104,6 +104,18 @@ public interface IModernQueryService<TEntityDto, TEntityDbo, in TId>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
     Task<List<TEntityDto>> WhereAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns certain amount of paged entities from the data store that match the given <paramref name="predicate"/>
+    /// </summary>
+    /// <param name="predicate">The filtering predicate</param>
+    /// <param name="pageNumber">Page number. Entities to skip = (pageNumber - 1) * pageSize</param>
+    /// <param name="pageSize">The total number of items to select</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
+    /// <returns>A list of entities that match the condition</returns>
+    /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
+    /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    Task<PagedResult<TEntityDto>> WhereAsync(Expression<Func<TEntityDbo, bool>> predicate, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns <see cref="IQueryable{TEntity}"/> implementation
