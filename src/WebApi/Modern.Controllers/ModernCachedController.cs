@@ -7,10 +7,9 @@ using Modern.Services.Abstractions;
 namespace Modern.Controllers;
 
 /// <summary>
-/// The base controller for Modern applications
+/// The base controller for cached service
 /// </summary>
 [ApiController]
-//[Route("api/configs")]
 [Produces("application/json")]
 [Consumes("application/json")]
 public abstract class ModernCachedController<TEntityDto, TEntityDbo, TId> : ControllerBase
@@ -23,7 +22,7 @@ public abstract class ModernCachedController<TEntityDto, TEntityDbo, TId> : Cont
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    /// <param name="service"></param>
+    /// <param name="service">Cached service</param>
     protected ModernCachedController(IModernCachedService<TEntityDto, TEntityDbo, TId> service)
     {
         _service = service;

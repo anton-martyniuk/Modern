@@ -18,7 +18,7 @@ public interface IModernCache<TEntity, in TId>
     // TODO: add, update, delete many
 
     /// <summary>
-    /// Adds or updates <paramref name="entity"/> with the given <paramref name="id"/> in the cache.<br />
+    /// Adds or updates <paramref name="entity"/> with the given <paramref name="id"/> in the cache
     /// </summary>
     /// <param name="id">The entity id</param>
     /// <param name="entity">Entity</param>
@@ -54,7 +54,7 @@ public interface IModernCache<TEntity, in TId>
     TEntity? TryGetById(TId id);
 
     /// <summary>
-    /// Returns all entities from the cache.<br/>
+    /// Returns all entities from the cache
     /// IMPORTANT: there can be performance issues when retrieving large amount of entities from the cache
     /// </summary>
     /// <returns>List of entities</returns>

@@ -23,8 +23,6 @@ public class ModernInMemoryCache<TEntity, TId> : IModernCache<TEntity, TId>
         _cacheById = new ConcurrentDictionary<TId, TEntity>(EqualityComparer<TId>.Default);
     }
 
-    // TODO: create, update, delete many ?!
-
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
