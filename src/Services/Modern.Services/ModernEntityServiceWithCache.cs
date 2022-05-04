@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
+using MapsterMapper;
 using Modern.Cache.Abstractions;
 using Modern.Data.Paging;
 using Modern.Exceptions;
@@ -18,7 +19,7 @@ namespace Modern.Services;
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
 /// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-public abstract class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TRepository> :
+public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TRepository> :
     IModernEntityService<TEntityDto, TEntityDbo, TId>
     where TEntityDto : class
     where TEntityDbo : class
@@ -27,6 +28,7 @@ public abstract class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, 
 {
     private readonly string _entityName = typeof(TEntityDto).Name;
     private readonly string _serviceName = $"{typeof(TEntityDto).Name}Service";
+    private readonly IMapper _mapper = new Mapper();
 
     /// <summary>
     /// The repository instance
@@ -49,7 +51,8 @@ public abstract class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, 
     /// <param name="repository">The generic repository</param>
     /// <param name="distributedCache">Distributed cache</param>
     /// <param name="logger">The logger</param>
-    protected ModernEntityServiceWithCache(TRepository repository, IModernDistributedCache<TEntityDto, TId> distributedCache, ILogger logger)
+    public ModernEntityServiceWithCache(TRepository repository, IModernDistributedCache<TEntityDto, TId> distributedCache,
+        ILogger<ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TRepository>> logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
@@ -64,21 +67,22 @@ public abstract class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, 
     /// </summary>
     /// <param name="entityDto">Entity Dto</param>
     /// <returns>Entity Dbo</returns>
-    protected abstract TEntityDbo MapToDbo(TEntityDto entityDto);
+    protected virtual TEntityDbo MapToDbo(TEntityDto entityDto) => _mapper.Map<TEntityDbo>(entityDto);
 
     /// <summary>
     /// Returns <typeparamref name="TEntityDbo"/> mapped from <typeparamref name="TEntityDto"/>
     /// </summary>
     /// <param name="entityDbo">Entity Dbo</param>
     /// <returns>Entity Dto</returns>
-    protected abstract TEntityDto MapToDto(TEntityDbo entityDbo);
+    protected virtual TEntityDto MapToDto(TEntityDbo entityDbo) => _mapper.Map<TEntityDto>(entityDbo);
 
     /// <summary>
     /// Returns entity id of type <typeparamref name="TId"/>
     /// </summary>
     /// <param name="entityDto">Entity Dto</param>
     /// <returns>Entity id</returns>
-    protected abstract TId GetEntityId(TEntityDto entityDto);
+    // TODO: use source generators for this
+    protected virtual TId GetEntityId(TEntityDto entityDto) => (TId)(entityDto.GetType().GetProperty("Id")?.GetValue(entityDto, null) ?? 0);
 
     /// <summary>
     /// Returns standardized service exception
@@ -118,7 +122,11 @@ public abstract class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, 
             }
 
             var entityDbo = await Repository.GetByIdAsync(id, null, cancellationToken).ConfigureAwait(false);
-            return MapToDto(entityDbo);
+            
+            entityDto = MapToDto(entityDbo);
+            await DistributedCache.AddOrUpdateAsync(GetEntityId(entityDto), entityDto).ConfigureAwait(false);
+
+            return entityDto;
         }
         catch (Exception ex)
         {
@@ -149,7 +157,15 @@ public abstract class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, 
             }
 
             var entityDbo = await Repository.TryGetByIdAsync(id, null, cancellationToken).ConfigureAwait(false);
-            return entityDbo is not null ? MapToDto(entityDbo) : null;
+            if (entityDbo is null)
+            {
+                return null;
+            }
+
+            entityDto = MapToDto(entityDbo);
+            await DistributedCache.AddOrUpdateAsync(GetEntityId(entityDto), entityDto).ConfigureAwait(false);
+
+            return entityDto;
         }
         catch (Exception ex)
         {

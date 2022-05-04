@@ -19,7 +19,7 @@ public class ModernDistributedInMemoryCache<TEntity, TId> : IModernDistributedCa
     private readonly IMemoryCache _cache;
     private readonly ModernCacheSettings _cacheSettings;
 
-    private readonly string _redisKeyPrefix = $"cache_{nameof(TEntity)}".ToLower();
+    private readonly string _redisKeyPrefix = $"modern_cache_{typeof(TEntity).Name}".ToLower();
 
     /// <summary>
     /// Initializes a new instance of the class

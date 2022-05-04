@@ -19,7 +19,7 @@ namespace Modern.Repositories.EFCore;
 /// <typeparam name="TDbContext">The type of EF Core DbContext</typeparam>
 /// <typeparam name="TEntity">The type of entity</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
-public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRepository<TEntity, TId>, IModernQueryRepository<TEntity, TId>
+public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEntity, TId>
     where TDbContext : DbContext
     where TEntity : class
     where TId : IEquatable<TId>
@@ -49,7 +49,7 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
     /// </summary>
     /// <param name="dbContextFactory">The <see cref="IDbContextFactory{TDbContext}"/> implementation</param>
     /// <param name="configuration">Repository configuration</param>
-    protected ModernRepository(IDbContextFactory<TDbContext> dbContextFactory, IOptions<EfCoreRepositoryConfiguration?> configuration)
+    public ModernRepository(IDbContextFactory<TDbContext> dbContextFactory, IOptions<EfCoreRepositoryConfiguration?> configuration)
     {
         DbContextFactory = dbContextFactory;
         _configuration = configuration.Value;
@@ -60,7 +60,7 @@ public abstract class ModernRepository<TDbContext, TEntity, TId> : IModernCrudRe
     /// </summary>
     /// <param name="entity">Entity</param>
     /// <returns>Entity id</returns>
-    protected abstract TId GetEntityId(TEntity entity);
+    protected virtual TId GetEntityId(TEntity entity) => (TId)(entity.GetType().GetProperty("Id")?.GetValue(entity, null) ?? 0);
 
     /// <summary>
     /// Returns standardized repository exception

@@ -19,7 +19,7 @@ public class ModernDistributedRedisCache<TEntity, TId> : IModernDistributedCache
     private readonly IRedisClient _redisClient;
     private readonly ModernCacheSettings _cacheSettings;
 
-    private readonly string _redisKeyPrefix = $"cache_{nameof(TEntity)}".ToLower();
+    private readonly string _redisKeyPrefix = $"modern_cache_{typeof(TEntity).Name}".ToLower();
 
     /// <summary>
     /// Initializes a new instance of the class
@@ -96,7 +96,7 @@ public class ModernDistributedRedisCache<TEntity, TId> : IModernDistributedCache
     /// </summary>
     public async Task AddOrUpdateAsync(Dictionary<TId, TEntity> entities)
     {
-        ArgumentNullException.ThrowIfNull(entities, nameof(entities)); // TODO: test if second parameter is needed
+        ArgumentNullException.ThrowIfNull(entities, nameof(entities));
         Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
 
         var items = entities.Select(x => Tuple.Create(GetKey(x.Key), x.Value)).ToArray();

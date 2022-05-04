@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MapsterMapper;
+using Microsoft.Extensions.Logging;
 using Modern.Cache.Abstractions;
 using Modern.Data.Paging;
 using Modern.Exceptions;
@@ -17,7 +18,7 @@ namespace Modern.Services;
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
 /// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-public abstract class ModernFullyCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
+public class ModernFullyCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     IModernCachedService<TEntityDto, TEntityDbo, TId>
     where TEntityDto : class
     where TEntityDbo : class
@@ -26,6 +27,7 @@ public abstract class ModernFullyCachedService<TEntityDto, TEntityDbo, TId, TRep
 {
     private readonly string _entityName = typeof(TEntityDto).Name;
     private readonly string _serviceName = $"{typeof(TEntityDto).Name}Service";
+    private readonly IMapper _mapper = new Mapper();
 
     /// <summary>
     /// The repository instance
@@ -48,7 +50,8 @@ public abstract class ModernFullyCachedService<TEntityDto, TEntityDbo, TId, TRep
     /// <param name="repository">The generic repository</param>
     /// <param name="cache">The cache of entities</param>
     /// <param name="logger">The logger</param>
-    protected ModernFullyCachedService(TRepository repository, IModernCache<TEntityDto, TId> cache, ILogger logger)
+    public ModernFullyCachedService(TRepository repository, IModernCache<TEntityDto, TId> cache,
+        ILogger<ModernFullyCachedService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
@@ -63,21 +66,22 @@ public abstract class ModernFullyCachedService<TEntityDto, TEntityDbo, TId, TRep
     /// </summary>
     /// <param name="entityDto">Entity Dto</param>
     /// <returns>Entity Dbo</returns>
-    protected abstract TEntityDbo MapToDbo(TEntityDto entityDto);
+    protected virtual TEntityDbo MapToDbo(TEntityDto entityDto) => _mapper.Map<TEntityDbo>(entityDto);
 
     /// <summary>
     /// Returns <typeparamref name="TEntityDbo"/> mapped from <typeparamref name="TEntityDto"/>
     /// </summary>
     /// <param name="entityDbo">Entity Dbo</param>
     /// <returns>Entity Dto</returns>
-    protected abstract TEntityDto MapToDto(TEntityDbo entityDbo);
+    protected virtual TEntityDto MapToDto(TEntityDbo entityDbo) => _mapper.Map<TEntityDto>(entityDbo);
 
     /// <summary>
     /// Returns entity id of type <typeparamref name="TId"/>
     /// </summary>
     /// <param name="entityDto">Entity Dto</param>
     /// <returns>Entity id</returns>
-    protected abstract TId GetEntityId(TEntityDto entityDto);
+    // TODO: use source generators for this
+    protected virtual TId GetEntityId(TEntityDto entityDto) => (TId)(entityDto.GetType().GetProperty("Id")?.GetValue(entityDto, null) ?? 0);
 
     /// <summary>
     /// Returns standardized service exception

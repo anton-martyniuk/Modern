@@ -12,7 +12,7 @@ namespace Modern.Controllers;
 [ApiController]
 [Produces("application/json")]
 [Consumes("application/json")]
-public abstract class ModernCachedController<TEntityDto, TEntityDbo, TId> : ControllerBase
+public class ModernCachedController<TEntityDto, TEntityDbo, TId> : ControllerBase
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
@@ -33,7 +33,8 @@ public abstract class ModernCachedController<TEntityDto, TEntityDbo, TId> : Cont
     /// </summary>
     /// <param name="entityDto">Entity Dto</param>
     /// <returns>Entity id</returns>
-    protected abstract TId GetEntityId(TEntityDto entityDto);
+    // TODO: use source generators for this
+    protected virtual TId GetEntityId(TEntityDto entityDto) => (TId)(entityDto.GetType().GetProperty("Id")?.GetValue(entityDto, null) ?? 0);
 
     /// <summary>
     /// Returns an entity with the given <paramref name="id"/>
@@ -102,7 +103,7 @@ public abstract class ModernCachedController<TEntityDto, TEntityDbo, TId> : Cont
     /// <response code="201">The entities were created</response>
     /// <response code="400">One of entity models is invalid</response>
     /// <response code="500">Error occurred while creating entities</response>
-    [HttpPost("create-mnay")]
+    [HttpPost("create-many")]
     //[ProducesResponseType(typeof(TEntityDto), (int)HttpStatusCode.OK)]
     public virtual async Task<IActionResult> CreateMany([FromBody, Required] List<TEntityDto> entities)
     {

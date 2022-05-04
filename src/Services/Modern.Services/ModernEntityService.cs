@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
+using MapsterMapper;
 using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
@@ -17,7 +18,7 @@ namespace Modern.Services;
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
 /// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TRepository> :
+public class ModernEntityService<TEntityDto, TEntityDbo, TId, TRepository> :
     IModernEntityService<TEntityDto, TEntityDbo, TId>
     where TEntityDto : class
     where TEntityDbo : class
@@ -26,6 +27,7 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
 {
     private readonly string _entityName = typeof(TEntityDto).Name;
     private readonly string _serviceName = $"{typeof(TEntityDto).Name}Service";
+    private readonly IMapper _mapper = new Mapper();
 
     /// <summary>
     /// The repository instance
@@ -42,7 +44,7 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
     /// </summary>
     /// <param name="repository">The generic repository</param>
     /// <param name="logger">The logger</param>
-    protected ModernEntityService(TRepository repository, ILogger<ModernEntityService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
+    public ModernEntityService(TRepository repository, ILogger<ModernEntityService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
@@ -56,14 +58,14 @@ public abstract class ModernEntityService<TEntityDto, TEntityDbo, TId, TReposito
     /// </summary>
     /// <param name="entityDto">Entity Dto</param>
     /// <returns>Entity Dbo</returns>
-    protected abstract TEntityDbo MapToDbo(TEntityDto entityDto);
+    protected virtual TEntityDbo MapToDbo(TEntityDto entityDto) => _mapper.Map<TEntityDbo>(entityDto);
 
     /// <summary>
     /// Returns <typeparamref name="TEntityDbo"/> mapped from <typeparamref name="TEntityDto"/>
     /// </summary>
     /// <param name="entityDbo">Entity Dbo</param>
     /// <returns>Entity Dto</returns>
-    protected abstract TEntityDto MapToDto(TEntityDbo entityDbo);
+    protected virtual TEntityDto MapToDto(TEntityDbo entityDbo) => _mapper.Map<TEntityDto>(entityDbo);
 
     /// <summary>
     /// Returns standardized service exception
