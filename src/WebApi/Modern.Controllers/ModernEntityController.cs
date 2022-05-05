@@ -9,7 +9,6 @@ namespace Modern.Controllers;
 /// <summary>
 /// The base entity controller for entity service
 /// </summary>
-[ApiController]
 [Produces("application/json")]
 [Consumes("application/json")]
 public class ModernEntityController<TEntityDto, TEntityDbo, TId> : ControllerBase

@@ -7,7 +7,6 @@ namespace Modern.Controllers.OData;
 /// <summary>
 /// The OData controller for cached service
 /// </summary>
-[ApiController]
 [Produces("application/json")]
 [Consumes("application/json")]
 public abstract class ModernCachedODataController<TEntityDto, TEntityDbo, TId> : ControllerBase

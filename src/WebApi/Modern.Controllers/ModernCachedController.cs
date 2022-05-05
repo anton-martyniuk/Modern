@@ -9,7 +9,6 @@ namespace Modern.Controllers;
 /// <summary>
 /// The base controller for cached service
 /// </summary>
-[ApiController]
 [Produces("application/json")]
 [Consumes("application/json")]
 public class ModernCachedController<TEntityDto, TEntityDbo, TId> : ControllerBase

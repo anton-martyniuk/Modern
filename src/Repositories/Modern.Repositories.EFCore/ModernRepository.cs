@@ -641,7 +641,10 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
             //await context.Set<TEntity>().WhereIdEquals(entityType, id).UpdateFromQueryAsync(_ => entity, cancellationToken).ConfigureAwait(false);
             //await context.Set<TEntity>().Where(x => GetEntityId(x, entity)).UpdateFromQueryAsync(_ => entity, cancellationToken).ConfigureAwait(false);
 
-            var entityId = GetEntityId(entity); // TODO: is this needed?
+            // TODO: System.Exception: Invalid Cast. The update expression must be of type MemberInitExpression
+            // see: https://github.com/zzzprojects/EntityFramework-Plus/issues/357
+            // the object must be constructed something like this: x => new User() { IsSoftDeleted = 1 }
+            var entityId = GetEntityId(entity);
             await context.Set<TEntity>().Where(x => entityId.Equals(EF.Property<TId>(x, idName))).UpdateFromQueryAsync(_ => entity, cancellationToken).ConfigureAwait(false);
         }
 

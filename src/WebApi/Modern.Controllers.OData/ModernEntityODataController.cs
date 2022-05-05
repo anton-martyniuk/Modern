@@ -7,7 +7,6 @@ namespace Modern.Controllers.OData;
 /// <summary>
 /// The OData controller for entity service
 /// </summary>
-[ApiController]
 [Produces("application/json")]
 [Consumes("application/json")]
 public abstract class ModernEntityODataController<TEntityDto, TEntityDbo, TId> : ControllerBase
