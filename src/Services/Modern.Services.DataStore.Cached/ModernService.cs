@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
+using Ardalis.GuardClauses;
 using MapsterMapper;
 using Modern.Cache.Abstractions;
 using Modern.Data.Paging;
@@ -333,6 +334,8 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            Guard.Against.NegativeOrZero(pageNumber, nameof(pageNumber));
+            Guard.Against.NegativeOrZero(pageSize, nameof(pageSize));
             cancellationToken.ThrowIfCancellationRequested();
 
             LogMethod(nameof(WhereAsync));
@@ -413,6 +416,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         try
         {
             ArgumentNullException.ThrowIfNull(entities, nameof(entities));
+            Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
             cancellationToken.ThrowIfCancellationRequested();
 
             Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(CreateAsync), entities);
@@ -424,7 +428,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             Logger.LogDebug("Created {name} entities. {@entityDbo}", _entityName, entitiesDbo);
 
             var entitiesDto = entitiesDbo.ConvertAll(MapToDto);
-            var dictionary = entitiesDto.ToDictionary(x => GetEntityId(x), v => v);
+            var dictionary = entitiesDto.ToDictionary(key => GetEntityId(key), value => value);
 
             Logger.LogDebug("Creating {name} entities in cache...", _entityName);
             await Cache.AddOrUpdateAsync(dictionary).ConfigureAwait(false);
@@ -482,6 +486,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         try
         {
             ArgumentNullException.ThrowIfNull(entities, nameof(entities));
+            Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
             cancellationToken.ThrowIfCancellationRequested();
 
             Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(UpdateAsync), entities);
@@ -576,6 +581,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         try
         {
             ArgumentNullException.ThrowIfNull(ids, nameof(ids));
+            Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
             cancellationToken.ThrowIfCancellationRequested();
 
             Logger.LogTrace("{serviceName}.{method} ids: {@ids}", _serviceName, nameof(DeleteAsync), ids);

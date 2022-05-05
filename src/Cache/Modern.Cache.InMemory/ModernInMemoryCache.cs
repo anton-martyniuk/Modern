@@ -35,7 +35,7 @@ public class ModernInMemoryCache<TEntity, TId> : IModernCache<TEntity, TId>
     /// <summary>
     /// <inheritdoc cref="IModernCache{TEntity,TId}.GetByIdAsync"/>
     /// </summary>
-    public Task<TEntity> GetByIdAsync(TId id)
+    public ValueTask<TEntity> GetByIdAsync(TId id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
@@ -46,37 +46,37 @@ public class ModernInMemoryCache<TEntity, TId> : IModernCache<TEntity, TId>
             throw new EntityNotFoundException($"Entity with id '{id}' not found");
         }
 
-        return Task.FromResult(entity);
+        return ValueTask.FromResult(entity);
     }
 
     /// <summary>
     /// <inheritdoc cref="IModernCache{TEntity,TId}.TryGetByIdAsync"/>
     /// </summary>
-    public Task<TEntity?> TryGetByIdAsync(TId id)
+    public ValueTask<TEntity?> TryGetByIdAsync(TId id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
         var key = GetKey(id);
-        return Task.FromResult(_cache.Get<TEntity?>(key));
+        return ValueTask.FromResult(_cache.Get<TEntity?>(key));
     }
 
     /// <summary>
     /// <inheritdoc cref="IModernCache{TEntity,TId}.TryGetManyAsync"/>
     /// </summary>
-    public Task<List<TEntity>> TryGetManyAsync(List<TId> ids)
+    public ValueTask<List<TEntity>> TryGetManyAsync(List<TId> ids)
     {
         ArgumentNullException.ThrowIfNull(ids, nameof(ids));
         Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
 
         var keys = ids.Select(x => GetKey(x)).ToArray();
         var entities = keys.Select(x => _cache.Get<TEntity>(x)).Where(x => x is not null);
-        return Task.FromResult(entities.ToList());
+        return ValueTask.FromResult(entities.ToList());
     }
 
     /// <summary>
     /// <inheritdoc cref="IModernCache{TEntity,TId}.AddOrUpdateAsync(TId,TEntity)"/>
     /// </summary>
-    public Task AddOrUpdateAsync(TId id, TEntity entity)
+    public ValueTask AddOrUpdateAsync(TId id, TEntity entity)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
@@ -85,17 +85,17 @@ public class ModernInMemoryCache<TEntity, TId> : IModernCache<TEntity, TId>
         if (_cacheSettings.ExpiresIn is null)
         {
             _cache.Set(key, entity);
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
         _cache.Set(key, entity, _cacheSettings.ExpiresIn.Value);
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
     /// <summary>
     /// <inheritdoc cref="IModernCache{TEntity,TId}.AddOrUpdateAsync(Dictionary{TId,TEntity})"/>
     /// </summary>
-    public Task AddOrUpdateAsync(Dictionary<TId, TEntity> entities)
+    public ValueTask AddOrUpdateAsync(Dictionary<TId, TEntity> entities)
     {
         ArgumentNullException.ThrowIfNull(entities, nameof(entities));
         Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
@@ -114,26 +114,26 @@ public class ModernInMemoryCache<TEntity, TId> : IModernCache<TEntity, TId>
             }
         }
 
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
     /// <summary>
     /// <inheritdoc cref="IModernCache{TEntity,TId}.DeleteAsync(TId)"/>
     /// </summary>
-    public Task DeleteAsync(TId id)
+    public ValueTask DeleteAsync(TId id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
         var key = GetKey(id);
         _cache.Remove(key);
 
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
     /// <summary>
     /// <inheritdoc cref="IModernCache{TEntity,TId}.DeleteAsync(List{TId})"/>
     /// </summary>
-    public Task DeleteAsync(List<TId> ids)
+    public ValueTask DeleteAsync(List<TId> ids)
     {
         ArgumentNullException.ThrowIfNull(ids, nameof(ids));
         Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
@@ -143,7 +143,7 @@ public class ModernInMemoryCache<TEntity, TId> : IModernCache<TEntity, TId>
             _cache.Remove(key);
         }
 
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
     /// <summary>

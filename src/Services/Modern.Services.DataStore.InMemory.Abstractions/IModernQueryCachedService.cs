@@ -117,22 +117,22 @@ public interface IModernQueryCachedService<TEntityDto, out TEntityDbo, in TId>
     Task<PagedResult<TEntityDto>> WhereAsync(Func<TEntityDto, bool> predicate, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Returns <see cref="IEnumerable{TEntity}"/> implementation with data from the cache
+    /// Returns <see cref="IEnumerable{TEntityDto}"/> implementation with data from the cache
     /// </summary>
     /// <remarks>
-    /// IMPORTANT: The members of the returned <see cref="IEnumerable{TEntity}"/> instance can throw implementation specific exceptions
+    /// IMPORTANT: The members of the returned <see cref="IEnumerable{TEntityDto}"/> instance can throw implementation specific exceptions
     /// </remarks>
-    /// <returns>The object typed as <see cref="IEnumerable{TEntity}"/></returns>
+    /// <returns>The object typed as <see cref="IEnumerable{TEntityDto}"/></returns>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
     IEnumerable<TEntityDto> AsEnumerable();
 
     /// <summary>
-    /// Returns <see cref="IQueryable{TEntity}"/> implementation with data from the data store
+    /// Returns <see cref="IQueryable{TEntityDto}"/> implementation with data from the data store
     /// </summary>
     /// <remarks>
-    /// IMPORTANT: The members of the returned <see cref="IQueryable{TEntity}"/> instance can throw implementation specific exceptions
+    /// IMPORTANT: The members of the returned <see cref="IQueryable{TEntityDto}"/> instance can throw implementation specific exceptions
     /// </remarks>
-    /// <returns>The object typed as <see cref="IQueryable{TEntity}"/></returns>
+    /// <returns>The object typed as <see cref="IQueryable{TEntityDto}"/></returns>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
     IQueryable<TEntityDbo> AsQueryable();
 }

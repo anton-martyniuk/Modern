@@ -1,4 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using System.Linq.Expressions;
+using Ardalis.GuardClauses;
+using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Services.DataStore.InMemory.Abstractions.Cache;
 
@@ -13,14 +16,14 @@ public class ModernInMemoryServiceCache<TEntity, TId> : IModernServiceCache<TEnt
     where TEntity : class
     where TId : IEquatable<TId>
 {
-    private readonly ConcurrentDictionary<TId, TEntity> _cacheById;
+    private readonly ConcurrentDictionary<TId, TEntity> _dictionary;
 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
     public ModernInMemoryServiceCache()
     {
-        _cacheById = new ConcurrentDictionary<TId, TEntity>(EqualityComparer<TId>.Default);
+        _dictionary = new ConcurrentDictionary<TId, TEntity>(EqualityComparer<TId>.Default);
     }
 
     /// <summary>
@@ -29,66 +32,187 @@ public class ModernInMemoryServiceCache<TEntity, TId> : IModernServiceCache<TEnt
     /// <param name="equalityComparer">Equality comparer for the <typeparamref name="TId"/></param>
     public ModernInMemoryServiceCache(IEqualityComparer<TId> equalityComparer)
     {
-        _cacheById = new ConcurrentDictionary<TId, TEntity>(equalityComparer);
+        _dictionary = new ConcurrentDictionary<TId, TEntity>(equalityComparer);
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.AddOrUpdate"/>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.AddOrUpdateAsync(TId,TEntity)"/>
     /// </summary>
-    public void AddOrUpdate(TId id, TEntity entity) => _cacheById.AddOrUpdate(id, entity, (_, _) => entity);
+    public ValueTask AddOrUpdateAsync(TId id, TEntity entity)
+    {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+
+        _dictionary.AddOrUpdate(id, entity, (_, _) => entity);
+        return ValueTask.CompletedTask;
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.Delete"/>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.AddOrUpdateAsync(Dictionary{TId, TEntity})"/>
     /// </summary>
-    public void Delete(TId id) => _cacheById.TryRemove(id, out _);
+    public ValueTask AddOrUpdateAsync(Dictionary<TId, TEntity> entities)
+    {
+        ArgumentNullException.ThrowIfNull(entities, nameof(entities));
+        Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
+
+        foreach (var (key, value) in entities)
+        {
+            _dictionary.AddOrUpdate(key, value, (_, _) => value);
+        }
+
+        return ValueTask.CompletedTask;
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.Clear"/>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.DeleteAsync(TId)"/>
     /// </summary>
-    public void Clear() => _cacheById.Clear();
+    public ValueTask DeleteAsync(TId id)
+    {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+
+        _dictionary.TryRemove(id, out _);
+        return ValueTask.CompletedTask;
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.GetById"/>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.DeleteAsync(List{TId})"/>
     /// </summary>
-    public TEntity GetById(TId id) => _cacheById.TryGetValue(id, out var entity) ? entity : throw new EntityNotFoundException($"Entity with id '{id}' not found");
+    public ValueTask DeleteAsync(List<TId> ids)
+    {
+        ArgumentNullException.ThrowIfNull(ids, nameof(ids));
+        Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
+
+        foreach (var id in ids)
+        {
+            _dictionary.TryRemove(id, out _);
+        }
+
+        return ValueTask.CompletedTask;
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.TryGetById"/>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.ClearAsync"/>
     /// </summary>
-    public TEntity? TryGetById(TId id) => _cacheById.TryGetValue(id, out var entity) ? entity : null;
+    public ValueTask ClearAsync()
+    {
+        _dictionary.Clear();
+        return ValueTask.CompletedTask;
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.GetAll"/>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.GetByIdAsync"/>
     /// </summary>
-    public IEnumerable<TEntity> GetAll() => _cacheById.Values.AsEnumerable();
+    public ValueTask<TEntity> GetByIdAsync(TId id)
+    {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+
+        return ValueTask.FromResult(_dictionary.TryGetValue(id, out var entity)
+            ? entity
+            : throw new EntityNotFoundException($"Entity with id '{id}' not found"));
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.Count()"/>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.TryGetByIdAsync"/>
     /// </summary>
-    public int Count() => _cacheById.Values.Count;
+    public ValueTask<TEntity?> TryGetByIdAsync(TId id)
+    {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+
+        return ValueTask.FromResult(_dictionary.TryGetValue(id, out var entity) ? entity : null);
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.Count(Func{TEntity, bool})"/>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.TryGetManyAsync"/>
     /// </summary>
-    public int Count(Func<TEntity, bool> predicate) => _cacheById.Values.Count(predicate);
+    public ValueTask<List<TEntity>> TryGetManyAsync(List<TId> ids)
+    {
+        ArgumentNullException.ThrowIfNull(ids, nameof(ids));
+        Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
+
+        return ValueTask.FromResult(ids.Where(x => _dictionary.ContainsKey(x)).Select(k => _dictionary[k]).ToList());
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.Exists"/>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.GetAllAsync"/>
     /// </summary>
-    public bool Exists(Func<TEntity, bool> predicate) => _cacheById.Values.Any(predicate);
+    public ValueTask<List<TEntity>> GetAllAsync() => ValueTask.FromResult(_dictionary.Values.ToList());
 
     /// <summary>
-    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.FirstOrDefault"/>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.CountAsync()"/>
     /// </summary>
-    public TEntity? FirstOrDefault(Func<TEntity, bool> predicate) => _cacheById.Values.FirstOrDefault(predicate);
+    public ValueTask<int> CountAsync() => ValueTask.FromResult(_dictionary.Values.Count);
 
     /// <summary>
-    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.SingleOrDefault"/>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.CountAsync(Func{TEntity, bool})"/>
     /// </summary>
-    public TEntity? SingleOrDefault(Func<TEntity, bool> predicate) => _cacheById.Values.SingleOrDefault(predicate);
+    public ValueTask<int> CountAsync(Func<TEntity, bool> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+
+        return ValueTask.FromResult(_dictionary.Values.Count(predicate));
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.Where"/>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.ExistsAsync"/>
     /// </summary>
-    public IEnumerable<TEntity> Where(Func<TEntity, bool> predicate) => _cacheById.Values.Where(predicate);
+    public ValueTask<bool> ExistsAsync(Func<TEntity, bool> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+
+        return ValueTask.FromResult(_dictionary.Values.Any(predicate));
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.FirstOrDefaultAsync"/>
+    /// </summary>
+    public ValueTask<TEntity?> FirstOrDefaultAsync(Func<TEntity, bool> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+
+        return ValueTask.FromResult(_dictionary.Values.FirstOrDefault(predicate));
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.SingleOrDefaultAsync"/>
+    /// </summary>
+    public ValueTask<TEntity?> SingleOrDefaultAsync(Func<TEntity, bool> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+
+        return ValueTask.FromResult(_dictionary.Values.SingleOrDefault(predicate));
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.WhereAsync(Func{TEntity,bool})"/>
+    /// </summary>
+    public ValueTask<List<TEntity>> WhereAsync(Func<TEntity, bool> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+
+        return ValueTask.FromResult(_dictionary.Values.Where(predicate).ToList());
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.WhereAsync(Func{TEntity,bool}, int, int)"/>
+    /// </summary>
+    public ValueTask<PagedResult<TEntity>> WhereAsync(Func<TEntity, bool> predicate, int pageNumber, int pageSize)
+    {
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+        Guard.Against.NegativeOrZero(pageNumber, nameof(pageNumber));
+        Guard.Against.NegativeOrZero(pageSize, nameof(pageSize));
+
+        var pagedResult = new PagedResult<TEntity>
+        {
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = _dictionary.Values.Count(predicate),
+            Items = _dictionary.Values.Where(predicate).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList()
+        };
+        return ValueTask.FromResult(pagedResult);
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="IModernServiceCache{TEntity,TId}.AsEnumerable"/>
+    /// </summary>
+    public IEnumerable<TEntity> AsEnumerable() => _dictionary.Values.AsEnumerable();
 }

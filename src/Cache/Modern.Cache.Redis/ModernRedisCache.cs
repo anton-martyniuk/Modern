@@ -35,7 +35,7 @@ public class ModernRedisCache<TEntity, TId> : IModernCache<TEntity, TId>
     /// <summary>
     /// <inheritdoc cref="IModernCache{TEntity,TId}.GetByIdAsync"/>
     /// </summary>
-    public async Task<TEntity> GetByIdAsync(TId id)
+    public async ValueTask<TEntity> GetByIdAsync(TId id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
@@ -56,7 +56,7 @@ public class ModernRedisCache<TEntity, TId> : IModernCache<TEntity, TId>
     /// <summary>
     /// <inheritdoc cref="IModernCache{TEntity,TId}.TryGetByIdAsync"/>
     /// </summary>
-    public async Task<TEntity?> TryGetByIdAsync(TId id)
+    public async ValueTask<TEntity?> TryGetByIdAsync(TId id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
@@ -72,7 +72,7 @@ public class ModernRedisCache<TEntity, TId> : IModernCache<TEntity, TId>
     /// <summary>
     /// <inheritdoc cref="IModernCache{TEntity,TId}.TryGetManyAsync"/>
     /// </summary>
-    public async Task<List<TEntity>> TryGetManyAsync(List<TId> ids)
+    public async ValueTask<List<TEntity>> TryGetManyAsync(List<TId> ids)
     {
         ArgumentNullException.ThrowIfNull(ids, nameof(ids));
         Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
@@ -85,7 +85,7 @@ public class ModernRedisCache<TEntity, TId> : IModernCache<TEntity, TId>
     /// <summary>
     /// <inheritdoc cref="IModernCache{TEntity,TId}.AddOrUpdateAsync(TId,TEntity)"/>
     /// </summary>
-    public async Task AddOrUpdateAsync(TId id, TEntity entity)
+    public async ValueTask AddOrUpdateAsync(TId id, TEntity entity)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
@@ -103,7 +103,7 @@ public class ModernRedisCache<TEntity, TId> : IModernCache<TEntity, TId>
     /// <summary>
     /// <inheritdoc cref="IModernCache{TEntity,TId}.AddOrUpdateAsync(Dictionary{TId,TEntity})"/>
     /// </summary>
-    public async Task AddOrUpdateAsync(Dictionary<TId, TEntity> entities)
+    public async ValueTask AddOrUpdateAsync(Dictionary<TId, TEntity> entities)
     {
         ArgumentNullException.ThrowIfNull(entities, nameof(entities));
         Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
@@ -122,7 +122,7 @@ public class ModernRedisCache<TEntity, TId> : IModernCache<TEntity, TId>
     /// <summary>
     /// <inheritdoc cref="IModernCache{TEntity,TId}.DeleteAsync(TId)"/>
     /// </summary>
-    public async Task DeleteAsync(TId id)
+    public async ValueTask DeleteAsync(TId id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
@@ -133,7 +133,7 @@ public class ModernRedisCache<TEntity, TId> : IModernCache<TEntity, TId>
     /// <summary>
     /// <inheritdoc cref="IModernCache{TEntity,TId}.DeleteAsync(List{TId})"/>
     /// </summary>
-    public async Task DeleteAsync(List<TId> ids)
+    public async ValueTask DeleteAsync(List<TId> ids)
     {
         ArgumentNullException.ThrowIfNull(ids, nameof(ids));
         Guard.Against.NegativeOrZero(ids.Count, nameof(ids));

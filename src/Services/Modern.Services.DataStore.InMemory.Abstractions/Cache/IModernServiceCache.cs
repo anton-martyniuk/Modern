@@ -1,4 +1,6 @@
-﻿using Modern.Exceptions;
+﻿using System.Linq.Expressions;
+using Modern.Data.Paging;
+using Modern.Exceptions;
 
 namespace Modern.Services.DataStore.InMemory.Abstractions.Cache;
 
@@ -7,33 +9,39 @@ namespace Modern.Services.DataStore.InMemory.Abstractions.Cache;
 /// </summary>
 /// <typeparam name="TEntity">The type of entity in the cache</typeparam>
 /// <typeparam name="TId">The Entity identifier. Id must be unique</typeparam>
-public interface IModernServiceCache<TEntity, in TId>
+public interface IModernServiceCache<TEntity, TId>
     where TEntity : class
     where TId : IEquatable<TId>
 {
-    // TODO: make async?
-
-    // TODO: add guard clauses?
-
-    // TODO: add, update, delete many
-
     /// <summary>
-    /// Adds or updates <paramref name="entity"/> with the given <paramref name="id"/> in the cache
+    /// Adds or updates <paramref name="entity"/> with the given <paramref name="id"/> in the cache.<br />
     /// </summary>
     /// <param name="id">The entity id</param>
     /// <param name="entity">Entity</param>
-    void AddOrUpdate(TId id, TEntity entity);
+    ValueTask AddOrUpdateAsync(TId id, TEntity entity);
+
+    /// <summary>
+    /// Adds or updates multiple <paramref name="entities"/> in the cache
+    /// </summary>
+    /// <param name="entities">Set of entities</param>
+    ValueTask AddOrUpdateAsync(Dictionary<TId, TEntity> entities);
 
     /// <summary>
     /// Deletes the entity in the cache by the given <paramref name="id"/>
     /// </summary>
     /// <param name="id">The entity id</param>
-    void Delete(TId id);
+    ValueTask DeleteAsync(TId id);
+
+    /// <summary>
+    /// Deletes multiple entities in the cache by the given list of <paramref name="ids"/>
+    /// </summary>
+    /// <param name="ids">List of entity ids</param>
+    ValueTask DeleteAsync(List<TId> ids);
 
     /// <summary>
     /// Deletes all entities in the cache
     /// </summary>
-    void Clear();
+    ValueTask ClearAsync();
 
     /// <summary>
     /// Returns an entity from the cache with the given <paramref name="id"/>
@@ -41,7 +49,7 @@ public interface IModernServiceCache<TEntity, in TId>
     /// <param name="id">The entity id</param>
     /// <returns>Entity</returns>
     /// <exception cref="EntityNotFoundException">Thrown if entity is not found in the cache</exception>
-    TEntity GetById(TId id);
+    ValueTask<TEntity> GetByIdAsync(TId id);
 
     /// <summary>
     /// Tries to return an entity from the cache with the given <paramref name="id"/>; otherwise, <see langword="null"/>
@@ -51,41 +59,51 @@ public interface IModernServiceCache<TEntity, in TId>
     /// </remarks>
     /// <param name="id">The entity id</param>
     /// <returns>Entity</returns>
-    TEntity? TryGetById(TId id);
+    ValueTask<TEntity?> TryGetByIdAsync(TId id);
+
+    /// <summary>
+    /// Tries to return a list of entities from the cache with the given list of <paramref name="ids"/>
+    /// </summary>
+    /// <remarks>
+    /// Method does not throw exception if entity is not found
+    /// </remarks>
+    /// <param name="ids"></param>
+    /// <returns>List of entities</returns>
+    ValueTask<List<TEntity>> TryGetManyAsync(List<TId> ids);
 
     /// <summary>
     /// Returns all entities from the cache
     /// IMPORTANT: there can be performance issues when retrieving large amount of entities from the cache
     /// </summary>
     /// <returns>List of entities</returns>
-    IEnumerable<TEntity> GetAll();
+    ValueTask<List<TEntity>> GetAllAsync();
 
     /// <summary>
     /// Returns the total count of entities in the cache
     /// </summary>
     /// <returns>Count of entities</returns>
-    int Count();
+    ValueTask<int> CountAsync();
 
     /// <summary>
     /// Returns the total count of entities in the cache that match the given <paramref name="predicate"/>
     /// </summary>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <returns>The count of filtered entities in the cache</returns>
-    int Count(Func<TEntity, bool> predicate);
+    ValueTask<int> CountAsync(Func<TEntity, bool> predicate);
 
     /// <summary>
     /// Determines whether the cache contains at least one entity that matches the given <paramref name="predicate"/>
     /// </summary>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <returns><see langword="true"/> if at least one entity exists; otherwise, <see langword="false"/></returns>
-    bool Exists(Func<TEntity, bool> predicate);
+    ValueTask<bool> ExistsAsync(Func<TEntity, bool> predicate);
 
     /// <summary>
     /// Returns the first entity from the cache that matches the given <paramref name="predicate"/>
     /// </summary>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <returns>Entity or null if not found</returns>
-    TEntity? FirstOrDefault(Func<TEntity, bool> predicate);
+    ValueTask<TEntity?> FirstOrDefaultAsync(Func<TEntity, bool> predicate);
 
     /// <summary>
     /// Returns the single entity from the cache that matches the given <paramref name="predicate"/>
@@ -93,12 +111,33 @@ public interface IModernServiceCache<TEntity, in TId>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <exception cref="InvalidOperationException">Thrown if the data store contains more than one entity that matches the condition</exception>
     /// <returns>Entity or null if not found</returns>
-    TEntity? SingleOrDefault(Func<TEntity, bool> predicate);
+    ValueTask<TEntity?> SingleOrDefaultAsync(Func<TEntity, bool> predicate);
 
     /// <summary>
     /// Returns all entities that match the given <paramref name="predicate"/>
     /// </summary>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <returns>Enumeration of entities</returns>
-    IEnumerable<TEntity> Where(Func<TEntity, bool> predicate);
+    ValueTask<List<TEntity>> WhereAsync(Func<TEntity, bool> predicate);
+
+    /// <summary>
+    /// Returns certain amount of paged entities from the data store that match the given <paramref name="predicate"/>
+    /// </summary>
+    /// <param name="predicate">The filtering predicate</param>
+    /// <param name="pageNumber">Page number. Entities to skip = (pageNumber - 1) * pageSize</param>
+    /// <param name="pageSize">The total number of items to select</param>
+    /// <returns>A list of entities that match the condition</returns>
+    /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
+    /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    ValueTask<PagedResult<TEntity>> WhereAsync(Func<TEntity, bool> predicate, int pageNumber, int pageSize);
+
+    /// <summary>
+    /// Returns <see cref="IEnumerable{TEntity}"/> implementation with data from the cache
+    /// </summary>
+    /// <remarks>
+    /// IMPORTANT: The members of the returned <see cref="IEnumerable{TEntity}"/> instance can throw implementation specific exceptions
+    /// </remarks>
+    /// <returns>The object typed as <see cref="IEnumerable{TEntity}"/></returns>
+    /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    IEnumerable<TEntity> AsEnumerable();
 }

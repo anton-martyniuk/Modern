@@ -1,4 +1,5 @@
-﻿using MapsterMapper;
+﻿using Ardalis.GuardClauses;
+using MapsterMapper;
 using Microsoft.Extensions.Logging;
 using Modern.Data.Paging;
 using Modern.Exceptions;
@@ -113,8 +114,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
                 Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(GetByIdAsync), id);
             }
 
-            await Task.CompletedTask;
-            return Cache.GetById(id);
+            return await Cache.GetByIdAsync(id).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -138,8 +138,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
                 Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(TryGetByIdAsync), id);
             }
 
-            await Task.CompletedTask;
-            return Cache.TryGetById(id);
+            return await Cache.TryGetByIdAsync(id).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -159,8 +158,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             LogMethod(nameof(GetAllAsync));
 
-            await Task.CompletedTask;
-            return Cache.GetAll().ToList();
+            return await Cache.GetAllAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -183,8 +181,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
                 Logger.LogTrace("{serviceName}.{method} of all entities", _serviceName, nameof(CountAsync));
             }
 
-            await Task.CompletedTask;
-            return Cache.Count();
+            return await Cache.CountAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -205,8 +202,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             LogMethod(nameof(CountAsync));
 
-            await Task.CompletedTask;
-            return Cache.Count(predicate);
+            return await Cache.CountAsync(predicate).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -227,8 +223,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             LogMethod(nameof(ExistsAsync));
 
-            await Task.CompletedTask;
-            return Cache.Exists(predicate);
+            return await Cache.ExistsAsync(predicate).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -249,8 +244,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             LogMethod(nameof(FirstOrDefaultAsync));
 
-            await Task.CompletedTask;
-            return Cache.FirstOrDefault(predicate);
+            return await Cache.FirstOrDefaultAsync(predicate).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -271,8 +265,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             LogMethod(nameof(SingleOrDefaultAsync));
 
-            await Task.CompletedTask;
-            return Cache.SingleOrDefault(predicate);
+            return await Cache.SingleOrDefaultAsync(predicate).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -293,8 +286,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             LogMethod(nameof(WhereAsync));
 
-            await Task.CompletedTask;
-            return Cache.Where(predicate).ToList();
+            return await Cache.WhereAsync(predicate).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -311,19 +303,14 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
         try
         {
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+            Guard.Against.NegativeOrZero(pageNumber, nameof(pageNumber));
+            Guard.Against.NegativeOrZero(pageSize, nameof(pageSize));
+
             cancellationToken.ThrowIfCancellationRequested();
 
             LogMethod(nameof(WhereAsync));
 
-            await Task.CompletedTask;
-            var pagedResult = new PagedResult<TEntityDto>
-            {
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-                TotalCount = Cache.Count(predicate),
-                Items = Cache.Where(predicate).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList()
-            };
-            return pagedResult;
+            return await Cache.WhereAsync(predicate, pageNumber, pageSize).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -341,7 +328,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
         {
             LogMethod(nameof(AsEnumerable));
 
-            return Cache.GetAll();
+            return Cache.AsEnumerable();
         }
         catch (Exception ex)
         {
@@ -390,7 +377,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
             var entityId = GetEntityId(entityDto);
 
             Logger.LogDebug("Creating {name} entity with id '{id}' in cache...", _entityName, entityId);
-            Cache.AddOrUpdate(entityId, entityDto);
+            await Cache.AddOrUpdateAsync(entityId, entityDto).ConfigureAwait(false);
             Logger.LogDebug("Created {name} entity with id '{id}'. {@entityDto}", _entityName, entityId, entityDto);
 
             return entityDto;
@@ -410,6 +397,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
         try
         {
             ArgumentNullException.ThrowIfNull(entities, nameof(entities));
+            Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
             cancellationToken.ThrowIfCancellationRequested();
 
             Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(CreateAsync), entities);
@@ -421,14 +409,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
             Logger.LogDebug("Created {name} entities. {@entitiesDbo}", _entityName, entitiesDbo);
 
             var entitiesDto = entitiesDbo.ConvertAll(MapToDto);
-            foreach (var entityDto in entitiesDto)
-            {
-                var entityId = GetEntityId(entityDto);
+            var dictionary = entitiesDto.ToDictionary(key => GetEntityId(key), value => value);
 
-                Logger.LogDebug("Creating {name} entity with id '{id}' in cache...", _entityName, entityId);
-                Cache.AddOrUpdate(entityId, entityDto);
-                Logger.LogDebug("Created {name} entities with id '{id}'. {@entityDto}", _entityName, entityId, entityDto);
-            }
+            Logger.LogDebug("Creating {name} entities in cache...", _entityName);
+            await Cache.AddOrUpdateAsync(dictionary).ConfigureAwait(false);
+            Logger.LogDebug("Created {name} entities. {@entityDto}", _entityName, entitiesDto);
 
             return entitiesDto;
         }
@@ -462,7 +447,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
             var entityId = GetEntityId(entityDto);
 
             Logger.LogDebug("Updating {name} entity with id '{id}' in cache...", _entityName, entityId);
-            Cache.AddOrUpdate(entityId, entityDto);
+            await Cache.AddOrUpdateAsync(entityId, entityDto).ConfigureAwait(false);
             Logger.LogDebug("Updated {name} entity with id '{id}'. {@entityDto}", _entityName, entityId, entityDto);
 
             return entityDto;
@@ -482,6 +467,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
         try
         {
             ArgumentNullException.ThrowIfNull(entities, nameof(entities));
+            Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
             cancellationToken.ThrowIfCancellationRequested();
 
             Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(UpdateAsync), entities);
@@ -493,14 +479,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
             Logger.LogDebug("Updated {name} entities. {@entitiesDbo}", _entityName, entitiesDbo);
 
             var entitiesDto = entitiesDbo.ConvertAll(MapToDto);
-            foreach (var entityDto in entitiesDto)
-            {
-                var entityId = GetEntityId(entityDto);
+            var dictionary = entitiesDto.ToDictionary(key => GetEntityId(key), value => value);
 
-                Logger.LogDebug("Updating {name} entity with id '{id}' in cache...", _entityName, entityId);
-                Cache.AddOrUpdate(entityId, entityDto);
-                Logger.LogDebug("Updated {name} entities with id '{id}'. {@entityDto}", _entityName, entityId, entityDto);
-            }
+            Logger.LogDebug("Updating {name} entities from cache with ids: {@ids}...", _entityName, dictionary);
+            await Cache.AddOrUpdateAsync(dictionary).ConfigureAwait(false);
+            Logger.LogDebug("Update {name} entities", _entityName);
 
             return entitiesDto;
         }
@@ -524,11 +507,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(UpdateAsync), id);
 
-            var entityDto = Cache.GetById(id);
+            var entityDto = await Cache.GetByIdAsync(id).ConfigureAwait(false);
             update(entityDto);
 
             Logger.LogDebug("Updating {name} entity with id '{id}' in cache...", _entityName, id);
-            Cache.AddOrUpdate(id, entityDto);
+            await Cache.AddOrUpdateAsync(id, entityDto).ConfigureAwait(false);
             Logger.LogDebug("Updated {name} entity with id '{id}'. {@entityDto}", _entityName, id, entityDto);
 
             var entityDbo = MapToDbo(entityDto);
@@ -563,7 +546,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
             Logger.LogDebug("Deleted {name} entity with id {id}", _entityName, id);
 
             Logger.LogDebug("Deleting {name} entity with id '{id}' from cache...", _entityName, id);
-            Cache.Delete(id);
+            await Cache.DeleteAsync(id).ConfigureAwait(false);
             Logger.LogDebug("Deleted {name} entity with id '{id}'", _entityName, id);
         }
         catch (Exception ex)
@@ -581,6 +564,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
         try
         {
             ArgumentNullException.ThrowIfNull(ids, nameof(ids));
+            Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
             cancellationToken.ThrowIfCancellationRequested();
 
             Logger.LogTrace("{serviceName}.{method} ids: {@ids}", _serviceName, nameof(DeleteAsync), ids);
@@ -589,12 +573,9 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
             await Repository.DeleteAsync(ids, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Deleted {name} entities with ids: {@ids}", _entityName, ids);
 
-            foreach (var id in ids)
-            {
-                Logger.LogDebug("Deleting {name} entity with id '{id}' from cache...", _entityName, id);
-                Cache.Delete(id);
-                Logger.LogDebug("Deleted {name} entity with id '{id}'", _entityName, id);
-            }
+            Logger.LogDebug("Deleting {name} entities from cache with ids: {@ids}...", _entityName, ids);
+            await Cache.DeleteAsync(ids).ConfigureAwait(false);
+            Logger.LogDebug("Deleted {name} entities", _entityName);
         }
         catch (Exception ex)
         {
@@ -616,16 +597,14 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
             Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(DeleteAndReturnAsync), id);
 
             // Check if entity exists in cache. If not - exception will be thrown.
-            Cache.GetById(id);
+            var entityDto = await Cache.GetByIdAsync(id).ConfigureAwait(false);
 
             Logger.LogDebug("Deleting {name} entity with id '{id}' in db...", _entityName, id);
             var entityDbo = await Repository.DeleteAndReturnAsync(id, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Deleted {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDbo);
 
-            var entityDto = Cache.GetById(id);
-
             Logger.LogDebug("Deleting {name} entity with id '{id}' from cache...", _entityName, id);
-            Cache.Delete(id);
+            await Cache.DeleteAsync(id).ConfigureAwait(false);
             Logger.LogDebug("Deleted {name} entity with id '{id}'", _entityName, id);
 
             return entityDto;
