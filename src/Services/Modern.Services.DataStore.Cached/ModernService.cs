@@ -6,21 +6,20 @@ using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Exceptions;
-using Modern.Services.Abstractions;
-using Modern.Services.Abstractions.Query;
+using Modern.Services.DataStore.Abstractions;
 
-namespace Modern.Services;
+namespace Modern.Services.DataStore.Cached;
 
 /// <summary>
-/// Represents an <see cref="IModernEntityService{TEntityDto, TEntityDbo, TId}"/> implementation
+/// Represents an <see cref="IModernService{TEntityDto,TEntityDbo,TId}"/> implementation
 /// with data access through generic repository with distributed caching
 /// </summary>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
 /// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TRepository> :
-    IModernEntityService<TEntityDto, TEntityDbo, TId>
+public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
+    IModernService<TEntityDto, TEntityDbo, TId>
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
@@ -38,7 +37,7 @@ public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TReposito
     /// <summary>
     /// The distributed cache
     /// </summary>
-    protected readonly IModernDistributedCache<TEntityDto, TId> DistributedCache;
+    protected readonly IModernCache<TEntityDto, TId> Cache;
 
     /// <summary>
     /// The repository instance
@@ -49,16 +48,16 @@ public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TReposito
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="repository">The generic repository</param>
-    /// <param name="distributedCache">Distributed cache</param>
+    /// <param name="cache">Distributed cache</param>
     /// <param name="logger">The logger</param>
-    public ModernEntityServiceWithCache(TRepository repository, IModernDistributedCache<TEntityDto, TId> distributedCache,
-        ILogger<ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TRepository>> logger)
+    public ModernService(TRepository repository, IModernCache<TEntityDto, TId> cache,
+        ILogger<ModernService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
         Repository = repository;
-        DistributedCache = distributedCache;
+        Cache = cache;
         Logger = logger;
     }
 
@@ -115,16 +114,16 @@ public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TReposito
                 Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(GetByIdAsync), id);
             }
 
-            var entityDto = await DistributedCache.TryGetByIdAsync(id).ConfigureAwait(false);
+            var entityDto = await Cache.TryGetByIdAsync(id).ConfigureAwait(false);
             if (entityDto is not null)
             {
                 return entityDto;
             }
 
             var entityDbo = await Repository.GetByIdAsync(id, null, cancellationToken).ConfigureAwait(false);
-            
+
             entityDto = MapToDto(entityDbo);
-            await DistributedCache.AddOrUpdateAsync(GetEntityId(entityDto), entityDto).ConfigureAwait(false);
+            await Cache.AddOrUpdateAsync(GetEntityId(entityDto), entityDto).ConfigureAwait(false);
 
             return entityDto;
         }
@@ -150,7 +149,7 @@ public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TReposito
                 Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(TryGetByIdAsync), id);
             }
 
-            var entityDto = await DistributedCache.TryGetByIdAsync(id).ConfigureAwait(false);
+            var entityDto = await Cache.TryGetByIdAsync(id).ConfigureAwait(false);
             if (entityDto is not null)
             {
                 return entityDto;
@@ -163,7 +162,7 @@ public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TReposito
             }
 
             entityDto = MapToDto(entityDbo);
-            await DistributedCache.AddOrUpdateAsync(GetEntityId(entityDto), entityDto).ConfigureAwait(false);
+            await Cache.AddOrUpdateAsync(GetEntityId(entityDto), entityDto).ConfigureAwait(false);
 
             return entityDto;
         }
@@ -394,7 +393,7 @@ public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TReposito
             var entityId = GetEntityId(entityDto);
 
             Logger.LogDebug("Creating {name} entity with id '{id}' in cache...", _entityName, entityId);
-            await DistributedCache.AddOrUpdateAsync(entityId, entityDto).ConfigureAwait(false);
+            await Cache.AddOrUpdateAsync(entityId, entityDto).ConfigureAwait(false);
             Logger.LogDebug("Created {name} entity with id '{id}'. {@entityDto}", _entityName, entityId, entityDto);
 
             return entityDto;
@@ -424,16 +423,12 @@ public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TReposito
             entitiesDbo = await Repository.CreateAsync(entitiesDbo, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Created {name} entities. {@entityDbo}", _entityName, entitiesDbo);
 
-            // TODO: AddMany
             var entitiesDto = entitiesDbo.ConvertAll(MapToDto);
-            foreach (var entityDto in entitiesDto)
-            {
-                var entityId = GetEntityId(entityDto);
+            var dictionary = entitiesDto.ToDictionary(x => GetEntityId(x), v => v);
 
-                Logger.LogDebug("Creating {name} entity with id '{id}' in cache...", _entityName, entityId);
-                await DistributedCache.AddOrUpdateAsync(entityId, entityDto).ConfigureAwait(false);
-                Logger.LogDebug("Created {name} entities with id '{id}'. {@entityDto}", _entityName, entityId, entityDto);
-            }
+            Logger.LogDebug("Creating {name} entities in cache...", _entityName);
+            await Cache.AddOrUpdateAsync(dictionary).ConfigureAwait(false);
+            Logger.LogDebug("Created {name} entities. {@entityDto}", _entityName, entitiesDto);
 
             return entitiesDto;
         }
@@ -467,7 +462,7 @@ public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TReposito
             var entityId = GetEntityId(entityDto);
 
             Logger.LogDebug("Updating {name} entity with id '{id}' in cache...", _entityName, entityId);
-            await DistributedCache.AddOrUpdateAsync(entityId, entityDto).ConfigureAwait(false);
+            await Cache.AddOrUpdateAsync(entityId, entityDto).ConfigureAwait(false);
             Logger.LogDebug("Updated {name} entity with id '{id}'. {@entityDto}", _entityName, entityId, entityDto);
 
             return entityDto;
@@ -501,7 +496,7 @@ public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TReposito
             var dictionary = entitiesDto.ToDictionary(key => GetEntityId(key), value => value);
 
             Logger.LogDebug("Updating {name} entities from cache with ids: {@ids}...", _entityName, dictionary);
-            await DistributedCache.AddOrUpdateAsync(dictionary).ConfigureAwait(false);
+            await Cache.AddOrUpdateAsync(dictionary).ConfigureAwait(false);
             Logger.LogDebug("Update {name} entities", _entityName);
 
             return entitiesDto;
@@ -534,7 +529,7 @@ public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TReposito
             var entityId = GetEntityId(entityDto);
 
             Logger.LogDebug("Updating {name} entity with id '{id}' in cache...", _entityName, entityId);
-            await DistributedCache.AddOrUpdateAsync(entityId, entityDto).ConfigureAwait(false);
+            await Cache.AddOrUpdateAsync(entityId, entityDto).ConfigureAwait(false);
             Logger.LogDebug("Updated {name} entity with id '{id}'. {@entityDto}", _entityName, entityId, entityDto);
 
             return entityDto;
@@ -563,7 +558,7 @@ public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TReposito
             Logger.LogDebug("Deleted {name} entity with id {id}", _entityName, id);
 
             Logger.LogDebug("Deleting {name} entity with id '{id}' from cache...", _entityName, id);
-            await DistributedCache.DeleteAsync(id).ConfigureAwait(false);
+            await Cache.DeleteAsync(id).ConfigureAwait(false);
             Logger.LogDebug("Deleted {name} entity with id '{id}'", _entityName, id);
         }
         catch (Exception ex)
@@ -590,7 +585,7 @@ public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TReposito
             Logger.LogDebug("Deleted {name} entities with ids: {@ids}", _entityName, ids);
 
             Logger.LogDebug("Deleting {name} entities from cache with ids: {@ids}...", _entityName, ids);
-            await DistributedCache.DeleteAsync(ids).ConfigureAwait(false);
+            await Cache.DeleteAsync(ids).ConfigureAwait(false);
             Logger.LogDebug("Deleted {name} entities", _entityName);
         }
         catch (Exception ex)
@@ -616,10 +611,10 @@ public class ModernEntityServiceWithCache<TEntityDto, TEntityDbo, TId, TReposito
             var entityDbo = await Repository.DeleteAndReturnAsync(id, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Deleted {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDbo);
 
-            var entityDto = await DistributedCache.GetByIdAsync(id).ConfigureAwait(false);
+            var entityDto = await Cache.GetByIdAsync(id).ConfigureAwait(false);
 
             Logger.LogDebug("Deleting {name} entity with id '{id}' from cache...", _entityName, id);
-            await DistributedCache.DeleteAsync(id).ConfigureAwait(false);
+            await Cache.DeleteAsync(id).ConfigureAwait(false);
             Logger.LogDebug("Deleted {name} entity with id '{id}'", _entityName, id);
 
             return entityDto;

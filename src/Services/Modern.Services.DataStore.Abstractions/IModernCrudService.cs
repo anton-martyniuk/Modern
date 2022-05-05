@@ -1,14 +1,16 @@
 ﻿using Modern.Exceptions;
 
-namespace Modern.Services.Abstractions.Crud;
+namespace Modern.Services.DataStore.Abstractions;
 
 /// <summary>
-/// The generic service definition for CRUD cached operations
+/// The generic service definition for CRUD operations
 /// </summary>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
+/// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of the entity's identifier (mainly primary key)</typeparam>
-public interface IModernCrudCachedService<TEntityDto, TId>
+public interface IModernCrudService<TEntityDto, out TEntityDbo, TId>
     where TEntityDto : class
+    where TEntityDbo : class
     where TId : IEquatable<TId>
 {
     /// <summary>
@@ -78,7 +80,7 @@ public interface IModernCrudCachedService<TEntityDto, TId>
     /// <exception cref="EntityNotFoundException">Thrown if an entity does not exist in the data store</exception>
     /// <exception cref="EntityConcurrentUpdateException">If an entity concurrent update occurred</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while updating the entity in the data store</exception>
-    Task<TEntityDto> UpdateAsync(TId id, Action<TEntityDto> update, CancellationToken cancellationToken = default);
+    Task<TEntityDto> UpdateAsync(TId id, Action<TEntityDbo> update, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes the entity in the data store with the given <paramref name="id"/>.<br/>

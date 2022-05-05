@@ -1,10 +1,7 @@
-﻿using Modern.Services.Abstractions.Crud;
-using Modern.Services.Abstractions.Query;
-
-namespace Modern.Services.Abstractions;
+﻿namespace Modern.Services.DataStore.InMemory.Abstractions;
 
 /// <summary>
-/// Represents an <see cref="IModernCrudService{TEntityDto, TEntityDbo, TId}"/> and <see cref="IModernQueryCachedService{TEntityDto, TEntityDbo,TId}"/> abstraction
+/// Represents an <see cref="IModernCrudCachedService{TEntityDto, TId}"/> and <see cref="IModernQueryCachedService{TEntityDto, TEntityDbo,TId}"/> abstraction
 /// with data access with caching and through generic repository
 /// </summary>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>

@@ -1,26 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using Modern.Services.Abstractions;
+using Modern.Services.DataStore.InMemory.Abstractions;
 
-namespace Modern.Controllers.OData;
+namespace Modern.Controllers.DataStore.InMemory.OData;
 
 /// <summary>
-/// The OData controller for entity service
+/// The OData controller for cached service
 /// </summary>
 [Produces("application/json")]
 [Consumes("application/json")]
-public abstract class ModernEntityODataController<TEntityDto, TEntityDbo, TId> : ControllerBase
+public abstract class ModernCachedODataController<TEntityDto, TEntityDbo, TId> : ControllerBase
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
 {
-    private readonly IModernEntityService<TEntityDto, TEntityDbo, TId> _service;
+    private readonly IModernCachedService<TEntityDto, TEntityDbo, TId> _service;
 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    /// <param name="service">Entity service</param>
-    protected ModernEntityODataController(IModernEntityService<TEntityDto, TEntityDbo, TId> service)
+    /// <param name="service">Cached service</param>
+    protected ModernCachedODataController(IModernCachedService<TEntityDto, TEntityDbo, TId> service)
     {
         _service = service;
     }
@@ -38,9 +38,9 @@ public abstract class ModernEntityODataController<TEntityDto, TEntityDbo, TId> :
     /// <response code="500">Error occurred in the entity service</response>
     [HttpGet]
     [EnableQuery(MaxNodeCount = 1000)]
-    //[ProducesResponseType(typeof(IQueryable<TEntity>), (int)HttpStatusCode.OK)] TODO: // create attribute
+    //[ProducesResponseType(typeof(IEnumerable<TEntity>), (int)HttpStatusCode.OK)] TODO: // create attribute
     public virtual IActionResult Get()
     {
-        return Ok(_service.AsQueryable());
+        return Ok(_service.AsEnumerable());
     }
 }

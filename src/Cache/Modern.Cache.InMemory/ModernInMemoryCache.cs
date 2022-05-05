@@ -1,11 +1,14 @@
-﻿using System.Collections.Concurrent;
+﻿using Ardalis.GuardClauses;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Modern.Cache.Abstractions;
+using Modern.Cache.Abstractions.Configuration;
 using Modern.Exceptions;
 
 namespace Modern.Cache.InMemory;
 
 /// <summary>
-/// The <see cref="IModernCache{TEntity,TId}"/> implementation using <see cref="ConcurrentDictionary{TKey,TValue}"/>
+/// The <see cref="IModernCache{TEntity,TId}"/> implementation using in-memory cache
 /// </summary>
 /// <typeparam name="TEntity">Type of entity</typeparam>
 /// <typeparam name="TId">Type of entity identifier</typeparam>
@@ -13,82 +16,140 @@ public class ModernInMemoryCache<TEntity, TId> : IModernCache<TEntity, TId>
     where TEntity : class
     where TId : IEquatable<TId>
 {
-    private readonly ConcurrentDictionary<TId, TEntity> _cacheById;
+    private readonly IMemoryCache _cache;
+    private readonly ModernCacheSettings _cacheSettings;
+
+    private readonly string _redisKeyPrefix = $"modern_cache_{typeof(TEntity).Name}".ToLower();
 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    public ModernInMemoryCache()
+    /// <param name="cache">In-memory cache</param>
+    /// <param name="cacheSettings">Cache settings</param>
+    public ModernInMemoryCache(IMemoryCache cache, IOptions<ModernCacheSettings> cacheSettings)
     {
-        _cacheById = new ConcurrentDictionary<TId, TEntity>(EqualityComparer<TId>.Default);
+        _cache = cache;
+        _cacheSettings = cacheSettings.Value;
     }
 
     /// <summary>
-    /// Initializes a new instance of the class
+    /// <inheritdoc cref="IModernCache{TEntity,TId}.GetByIdAsync"/>
     /// </summary>
-    /// <param name="equalityComparer">Equality comparer for the <typeparamref name="TId"/></param>
-    public ModernInMemoryCache(IEqualityComparer<TId> equalityComparer)
+    public Task<TEntity> GetByIdAsync(TId id)
     {
-        _cacheById = new ConcurrentDictionary<TId, TEntity>(equalityComparer);
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+
+        var key = GetKey(id);
+        var entity = _cache.Get<TEntity>(key);
+        if (entity is null)
+        {
+            throw new EntityNotFoundException($"Entity with id '{id}' not found");
+        }
+
+        return Task.FromResult(entity);
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCache{TEntity,TId}.AddOrUpdate"/>
+    /// <inheritdoc cref="IModernCache{TEntity,TId}.TryGetByIdAsync"/>
     /// </summary>
-    public void AddOrUpdate(TId id, TEntity entity) => _cacheById.AddOrUpdate(id, entity, (_, _) => entity);
+    public Task<TEntity?> TryGetByIdAsync(TId id)
+    {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+
+        var key = GetKey(id);
+        return Task.FromResult(_cache.Get<TEntity?>(key));
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCache{TEntity,TId}.Delete"/>
+    /// <inheritdoc cref="IModernCache{TEntity,TId}.TryGetManyAsync"/>
     /// </summary>
-    public void Delete(TId id) => _cacheById.TryRemove(id, out _);
+    public Task<List<TEntity>> TryGetManyAsync(List<TId> ids)
+    {
+        ArgumentNullException.ThrowIfNull(ids, nameof(ids));
+        Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
+
+        var keys = ids.Select(x => GetKey(x)).ToArray();
+        var entities = keys.Select(x => _cache.Get<TEntity>(x)).Where(x => x is not null);
+        return Task.FromResult(entities.ToList());
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCache{TEntity,TId}.Clear"/>
+    /// <inheritdoc cref="IModernCache{TEntity,TId}.AddOrUpdateAsync(TId,TEntity)"/>
     /// </summary>
-    public void Clear() => _cacheById.Clear();
+    public Task AddOrUpdateAsync(TId id, TEntity entity)
+    {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+
+        var key = GetKey(id);
+
+        if (_cacheSettings.ExpiresIn is null)
+        {
+            _cache.Set(key, entity);
+            return Task.CompletedTask;
+        }
+
+        _cache.Set(key, entity, _cacheSettings.ExpiresIn.Value);
+        return Task.CompletedTask;
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCache{TEntity,TId}.GetById"/>
+    /// <inheritdoc cref="IModernCache{TEntity,TId}.AddOrUpdateAsync(Dictionary{TId,TEntity})"/>
     /// </summary>
-    public TEntity GetById(TId id) => _cacheById.TryGetValue(id, out var entity) ? entity : throw new EntityNotFoundException($"Entity with id '{id}' not found");
+    public Task AddOrUpdateAsync(Dictionary<TId, TEntity> entities)
+    {
+        ArgumentNullException.ThrowIfNull(entities, nameof(entities));
+        Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
+
+        foreach (var (id, value) in entities)
+        {
+            var key = GetKey(id);
+
+            if (_cacheSettings.ExpiresIn is null)
+            {
+                _cache.Set(key, value);
+            }
+            else
+            {
+                _cache.Set(key, value, _cacheSettings.ExpiresIn.Value);
+            }
+        }
+
+        return Task.CompletedTask;
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCache{TEntity,TId}.TryGetById"/>
+    /// <inheritdoc cref="IModernCache{TEntity,TId}.DeleteAsync(TId)"/>
     /// </summary>
-    public TEntity? TryGetById(TId id) => _cacheById.TryGetValue(id, out var entity) ? entity : null;
+    public Task DeleteAsync(TId id)
+    {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+
+        var key = GetKey(id);
+        _cache.Remove(key);
+
+        return Task.CompletedTask;
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCache{TEntity,TId}.GetAll"/>
+    /// <inheritdoc cref="IModernCache{TEntity,TId}.DeleteAsync(List{TId})"/>
     /// </summary>
-    public IEnumerable<TEntity> GetAll() => _cacheById.Values.AsEnumerable();
+    public Task DeleteAsync(List<TId> ids)
+    {
+        ArgumentNullException.ThrowIfNull(ids, nameof(ids));
+        Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
+
+        foreach (var key in ids.Select(x => GetKey(x)))
+        {
+            _cache.Remove(key);
+        }
+
+        return Task.CompletedTask;
+    }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCache{TEntity,TId}.Count()"/>
+    /// Returns key name to access entity in the cache
     /// </summary>
-    public int Count() => _cacheById.Values.Count;
-
-    /// <summary>
-    /// <inheritdoc cref="IModernCache{TEntity,TId}.Count(Func{TEntity, bool})"/>
-    /// </summary>
-    public int Count(Func<TEntity, bool> predicate) => _cacheById.Values.Count(predicate);
-
-    /// <summary>
-    /// <inheritdoc cref="IModernCache{TEntity,TId}.Exists"/>
-    /// </summary>
-    public bool Exists(Func<TEntity, bool> predicate) => _cacheById.Values.Any(predicate);
-
-    /// <summary>
-    /// <inheritdoc cref="IModernCache{TEntity,TId}.FirstOrDefault"/>
-    /// </summary>
-    public TEntity? FirstOrDefault(Func<TEntity, bool> predicate) => _cacheById.Values.FirstOrDefault(predicate);
-
-    /// <summary>
-    /// <inheritdoc cref="IModernCache{TEntity,TId}.SingleOrDefault"/>
-    /// </summary>
-    public TEntity? SingleOrDefault(Func<TEntity, bool> predicate) => _cacheById.Values.SingleOrDefault(predicate);
-
-    /// <summary>
-    /// <inheritdoc cref="IModernCache{TEntity,TId}.Where"/>
-    /// </summary>
-    public IEnumerable<TEntity> Where(Func<TEntity, bool> predicate) => _cacheById.Values.Where(predicate);
+    /// <param name="id">Entity id</param>
+    /// <returns>Key name</returns>
+    private string GetKey(TId id) => $"{_redisKeyPrefix}_{id}";
 }

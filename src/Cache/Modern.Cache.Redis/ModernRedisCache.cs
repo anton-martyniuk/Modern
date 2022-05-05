@@ -8,11 +8,11 @@ using StackExchange.Redis.Extensions.Core.Abstractions;
 namespace Modern.Cache.Redis;
 
 /// <summary>
-/// The <see cref="IModernDistributedCache{TEntity,TId}"/> implementation using Redis
+/// The <see cref="IModernCache{TEntity,TId}"/> implementation using Redis
 /// </summary>
 /// <typeparam name="TEntity">Type of entity</typeparam>
 /// <typeparam name="TId">Type of entity identifier</typeparam>
-public class ModernDistributedRedisCache<TEntity, TId> : IModernDistributedCache<TEntity, TId>
+public class ModernRedisCache<TEntity, TId> : IModernCache<TEntity, TId>
     where TEntity : class
     where TId : IEquatable<TId>
 {
@@ -26,21 +26,25 @@ public class ModernDistributedRedisCache<TEntity, TId> : IModernDistributedCache
     /// </summary>
     /// <param name="redisClient">Redis client (wrapper around Redis Core)</param>
     /// <param name="cacheSettings">Cache settings</param>
-    public ModernDistributedRedisCache(IRedisClient redisClient, IOptions<ModernCacheSettings> cacheSettings)
+    public ModernRedisCache(IRedisClient redisClient, IOptions<ModernCacheSettings> cacheSettings)
     {
         _redisClient = redisClient;
         _cacheSettings = cacheSettings.Value;
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernDistributedCache{TEntity,TId}.GetByIdAsync"/>
+    /// <inheritdoc cref="IModernCache{TEntity,TId}.GetByIdAsync"/>
     /// </summary>
     public async Task<TEntity> GetByIdAsync(TId id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
         var key = GetKey(id);
-        var entity = await _redisClient.GetDefaultDatabase().GetAsync<TEntity>(key).ConfigureAwait(false);
+
+        var entity = _cacheSettings.ExpiresIn is null
+            ? await _redisClient.GetDefaultDatabase().GetAsync<TEntity>(key).ConfigureAwait(false)
+            : await _redisClient.GetDefaultDatabase().GetAsync<TEntity>(key, _cacheSettings.ExpiresIn.Value).ConfigureAwait(false);
+        
         if (entity is null)
         {
             throw new EntityNotFoundException($"Entity with id '{id}' not found");
@@ -50,18 +54,23 @@ public class ModernDistributedRedisCache<TEntity, TId> : IModernDistributedCache
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernDistributedCache{TEntity,TId}.TryGetByIdAsync"/>
+    /// <inheritdoc cref="IModernCache{TEntity,TId}.TryGetByIdAsync"/>
     /// </summary>
     public async Task<TEntity?> TryGetByIdAsync(TId id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
         var key = GetKey(id);
-        return await _redisClient.GetDefaultDatabase().GetAsync<TEntity>(key).ConfigureAwait(false);
+        
+        var entity = _cacheSettings.ExpiresIn is null
+            ? await _redisClient.GetDefaultDatabase().GetAsync<TEntity>(key).ConfigureAwait(false)
+            : await _redisClient.GetDefaultDatabase().GetAsync<TEntity>(key, _cacheSettings.ExpiresIn.Value).ConfigureAwait(false);
+
+        return entity;
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernDistributedCache{TEntity,TId}.TryGetManyAsync"/>
+    /// <inheritdoc cref="IModernCache{TEntity,TId}.TryGetManyAsync"/>
     /// </summary>
     public async Task<List<TEntity>> TryGetManyAsync(List<TId> ids)
     {
@@ -74,7 +83,7 @@ public class ModernDistributedRedisCache<TEntity, TId> : IModernDistributedCache
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernDistributedCache{TEntity,TId}.AddOrUpdateAsync(TId,TEntity)"/>
+    /// <inheritdoc cref="IModernCache{TEntity,TId}.AddOrUpdateAsync(TId,TEntity)"/>
     /// </summary>
     public async Task AddOrUpdateAsync(TId id, TEntity entity)
     {
@@ -92,7 +101,7 @@ public class ModernDistributedRedisCache<TEntity, TId> : IModernDistributedCache
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernDistributedCache{TEntity,TId}.AddOrUpdateAsync(Dictionary{TId,TEntity})"/>
+    /// <inheritdoc cref="IModernCache{TEntity,TId}.AddOrUpdateAsync(Dictionary{TId,TEntity})"/>
     /// </summary>
     public async Task AddOrUpdateAsync(Dictionary<TId, TEntity> entities)
     {
@@ -111,7 +120,7 @@ public class ModernDistributedRedisCache<TEntity, TId> : IModernDistributedCache
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernDistributedCache{TEntity,TId}.DeleteAsync(TId)"/>
+    /// <inheritdoc cref="IModernCache{TEntity,TId}.DeleteAsync(TId)"/>
     /// </summary>
     public async Task DeleteAsync(TId id)
     {
@@ -122,7 +131,7 @@ public class ModernDistributedRedisCache<TEntity, TId> : IModernDistributedCache
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernDistributedCache{TEntity,TId}.DeleteAsync(List{TId})"/>
+    /// <inheritdoc cref="IModernCache{TEntity,TId}.DeleteAsync(List{TId})"/>
     /// </summary>
     public async Task DeleteAsync(List<TId> ids)
     {

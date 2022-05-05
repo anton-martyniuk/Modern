@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
@@ -16,11 +16,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.10" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Services\Modern.Services.Abstractions\Modern.Services.Abstractions.csproj" />
+		<ProjectReference Include="..\..\Services\Modern.Services.DataStore.Abstractions\Modern.Services.DataStore.Abstractions.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 using Modern.Data.Paging;
 using Modern.Exceptions;
 
-namespace Modern.Services.Abstractions.Query;
+namespace Modern.Services.DataStore.Abstractions;
 
 /// <summary>
 /// The generic service definition for querying operations

@@ -17,9 +17,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Cache\Modern.Cache.Abstractions\Modern.Cache.Abstractions.csproj" />
-	  <ProjectReference Include="..\..\Repositories\Modern.Repositories.Abstractions\Modern.Repositories.Abstractions.csproj" />
-	  <ProjectReference Include="..\Modern.Services.Abstractions\Modern.Services.Abstractions.csproj" />
+		<ProjectReference Include="..\..\Repositories\Modern.Repositories.Abstractions\Modern.Repositories.Abstractions.csproj" />
+		<ProjectReference Include="..\Modern.Services.DataStore.Abstractions\Modern.Services.DataStore.Abstractions.csproj" />
 	</ItemGroup>
 
 </Project>

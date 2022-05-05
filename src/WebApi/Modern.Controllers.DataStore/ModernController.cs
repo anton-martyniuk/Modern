@@ -1,28 +1,29 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Net;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Modern.Exceptions;
-using Modern.Services.Abstractions;
+using Modern.Services.DataStore.Abstractions;
 
-namespace Modern.Controllers;
+namespace Modern.Controllers.DataStore;
 
 /// <summary>
 /// The base entity controller for entity service
 /// </summary>
 [Produces("application/json")]
 [Consumes("application/json")]
-public class ModernEntityController<TEntityDto, TEntityDbo, TId> : ControllerBase
+public class ModernController<TEntityDto, TEntityDbo, TId> : ControllerBase
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
 {
-    private readonly IModernEntityService<TEntityDto, TEntityDbo, TId> _service;
+    private readonly IModernService<TEntityDto, TEntityDbo, TId> _service;
 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="service">Entity service</param>
-    public ModernEntityController(IModernEntityService<TEntityDto, TEntityDbo, TId> service)
+    public ModernController(IModernService<TEntityDto, TEntityDbo, TId> service)
     {
         _service = service;
     }
@@ -45,6 +46,9 @@ public class ModernEntityController<TEntityDto, TEntityDbo, TId> : ControllerBas
     /// <response code="500">Error occurred while retrieving entity</response>
     [HttpGet("get/{id}")]
     //[ProducesResponseType(typeof(TEntityDto), (int)HttpStatusCode.OK)] // TODO: use Source Generator to create Attribute
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public virtual async Task<IActionResult> GetById([Required] TId id)
     {
         try
@@ -63,10 +67,13 @@ public class ModernEntityController<TEntityDto, TEntityDbo, TId> : ControllerBas
     /// </summary>
     /// <returns>List of entities</returns>
     /// <response code="200">Entities was found and returned</response>
-    /// <response code="404">Entities was not found in the data store</response>
+    /// <response code="404">Entities were not found in the data store</response>
     /// <response code="500">Error occurred while retrieving entities</response>
     [HttpGet("get")]
     //[ProducesResponseType(typeof(TEntityDto), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public virtual async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         try
@@ -89,6 +96,9 @@ public class ModernEntityController<TEntityDto, TEntityDbo, TId> : ControllerBas
     /// <response code="500">Error occurred while creating entity</response>
     [HttpPost("create")]
     //[ProducesResponseType(typeof(TEntityDto), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.Created)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public virtual async Task<IActionResult> Create([FromBody, Required] TEntityDto entity)
     {
         var createdEntity = await _service.CreateAsync(entity).ConfigureAwait(false);
@@ -104,6 +114,9 @@ public class ModernEntityController<TEntityDto, TEntityDbo, TId> : ControllerBas
     /// <response code="500">Error occurred while creating entities</response>
     [HttpPost("create-many")]
     //[ProducesResponseType(typeof(TEntityDto), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.Created)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public virtual async Task<IActionResult> CreateMany([FromBody, Required] List<TEntityDto> entities)
     {
         var createdEntities = await _service.CreateAsync(entities).ConfigureAwait(false);
@@ -119,6 +132,10 @@ public class ModernEntityController<TEntityDto, TEntityDbo, TId> : ControllerBas
     /// <response code="400">The entity model is invalid</response>
     /// <response code="404">Entity with the given id not found</response>
     /// <response code="500">Error occurred while updating entity</response>
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [HttpPut("update/{id}")]
     public virtual async Task<IActionResult> Update([Required] TId id, [FromBody, Required] TEntityDto entity)
     {
@@ -147,6 +164,10 @@ public class ModernEntityController<TEntityDto, TEntityDbo, TId> : ControllerBas
     /// <response code="400">The entity model is invalid</response>
     /// <response code="404">Entity with the given id not found</response>
     /// <response code="500">Error occurred while updating entities</response>
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [HttpPut("update-many")]
     public virtual async Task<IActionResult> UpdateMany([FromBody, Required] List<TEntityDto> entities)
     {
@@ -171,6 +192,10 @@ public class ModernEntityController<TEntityDto, TEntityDbo, TId> : ControllerBas
     /// <response code="400">The entity model is invalid</response>
     /// <response code="404">Entity with the given id not found</response>
     /// <response code="500">Error occurred while updating entity</response>
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [HttpPatch("patch/{id}")]
     public virtual async Task<IActionResult> Patch([Required] TId id, [FromBody] JsonPatchDocument<TEntityDbo> patch)
     {
@@ -190,9 +215,12 @@ public class ModernEntityController<TEntityDto, TEntityDbo, TId> : ControllerBas
     /// Deletes the entity in the data store with the given <paramref name="id"/>.<br/>
     /// </summary>
     /// <param name="id">The entity id</param>
-    /// <response code="200">Entity was found and deleted from the data store</response>
+    /// <response code="204">Entity was found and deleted from the data store</response>
     /// <response code="404">Entity was not found in the data store</response>
     /// <response code="500">Error occurred while deleting entity</response>
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [HttpDelete("delete/{id}")]
     public virtual async Task<IActionResult> Delete([Required] TId id)
     {
@@ -211,9 +239,12 @@ public class ModernEntityController<TEntityDto, TEntityDbo, TId> : ControllerBas
     /// Deletes the list of entities in the data store with the given list of <paramref name="ids"/>.<br/>
     /// </summary>
     /// <param name="ids">The list of entity ids</param>
-    /// <response code="200">Entity was found and deleted from the data store</response>
+    /// <response code="204">Entity was found and deleted from the data store</response>
     /// <response code="404">Entity was not found in the data store</response>
     /// <response code="500">Error occurred while deleting entity</response>
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [HttpDelete("delete-many")]
     public virtual async Task<IActionResult> DeleteMany([Required] List<TId> ids)
     {

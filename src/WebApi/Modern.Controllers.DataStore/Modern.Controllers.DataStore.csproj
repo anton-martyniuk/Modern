@@ -16,11 +16,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="6.0.4" />
+		<PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="6.0.4" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Services\Modern.Services.Abstractions\Modern.Services.Abstractions.csproj" />
+	  <ProjectReference Include="..\..\Services\Modern.Services.DataStore.Abstractions\Modern.Services.DataStore.Abstractions.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -5,21 +5,20 @@ using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Exceptions;
-using Modern.Services.Abstractions;
-using Modern.Services.Abstractions.Query;
+using Modern.Services.DataStore.Abstractions;
 
-namespace Modern.Services;
+namespace Modern.Services.DataStore;
 
 /// <summary>
-/// Represents an <see cref="IModernEntityService{TEntityDto, TEntityDbo, TId}"/> implementation
+/// Represents an <see cref="IModernService{TEntityDto,TEntityDbo,TId}"/> implementation
 /// with data access through generic repository
 /// </summary>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
 /// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-public class ModernEntityService<TEntityDto, TEntityDbo, TId, TRepository> :
-    IModernEntityService<TEntityDto, TEntityDbo, TId>
+public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
+    IModernService<TEntityDto, TEntityDbo, TId>
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
@@ -44,7 +43,7 @@ public class ModernEntityService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// </summary>
     /// <param name="repository">The generic repository</param>
     /// <param name="logger">The logger</param>
-    public ModernEntityService(TRepository repository, ILogger<ModernEntityService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
+    public ModernService(TRepository repository, ILogger<ModernService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));

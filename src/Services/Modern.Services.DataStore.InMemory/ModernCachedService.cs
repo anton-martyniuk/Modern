@@ -1,14 +1,13 @@
 ﻿using MapsterMapper;
 using Microsoft.Extensions.Logging;
-using Modern.Cache.Abstractions;
 using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Exceptions;
-using Modern.Services.Abstractions;
-using Modern.Services.Abstractions.Query;
+using Modern.Services.DataStore.InMemory.Abstractions;
+using Modern.Services.DataStore.InMemory.Abstractions.Cache;
 
-namespace Modern.Services;
+namespace Modern.Services.DataStore.InMemory;
 
 /// <summary>
 /// Represents an <see cref="IModernCachedService{TEntityDto,TEntityDbo,TId}"/> implementation
@@ -18,7 +17,7 @@ namespace Modern.Services;
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
 /// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-public class ModernFullyCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
+public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     IModernCachedService<TEntityDto, TEntityDbo, TId>
     where TEntityDto : class
     where TEntityDbo : class
@@ -37,7 +36,7 @@ public class ModernFullyCachedService<TEntityDto, TEntityDbo, TId, TRepository> 
     /// <summary>
     /// The service cache
     /// </summary>
-    protected readonly IModernCache<TEntityDto, TId> Cache;
+    protected readonly IModernServiceCache<TEntityDto, TId> Cache;
 
     /// <summary>
     /// The repository instance
@@ -48,10 +47,10 @@ public class ModernFullyCachedService<TEntityDto, TEntityDbo, TId, TRepository> 
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="repository">The generic repository</param>
-    /// <param name="cache">The cache of entities</param>
+    /// <param name="cache">The service cache of entities</param>
     /// <param name="logger">The logger</param>
-    public ModernFullyCachedService(TRepository repository, IModernCache<TEntityDto, TId> cache,
-        ILogger<ModernFullyCachedService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
+    public ModernCachedService(TRepository repository, IModernServiceCache<TEntityDto, TId> cache,
+        ILogger<ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
@@ -114,7 +113,6 @@ public class ModernFullyCachedService<TEntityDto, TEntityDbo, TId, TRepository> 
                 Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(GetByIdAsync), id);
             }
 
-            // TODO: await Cache ?
             await Task.CompletedTask;
             return Cache.GetById(id);
         }

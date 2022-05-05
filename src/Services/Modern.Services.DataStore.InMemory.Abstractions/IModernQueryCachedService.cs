@@ -1,7 +1,7 @@
 ﻿using Modern.Data.Paging;
 using Modern.Exceptions;
 
-namespace Modern.Services.Abstractions.Query;
+namespace Modern.Services.DataStore.InMemory.Abstractions;
 
 /// <summary>
 /// The generic service definition for cached querying operations
