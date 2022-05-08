@@ -18,10 +18,10 @@ public interface IModernCrudService<TEntityDto, out TEntityDbo, TId>
     /// </summary>
     /// <param name="entity">The entity to add to the data store</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
+    /// <returns>Updated entity by the data store (primary key, for example)</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided entity is null</exception>
     /// <exception cref="EntityAlreadyExistsException">Thrown if an entity already exists in the data store</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while saving the entity in the data store</exception>
-    /// <returns>Updated entity by the data store (primary key, for example)</returns>
     Task<TEntityDto> CreateAsync(TEntityDto entity, CancellationToken cancellationToken = default);
 
     /// <summary>

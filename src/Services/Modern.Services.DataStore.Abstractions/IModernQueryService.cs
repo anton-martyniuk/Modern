@@ -93,6 +93,7 @@ public interface IModernQueryService<TEntityDto, TEntityDbo, in TId>
     /// <returns>Entity that matches the given <paramref name="predicate"/> or <see langword="null"/> if entity not found</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    /// <exception cref="InvalidOperationException">Thrown if the data store contains more than one entity that matches the condition</exception>
     Task<TEntityDto?> SingleOrDefaultAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default);
 
     /// <summary>

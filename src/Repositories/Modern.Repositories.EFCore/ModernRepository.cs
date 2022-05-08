@@ -580,8 +580,6 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
         }
     }
 
-    // TODO: delete AsQueryable ?!
-
     // TODO: AsQueryable works only in NON async mode!
 
     /// <summary>
@@ -632,14 +630,27 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
     private async Task<List<TEntity>> PerformUpdateAsync(TDbContext context, List<TEntity> entities, CancellationToken cancellationToken)
     {
         var idName = GetEntityIdColumnOrThrow(context);
-        //var entityType = context.Set<TEntity>().EntityType;
-        //var keyName = entityType.FindPrimaryKey()?.Properties.Select(x => x.Name).SingleOrDefault();
+
+        //var newExpression = Expression.New(typeof(TEntity));
+        //var members = typeof(TEntity).GetMembers();
 
         foreach (var entity in entities)
         {
-            //var id = entity.GetType().GetProperty(idName)?.GetValue(entity, null);
-            //await context.Set<TEntity>().WhereIdEquals(entityType, id).UpdateFromQueryAsync(_ => entity, cancellationToken).ConfigureAwait(false);
-            //await context.Set<TEntity>().Where(x => GetEntityId(x, entity)).UpdateFromQueryAsync(_ => entity, cancellationToken).ConfigureAwait(false);
+            //var bindings = new List<MemberBinding>(members.Length);
+
+            //foreach (var propertyInfo in members.Select(x => x as PropertyInfo).Where(x => x?.CanWrite == true))
+            //{
+            //    if (propertyInfo is null)
+            //    {
+            //        continue;
+            //    }
+
+            //    var entityMemberValue = propertyInfo.GetValue(entity);
+            //    var binding = Expression.Bind(propertyInfo, Expression.Constant(entityMemberValue));
+            //    bindings.Add(binding);
+            //}
+
+            //var memberInitExpression = Expression.MemberInit(newExpression, bindings);
 
             // TODO: System.Exception: Invalid Cast. The update expression must be of type MemberInitExpression
             // see: https://github.com/zzzprojects/EntityFramework-Plus/issues/357
