@@ -9,7 +9,7 @@ namespace Modern.Data.Querying;
 public sealed class InMemoryDataSourceQuery<TEntity> where TEntity : class
 {
     /// <summary>
-    /// The filtering predicate
+    /// A function to test each element for condition
     /// </summary>
     public Func<TEntity, bool> Where { get; set; }
 

@@ -22,7 +22,7 @@ public sealed class InMemoryDataSourceQueryBuilder<TEntity> where TEntity : clas
     /// <summary>
     /// Sets a <see cref="InMemoryDataSourceQuery{TEntity}.Where"/> field
     /// </summary>
-    /// <param name="predicate">The filtering predicate</param>
+    /// <param name="predicate">A function to test each element for condition</param>
     /// <returns>The current builder instance (this)</returns>
     public InMemoryDataSourceQueryBuilder<TEntity> Where(Func<TEntity, bool> predicate)
     {

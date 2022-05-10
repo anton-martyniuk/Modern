@@ -308,7 +308,10 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            LogMethod(nameof(WhereAsync));
+            if (Logger.IsEnabled(LogLevel.Trace))
+            {
+                Logger.LogTrace("{serviceName}.{method}. Page number: {pageNumber}, page size: {pageSize}", _serviceName, nameof(WhereAsync), pageNumber, pageSize);
+            }
 
             return await Cache.WhereAsync(predicate, pageNumber, pageSize).ConfigureAwait(false);
         }

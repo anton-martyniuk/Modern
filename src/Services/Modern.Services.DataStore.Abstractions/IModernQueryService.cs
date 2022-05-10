@@ -44,7 +44,7 @@ public interface IModernQueryService<TEntityDto, TEntityDbo, in TId>
     /// IMPORTANT: there can be performance issues when retrieving large amount of entities
     /// </summary>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>The list of all entities</returns>
+    /// <returns>A list of all entities</returns>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
     Task<List<TEntityDto>> GetAllAsync(CancellationToken cancellationToken = default);
 
@@ -109,7 +109,7 @@ public interface IModernQueryService<TEntityDto, TEntityDbo, in TId>
     /// <summary>
     /// Returns certain amount of paged entities from the data store that match the given <paramref name="predicate"/>
     /// </summary>
-    /// <param name="predicate">The filtering predicate</param>
+    /// <param name="predicate">A function to test each element for condition</param>
     /// <param name="pageNumber">Page number. Entities to skip = (pageNumber - 1) * pageSize</param>
     /// <param name="pageSize">The total number of items to select</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>

@@ -122,7 +122,7 @@ public interface IModernServiceCache<TEntity, TId>
     /// <summary>
     /// Returns certain amount of paged entities from the data store that match the given <paramref name="predicate"/>
     /// </summary>
-    /// <param name="predicate">The filtering predicate</param>
+    /// <param name="predicate">A function to test each element for condition</param>
     /// <param name="pageNumber">Page number. Entities to skip = (pageNumber - 1) * pageSize</param>
     /// <param name="pageSize">The total number of items to select</param>
     /// <returns>A list of entities that match the condition</returns>

@@ -6,8 +6,9 @@ using Modern.Exceptions;
 namespace Modern.CQRS.DataStore.Abstractions.Queries;
 
 /// <summary>
-/// The mediator query model that Returns certain amount of paged entities from the data store that match the given predicate
+/// The mediator query model that returns certain amount of paged entities from the data store that match the given predicate
 /// </summary>
+/// <returns>A list of entities that match the condition</returns>
 /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
 public record GetWherePagedQuery<TEntityDto, TEntityDbo, TId> : IRequest<PagedResult<TEntityDto>>
@@ -16,7 +17,7 @@ public record GetWherePagedQuery<TEntityDto, TEntityDbo, TId> : IRequest<PagedRe
     where TId : IEquatable<TId>
 {
     /// <summary>
-    /// The filtering predicate
+    /// A function to test each element for condition
     /// </summary>
     public Expression<Func<TEntityDbo, bool>> Predicate { get; init; } = default!;
 

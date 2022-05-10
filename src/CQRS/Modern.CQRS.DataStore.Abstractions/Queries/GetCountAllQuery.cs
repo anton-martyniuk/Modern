@@ -6,6 +6,7 @@ namespace Modern.CQRS.DataStore.Abstractions.Queries;
 /// <summary>
 /// The mediator query model that returns the total count of entities
 /// </summary>
+/// <returns>Count of entities</returns>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
 public record GetCountAllQuery<TEntityDto, TId> : IRequest<int>
     where TEntityDto : class

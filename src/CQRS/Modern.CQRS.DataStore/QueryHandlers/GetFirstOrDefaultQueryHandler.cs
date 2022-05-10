@@ -8,22 +8,21 @@ using Modern.Repositories.Abstractions;
 namespace Modern.CQRS.DataStore.QueryHandlers;
 
 /// <summary>
-/// The mediator query handler that returns an entity with the given id
+/// The mediator query handler that returns the first entity that matches the given predicate
 /// </summary>
-/// <returns>The entity</returns>
-/// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
-/// <exception cref="EntityNotFoundException">Thrown if an entity does is not found</exception>
-/// <exception cref="InternalErrorException">If a service internal error occurred</exception>
-public class GetByIdQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
+/// <returns>Entity that matches the given predicate or <see langword="null"/> if entity not found</returns>
+/// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
+/// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+public class GetFirstOrDefaultQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     BaseMediatorHandler<TEntityDto, TEntityDbo>,
-    IRequestHandler<GetByIdQuery<TEntityDto, TId>, TEntityDto>
+    IRequestHandler<GetFirstOrDefaultQuery<TEntityDto, TEntityDbo, TId>, TEntityDto?>
 
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
     where TRepository : class, IModernQueryRepository<TEntityDbo, TId>
 {
-    private const string HandlerName = nameof(GetByIdQueryHandler<TEntityDto, TEntityDbo, TId, TRepository>);
+    private const string HandlerName = nameof(GetFirstOrDefaultQueryHandler<TEntityDto, TEntityDbo, TId, TRepository>);
 
     /// <summary>
     /// The repository instance
@@ -40,7 +39,7 @@ public class GetByIdQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     /// </summary>
     /// <param name="repository">The generic repository</param>
     /// <param name="logger">The logger</param>
-    public GetByIdQueryHandler(TRepository repository, ILogger<GetByIdQueryHandler<TEntityDto, TEntityDbo, TId, TRepository>> logger)
+    public GetFirstOrDefaultQueryHandler(TRepository repository, ILogger<GetFirstOrDefaultQueryHandler<TEntityDto, TEntityDbo, TId, TRepository>> logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
@@ -52,25 +51,25 @@ public class GetByIdQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     /// <summary>
     /// <inheritdoc cref="IRequestHandler{TRequest,TResponse}.Handle"/>
     /// </summary>
-    public async Task<TEntityDto> Handle(GetByIdQuery<TEntityDto, TId> request, CancellationToken cancellationToken)
+    public async Task<TEntityDto?> Handle(GetFirstOrDefaultQuery<TEntityDto, TEntityDbo, TId> request, CancellationToken cancellationToken)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
-            ArgumentNullException.ThrowIfNull(request.Id, nameof(request.Id));
+            ArgumentNullException.ThrowIfNull(request.Predicate, nameof(request.Predicate));
             cancellationToken.ThrowIfCancellationRequested();
 
             if (Logger.IsEnabled(LogLevel.Trace))
             {
-                Logger.LogTrace("{serviceName}.{method} id: {id}", EntityName, HandlerName, request.Id);
+                Logger.LogTrace("{serviceName}.{method}", EntityName, HandlerName);
             }
 
-            var entityDbo = await Repository.GetByIdAsync(request.Id, null, cancellationToken).ConfigureAwait(false);
-            return MapToDto(entityDbo);
+            var entityDbo = await Repository.FirstOrDefaultAsync(request.Predicate, null, cancellationToken).ConfigureAwait(false);
+            return entityDbo is not null ? MapToDto(entityDbo) : null;
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Could not get {name} entity by id '{id}': {reason}", EntityName, request.Id, ex.Message);
+            Logger.LogError(ex, "Could not get first {name} entity by the given predicate: {reason}", EntityName, ex.Message);
             throw CreateProperException(ex);
         }
     }

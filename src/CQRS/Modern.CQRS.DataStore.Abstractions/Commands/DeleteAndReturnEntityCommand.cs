@@ -9,6 +9,7 @@ namespace Modern.CQRS.DataStore.Abstractions.Commands;
 /// </summary>
 /// <returns>Deleted entity</returns>
 /// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
+/// <exception cref="EntityNotFoundException">Thrown if an entity does not exist in the data store</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while deleting the entity in the data store</exception>
 public record DeleteAndReturnEntityCommand<TEntityDto, TId>(TId Id) : IRequest<TEntityDto>
     where TEntityDto : class

@@ -28,7 +28,7 @@ public interface IModernCrudRepository<TEntity, TId>
     /// </summary>
     /// <param name="entities">The list of entities to add to the data store</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>Updated entity by the data store (primary key, for example)</returns>
+    /// <returns>A list of updated entities by the data store (primary key, for example)</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided list of entities is null</exception>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while saving the entities in the data store</exception>
     Task<List<TEntity>> CreateAsync(List<TEntity> entities, CancellationToken cancellationToken = default);

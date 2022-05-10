@@ -338,7 +338,10 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             Guard.Against.NegativeOrZero(pageSize, nameof(pageSize));
             cancellationToken.ThrowIfCancellationRequested();
 
-            LogMethod(nameof(WhereAsync));
+            if (Logger.IsEnabled(LogLevel.Trace))
+            {
+                Logger.LogTrace("{serviceName}.{method}. Page number: {pageNumber}, page size: {pageSize}", _serviceName, nameof(WhereAsync), pageNumber, pageSize);
+            }
 
             var pagedResult = await Repository.WhereAsync(predicate, pageNumber, pageSize, null, cancellationToken).ConfigureAwait(false);
             return new PagedResult<TEntityDto>

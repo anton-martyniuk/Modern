@@ -8,7 +8,7 @@ using Modern.Repositories.Abstractions;
 namespace Modern.CQRS.DataStore.CommandHandlers;
 
 /// <summary>
-/// The mediator command model that creates the new entity
+/// The mediator command handler that creates the new entity
 /// </summary>
 /// <returns>Updated entity by the data store (primary key, for example)</returns>
 /// <exception cref="ArgumentNullException">Thrown if provided entity is null</exception>
@@ -22,6 +22,8 @@ public class CreateEntityCommandHandler<TEntityDto, TEntityDbo, TId, TRepository
     where TId : IEquatable<TId>
     where TRepository : class, IModernCrudRepository<TEntityDbo, TId>
 {
+    private const string HandlerName = nameof(CreateEntityCommandHandler<TEntityDto, TEntityDbo, TId, TRepository>);
+
     /// <summary>
     /// The repository instance
     /// </summary>
@@ -53,10 +55,11 @@ public class CreateEntityCommandHandler<TEntityDto, TEntityDbo, TId, TRepository
     {
         try
         {
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
             ArgumentNullException.ThrowIfNull(request.Entity, nameof(request.Entity));
             cancellationToken.ThrowIfCancellationRequested();
 
-            Logger.LogTrace("{serviceName}.{method} entity: {@entity}", EntityName, "CreateEntityCommandHandler", request.Entity);
+            Logger.LogTrace("{serviceName}.{method} entity: {@entity}", EntityName, HandlerName, request.Entity);
 
             Logger.LogDebug("Creating {name} entity in db...", EntityName);
             var entityDbo = MapToDbo(request.Entity);

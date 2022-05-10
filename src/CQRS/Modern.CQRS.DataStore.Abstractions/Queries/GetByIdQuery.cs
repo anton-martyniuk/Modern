@@ -6,6 +6,7 @@ namespace Modern.CQRS.DataStore.Abstractions.Queries;
 /// <summary>
 /// The mediator query model that returns an entity with the given id
 /// </summary>
+/// <returns>The entity</returns>
 /// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
 /// <exception cref="EntityNotFoundException">Thrown if an entity does is not found</exception>
 /// <exception cref="InternalErrorException">If a service internal error occurred</exception>

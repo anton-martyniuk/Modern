@@ -107,7 +107,7 @@ public interface IModernQueryCachedService<TEntityDto, out TEntityDbo, in TId>
     /// <summary>
     /// Returns certain amount of paged entities from the data store that match the given <paramref name="predicate"/>
     /// </summary>
-    /// <param name="predicate">The filtering predicate</param>
+    /// <param name="predicate">A function to test each element for condition</param>
     /// <param name="pageNumber">Page number. Entities to skip = (pageNumber - 1) * pageSize</param>
     /// <param name="pageSize">The total number of items to select</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>

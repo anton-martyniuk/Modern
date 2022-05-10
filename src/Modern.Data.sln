@@ -49,15 +49,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Controllers.DataStor
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CQRS", "CQRS", "{0D47AA08-6DE7-4D41-A561-07979E3B6B86}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.CQRS.DataStore.Abstractions", "CQRS\Modern.CQRS.DataStore.Abstractions\Modern.CQRS.DataStore.Abstractions.csproj", "{F0DE9544-5E0E-4EDD-BF35-7004FCCD240E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.CQRS.DataStore.Abstractions", "CQRS\Modern.CQRS.DataStore.Abstractions\Modern.CQRS.DataStore.Abstractions.csproj", "{F0DE9544-5E0E-4EDD-BF35-7004FCCD240E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.CQRS.DataStore", "CQRS\Modern.CQRS.DataStore\Modern.CQRS.DataStore.csproj", "{DDE854DE-7C87-4CD2-991A-2CAB2C63C7DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.CQRS.DataStore", "CQRS\Modern.CQRS.DataStore\Modern.CQRS.DataStore.csproj", "{DDE854DE-7C87-4CD2-991A-2CAB2C63C7DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.CQRS.DataStore.Cached", "CQRS\Modern.CQRS.DataStore.Cached\Modern.CQRS.DataStore.Cached.csproj", "{E0D1D2D1-2C1A-4B3A-A80A-CA0C69C4AE83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.CQRS.DataStore.Cached", "CQRS\Modern.CQRS.DataStore.Cached\Modern.CQRS.DataStore.Cached.csproj", "{E0D1D2D1-2C1A-4B3A-A80A-CA0C69C4AE83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.CQRS.DataStore.InMemory", "CQRS\Modern.CQRS.DataStore.InMemory\Modern.CQRS.DataStore.InMemory.csproj", "{D2B12DC6-F6CF-48A3-8723-9DBDBBDDA7EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.CQRS.DataStore.InMemory", "CQRS\Modern.CQRS.DataStore.InMemory\Modern.CQRS.DataStore.InMemory.csproj", "{D2B12DC6-F6CF-48A3-8723-9DBDBBDDA7EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.CQRS.DataStore.InMemory.Abstractions", "CQRS\Modern.CQRS.DataStore.InMemory.Abstractions\Modern.CQRS.DataStore.InMemory.Abstractions.csproj", "{39ABF7B4-8AC3-4C94-9E93-FB15A8DEA33B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.CQRS.DataStore.InMemory.Abstractions", "CQRS\Modern.CQRS.DataStore.InMemory.Abstractions\Modern.CQRS.DataStore.InMemory.Abstractions.csproj", "{39ABF7B4-8AC3-4C94-9E93-FB15A8DEA33B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.CQRS.DataStore", "WebApi\Modern.Controllers.CQRS.DataStore\Modern.Controllers.CQRS.DataStore.csproj", "{59845BD1-DA9F-41B7-939B-6A97DFB450DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -153,6 +155,10 @@ Global
 		{39ABF7B4-8AC3-4C94-9E93-FB15A8DEA33B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39ABF7B4-8AC3-4C94-9E93-FB15A8DEA33B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39ABF7B4-8AC3-4C94-9E93-FB15A8DEA33B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59845BD1-DA9F-41B7-939B-6A97DFB450DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59845BD1-DA9F-41B7-939B-6A97DFB450DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59845BD1-DA9F-41B7-939B-6A97DFB450DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59845BD1-DA9F-41B7-939B-6A97DFB450DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -179,6 +185,7 @@ Global
 		{E0D1D2D1-2C1A-4B3A-A80A-CA0C69C4AE83} = {0D47AA08-6DE7-4D41-A561-07979E3B6B86}
 		{D2B12DC6-F6CF-48A3-8723-9DBDBBDDA7EF} = {0D47AA08-6DE7-4D41-A561-07979E3B6B86}
 		{39ABF7B4-8AC3-4C94-9E93-FB15A8DEA33B} = {0D47AA08-6DE7-4D41-A561-07979E3B6B86}
+		{59845BD1-DA9F-41B7-939B-6A97DFB450DA} = {88AE7017-A15C-462D-8A0B-8EE426BE4C52}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94D244EE-259E-401A-A55F-7D833CA4DC5E}
