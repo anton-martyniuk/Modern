@@ -19,7 +19,7 @@ namespace Modern.Services.DataStore.Cached;
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
 /// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
+public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     IModernService<TEntityDto, TEntityDbo, TId>
     where TEntityDto : class
     where TEntityDbo : class
@@ -51,8 +51,8 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// <param name="repository">The generic repository</param>
     /// <param name="cache">Distributed cache</param>
     /// <param name="logger">The logger</param>
-    public ModernService(TRepository repository, IModernCache<TEntityDto, TId> cache,
-        ILogger<ModernService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
+    public ModernCachedService(TRepository repository, IModernCache<TEntityDto, TId> cache,
+        ILogger<ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
