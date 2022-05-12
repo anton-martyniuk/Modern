@@ -36,7 +36,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     protected readonly TRepository Repository;
 
     /// <summary>
-    /// The distributed cache
+    /// The cache
     /// </summary>
     protected readonly IModernCache<TEntityDto, TId> Cache;
 
@@ -49,7 +49,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="repository">The generic repository</param>
-    /// <param name="cache">Distributed cache</param>
+    /// <param name="cache">Cache</param>
     /// <param name="logger">The logger</param>
     public ModernCachedService(TRepository repository, IModernCache<TEntityDto, TId> cache,
         ILogger<ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
