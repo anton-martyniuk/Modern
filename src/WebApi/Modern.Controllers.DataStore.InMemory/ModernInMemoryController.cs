@@ -10,8 +10,6 @@ namespace Modern.Controllers.DataStore.InMemory;
 /// <summary>
 /// The base controller for cached service
 /// </summary>
-[Produces("application/json")]
-[Consumes("application/json")]
 public class ModernInMemoryController<TEntityDto, TEntityDbo, TId> : ControllerBase
     where TEntityDto : class
     where TEntityDbo : class

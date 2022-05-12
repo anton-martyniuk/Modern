@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Modern.Services.DataStore.Abstractions;
 
 namespace Modern.Controllers.DataStore.OData;
@@ -7,9 +8,7 @@ namespace Modern.Controllers.DataStore.OData;
 /// <summary>
 /// The OData controller for entity service
 /// </summary>
-[Produces("application/json")]
-[Consumes("application/json")]
-public abstract class ModernODataController<TEntityDto, TEntityDbo, TId> : ControllerBase
+public abstract class ModernODataController<TEntityDto, TEntityDbo, TId> : ODataController
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
@@ -37,7 +36,7 @@ public abstract class ModernODataController<TEntityDto, TEntityDbo, TId> : Contr
     /// <response code="200">Entities retrieved</response>
     /// <response code="500">Error occurred in the entity service</response>
     [HttpGet]
-    [EnableQuery(MaxNodeCount = 1000)]
+    [EnableQuery(MaxNodeCount = 1000)] // TODO: configure this ?!
     //[ProducesResponseType(typeof(IQueryable<TEntity>), (int)HttpStatusCode.OK)] TODO: // create attribute
     public virtual IActionResult Get()
     {

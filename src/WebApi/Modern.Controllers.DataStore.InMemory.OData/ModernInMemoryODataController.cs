@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Modern.Services.DataStore.InMemory.Abstractions;
 
 namespace Modern.Controllers.DataStore.InMemory.OData;
@@ -7,9 +8,7 @@ namespace Modern.Controllers.DataStore.InMemory.OData;
 /// <summary>
 /// The OData controller for cached service
 /// </summary>
-[Produces("application/json")]
-[Consumes("application/json")]
-public abstract class ModernInMemoryODataController<TEntityDto, TEntityDbo, TId> : ControllerBase
+public abstract class ModernInMemoryODataController<TEntityDto, TEntityDbo, TId> : ODataController
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>

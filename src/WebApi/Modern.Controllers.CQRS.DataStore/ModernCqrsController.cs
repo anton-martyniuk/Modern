@@ -12,8 +12,6 @@ namespace Modern.Controllers.CQRS.DataStore;
 /// <summary>
 /// The base entity controller for entity service
 /// </summary>
-[Produces("application/json")]
-[Consumes("application/json")]
 public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     where TEntityDto : class
     where TEntityDbo : class

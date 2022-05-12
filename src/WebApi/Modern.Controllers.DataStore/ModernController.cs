@@ -10,8 +10,6 @@ namespace Modern.Controllers.DataStore;
 /// <summary>
 /// The base entity controller for entity service
 /// </summary>
-[Produces("application/json")]
-[Consumes("application/json")]
 public class ModernController<TEntityDto, TEntityDbo, TId> : ControllerBase
     where TEntityDto : class
     where TEntityDbo : class
