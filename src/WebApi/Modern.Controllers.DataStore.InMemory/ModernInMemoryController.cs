@@ -12,18 +12,18 @@ namespace Modern.Controllers.DataStore.InMemory;
 /// </summary>
 [Produces("application/json")]
 [Consumes("application/json")]
-public class ModernCachedController<TEntityDto, TEntityDbo, TId> : ControllerBase
+public class ModernInMemoryController<TEntityDto, TEntityDbo, TId> : ControllerBase
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
 {
-    private readonly IModernCachedService<TEntityDto, TEntityDbo, TId> _service;
+    private readonly IModernInMemoryService<TEntityDto, TEntityDbo, TId> _service;
 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="service">Cached service</param>
-    protected ModernCachedController(IModernCachedService<TEntityDto, TEntityDbo, TId> service)
+    protected ModernInMemoryController(IModernInMemoryService<TEntityDto, TEntityDbo, TId> service)
     {
         _service = service;
     }

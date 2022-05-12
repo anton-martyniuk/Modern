@@ -14,7 +14,7 @@ namespace Modern.Controllers.CQRS.DataStore;
 /// </summary>
 [Produces("application/json")]
 [Consumes("application/json")]
-public class ModernController<TEntityDto, TEntityDbo, TId> : ControllerBase
+public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
@@ -25,7 +25,7 @@ public class ModernController<TEntityDto, TEntityDbo, TId> : ControllerBase
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="mediator">The mediator</param>
-    public ModernController(IMediator mediator)
+    public ModernCqrsController(IMediator mediator)
     {
         _mediator = mediator;
     }

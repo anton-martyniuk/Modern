@@ -11,15 +11,15 @@ using Modern.Services.DataStore.InMemory.Abstractions.Cache;
 namespace Modern.Services.DataStore.InMemory;
 
 /// <summary>
-/// Represents an <see cref="IModernCachedService{TEntityDto,TEntityDbo,TId}"/> implementation
+/// Represents an <see cref="IModernInMemoryService{TEntityDto,TEntityDbo,TId}"/> implementation
 /// with data access with caching and through generic repository
 /// </summary>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
 /// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
-    IModernCachedService<TEntityDto, TEntityDbo, TId>
+public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
+    IModernInMemoryService<TEntityDto, TEntityDbo, TId>
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
@@ -50,8 +50,8 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// <param name="repository">The generic repository</param>
     /// <param name="cache">The service cache of entities</param>
     /// <param name="logger">The logger</param>
-    public ModernCachedService(TRepository repository, IModernServiceCache<TEntityDto, TId> cache,
-        ILogger<ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
+    public ModernInMemoryService(TRepository repository, IModernServiceCache<TEntityDto, TId> cache,
+        ILogger<ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
@@ -100,7 +100,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
         };
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.GetByIdAsync"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.GetByIdAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
@@ -124,7 +124,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.TryGetByIdAsync"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.TryGetByIdAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto?> TryGetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
@@ -148,7 +148,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.GetAllAsync"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.GetAllAsync"/>
     /// </summary>
     public virtual async Task<List<TEntityDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
@@ -168,7 +168,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.CountAsync(CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.CountAsync(CancellationToken)"/>
     /// </summary>
     public virtual async Task<int> CountAsync(CancellationToken cancellationToken = default)
     {
@@ -191,7 +191,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.CountAsync(Func{TEntityDto, bool},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.CountAsync(Func{TEntityDto, bool},CancellationToken)"/>
     /// </summary>
     public virtual async Task<int> CountAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
@@ -212,7 +212,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.ExistsAsync"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.ExistsAsync"/>
     /// </summary>
     public virtual async Task<bool> ExistsAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
@@ -233,7 +233,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.FirstOrDefaultAsync"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.FirstOrDefaultAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto?> FirstOrDefaultAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
@@ -254,7 +254,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.SingleOrDefaultAsync"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.SingleOrDefaultAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto?> SingleOrDefaultAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
@@ -275,7 +275,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.WhereAsync(Func{TEntityDto, bool},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.WhereAsync(Func{TEntityDto, bool},CancellationToken)"/>
     /// </summary>
     public virtual async Task<List<TEntityDto>> WhereAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
@@ -296,7 +296,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo,TId}.WhereAsync(Func{TEntityDto, bool},int,int,CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo,TId}.WhereAsync(Func{TEntityDto, bool},int,int,CancellationToken)"/>
     /// </summary>
     public virtual async Task<PagedResult<TEntityDto>> WhereAsync(Func<TEntityDto, bool> predicate, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
@@ -323,7 +323,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.AsQueryable"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.AsQueryable"/>
     /// </summary>
     public virtual IEnumerable<TEntityDto> AsEnumerable()
     {
@@ -341,7 +341,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryCachedService{TEntityDto, TEntityDbo, TId}.AsQueryable"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.AsQueryable"/>
     /// </summary>
     public virtual IQueryable<TEntityDbo> AsQueryable()
     {

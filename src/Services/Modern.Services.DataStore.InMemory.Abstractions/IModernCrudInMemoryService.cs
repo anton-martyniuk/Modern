@@ -7,7 +7,7 @@ namespace Modern.Services.DataStore.InMemory.Abstractions;
 /// </summary>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
 /// <typeparam name="TId">The type of the entity's identifier (mainly primary key)</typeparam>
-public interface IModernCrudCachedService<TEntityDto, TId>
+public interface IModernCrudInMemoryService<TEntityDto, TId>
     where TEntityDto : class
     where TId : IEquatable<TId>
 {

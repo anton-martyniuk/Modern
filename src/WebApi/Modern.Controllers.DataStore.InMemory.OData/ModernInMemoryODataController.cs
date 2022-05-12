@@ -9,18 +9,18 @@ namespace Modern.Controllers.DataStore.InMemory.OData;
 /// </summary>
 [Produces("application/json")]
 [Consumes("application/json")]
-public abstract class ModernCachedODataController<TEntityDto, TEntityDbo, TId> : ControllerBase
+public abstract class ModernInMemoryODataController<TEntityDto, TEntityDbo, TId> : ControllerBase
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
 {
-    private readonly IModernCachedService<TEntityDto, TEntityDbo, TId> _service;
+    private readonly IModernInMemoryService<TEntityDto, TEntityDbo, TId> _service;
 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="service">Cached service</param>
-    protected ModernCachedODataController(IModernCachedService<TEntityDto, TEntityDbo, TId> service)
+    protected ModernInMemoryODataController(IModernInMemoryService<TEntityDto, TEntityDbo, TId> service)
     {
         _service = service;
     }
