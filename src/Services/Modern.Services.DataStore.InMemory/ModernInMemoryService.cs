@@ -535,7 +535,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAsync(TId,CancellationToken)"/>
     /// </summary>
-    public virtual async Task DeleteAsync(TId id, CancellationToken cancellationToken = default)
+    public virtual async Task<bool> DeleteAsync(TId id, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -543,14 +543,22 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
             cancellationToken.ThrowIfCancellationRequested();
 
             Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(DeleteAsync), id);
-
             Logger.LogDebug("Deleting {name} entity with id '{id}' in db...", _entityName, id);
-            await Repository.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
+
+            var result = await Repository.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
+            if (!result)
+            {
+                Logger.LogDebug("{name} entity with id {id} was not found for deletion", _entityName, id);
+                return result;
+            }
+
             Logger.LogDebug("Deleted {name} entity with id {id}", _entityName, id);
 
             Logger.LogDebug("Deleting {name} entity with id '{id}' from cache...", _entityName, id);
             await Cache.DeleteAsync(id).ConfigureAwait(false);
             Logger.LogDebug("Deleted {name} entity with id '{id}'", _entityName, id);
+
+            return result;
         }
         catch (Exception ex)
         {
@@ -562,7 +570,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAsync(List{TId},CancellationToken)"/>
     /// </summary>
-    public virtual async Task DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default)
+    public virtual async Task<bool> DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -571,14 +579,22 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
             cancellationToken.ThrowIfCancellationRequested();
 
             Logger.LogTrace("{serviceName}.{method} ids: {@ids}", _serviceName, nameof(DeleteAsync), ids);
-
             Logger.LogDebug("Updating {name} entities in db...", _entityName);
-            await Repository.DeleteAsync(ids, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Deleted {name} entities with ids: {@ids}", _entityName, ids);
+
+            var result = await Repository.DeleteAsync(ids, cancellationToken).ConfigureAwait(false);
+            if (!result)
+            {
+                Logger.LogDebug("Not all {name} entities with ids: {@ids} were found for deletion", _entityName, ids);
+                return result;
+            }
+
+            Logger.LogDebug("Deleted {name} entities with ids: {@ids}. Result: {result}", _entityName, ids, result);
 
             Logger.LogDebug("Deleting {name} entities from cache with ids: {@ids}...", _entityName, ids);
             await Cache.DeleteAsync(ids).ConfigureAwait(false);
             Logger.LogDebug("Deleted {name} entities", _entityName);
+
+            return result;
         }
         catch (Exception ex)
         {

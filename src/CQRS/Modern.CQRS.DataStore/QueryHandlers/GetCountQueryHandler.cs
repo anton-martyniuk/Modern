@@ -10,9 +10,9 @@ namespace Modern.CQRS.DataStore.QueryHandlers;
 /// <summary>
 /// The mediator query handler that returns the total count of entities that match the given predicate
 /// </summary>
-/// <returns>Count of entities</returns>
 /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+/// <returns>Count of entities</returns>
 public class GetCountQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     BaseMediatorHandler<TEntityDto, TEntityDbo>,
     IRequestHandler<GetCountQuery<TEntityDbo, TId>, int>

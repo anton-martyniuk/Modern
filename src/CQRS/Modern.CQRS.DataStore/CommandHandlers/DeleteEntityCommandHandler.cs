@@ -13,9 +13,10 @@ namespace Modern.CQRS.DataStore.CommandHandlers;
 /// </summary>
 /// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while deleting the entity in the data store</exception>
+/// <returns><see langword="true"/> if entity was deleted; otherwise, <see langword="false"/></returns>
 public class DeleteEntityCommandHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     BaseMediatorHandler<TEntityDto, TEntityDbo>,
-    IRequestHandler<DeleteEntityCommand<TId>>
+    IRequestHandler<DeleteEntityCommand<TId>, bool>
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
@@ -50,7 +51,7 @@ public class DeleteEntityCommandHandler<TEntityDto, TEntityDbo, TId, TRepository
     /// <summary>
     /// <inheritdoc cref="IRequestHandler{TRequest,TResponse}.Handle"/>
     /// </summary>
-    public async Task<Unit> Handle(DeleteEntityCommand<TId> request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteEntityCommand<TId> request, CancellationToken cancellationToken)
     {
         try
         {
@@ -59,12 +60,17 @@ public class DeleteEntityCommandHandler<TEntityDto, TEntityDbo, TId, TRepository
             cancellationToken.ThrowIfCancellationRequested();
 
             Logger.LogTrace("{serviceName}.{method} id: {id}", EntityName, HandlerName, request.Id);
-
             Logger.LogDebug("Deleting {name} entity with id '{id}' in db...", EntityName, request.Id);
-            await Repository.DeleteAsync(request.Id, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Deleted {name} entity with id {id}", EntityName, request.Id);
 
-            return Unit.Value;
+            var result = await Repository.DeleteAsync(request.Id, cancellationToken).ConfigureAwait(false);
+            if (!result)
+            {
+                Logger.LogDebug("{name} entity with id {id} was not found for deletion", EntityName, request.Id);
+                return result;
+            }
+
+            Logger.LogDebug("Deleted {name} entity with id {id}", EntityName, request.Id);
+            return result;
         }
         catch (Exception ex)
         {

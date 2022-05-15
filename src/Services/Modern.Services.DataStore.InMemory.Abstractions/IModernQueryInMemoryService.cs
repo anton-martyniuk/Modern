@@ -19,10 +19,10 @@ public interface IModernQueryInMemoryService<TEntityDto, out TEntityDbo, in TId>
     /// </summary>
     /// <param name="id">The entity id</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>The entity</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
     /// <exception cref="EntityNotFoundException">Thrown if an entity does is not found</exception>
     /// <exception cref="InternalErrorException">If a service internal error occurred</exception>
+    /// <returns>The entity</returns>
     Task<TEntityDto> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -33,9 +33,9 @@ public interface IModernQueryInMemoryService<TEntityDto, out TEntityDbo, in TId>
     /// </remarks>
     /// <param name="id">The entity id</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>The entity</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    /// <returns>The entity</returns>
     Task<TEntityDto?> TryGetByIdAsync(TId id, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -43,15 +43,15 @@ public interface IModernQueryInMemoryService<TEntityDto, out TEntityDbo, in TId>
     /// IMPORTANT: there can be performance issues when retrieving large amount of entities
     /// </summary>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>The list of all entities</returns>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    /// <returns>The list of all entities</returns>
     Task<List<TEntityDto>> GetAllAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns the total count of entities
     /// </summary>
-    /// <returns>Count of entities</returns>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    /// <returns>Count of entities</returns>
     Task<int> CountAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -59,9 +59,9 @@ public interface IModernQueryInMemoryService<TEntityDto, out TEntityDbo, in TId>
     /// </summary>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>Count of entities</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    /// <returns>Count of entities</returns>
     Task<int> CountAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -69,9 +69,9 @@ public interface IModernQueryInMemoryService<TEntityDto, out TEntityDbo, in TId>
     /// </summary>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns><see langword="true"/> if at least one entity exists; otherwise, <see langword="false"/></returns>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    /// <returns><see langword="true"/> if at least one entity exists; otherwise, <see langword="false"/></returns>
     Task<bool> ExistsAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -79,9 +79,9 @@ public interface IModernQueryInMemoryService<TEntityDto, out TEntityDbo, in TId>
     /// </summary>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>Entity that matches the given <paramref name="predicate"/> or <see langword="null"/> if entity not found</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    /// <returns>Entity that matches the given <paramref name="predicate"/> or <see langword="null"/> if entity not found</returns>
     Task<TEntityDto?> FirstOrDefaultAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -89,9 +89,9 @@ public interface IModernQueryInMemoryService<TEntityDto, out TEntityDbo, in TId>
     /// </summary>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>Entity that matches the given <paramref name="predicate"/> or <see langword="null"/> if entity not found</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    /// <returns>Entity that matches the given <paramref name="predicate"/> or <see langword="null"/> if entity not found</returns>
     Task<TEntityDto?> SingleOrDefaultAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -99,9 +99,9 @@ public interface IModernQueryInMemoryService<TEntityDto, out TEntityDbo, in TId>
     /// </summary>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>A list of entities that match the condition</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    /// <returns>A list of entities that match the condition</returns>
     Task<List<TEntityDto>> WhereAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -111,9 +111,9 @@ public interface IModernQueryInMemoryService<TEntityDto, out TEntityDbo, in TId>
     /// <param name="pageNumber">Page number. Entities to skip = (pageNumber - 1) * pageSize</param>
     /// <param name="pageSize">The total number of items to select</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>A list of entities that match the condition</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    /// <returns>A list of entities that match the condition</returns>
     Task<PagedResult<TEntityDto>> WhereAsync(Func<TEntityDto, bool> predicate, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -122,8 +122,8 @@ public interface IModernQueryInMemoryService<TEntityDto, out TEntityDbo, in TId>
     /// <remarks>
     /// IMPORTANT: The members of the returned <see cref="IEnumerable{TEntityDto}"/> instance can throw implementation specific exceptions
     /// </remarks>
-    /// <returns>The object typed as <see cref="IEnumerable{TEntityDto}"/></returns>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    /// <returns>The object typed as <see cref="IEnumerable{TEntityDto}"/></returns>
     IEnumerable<TEntityDto> AsEnumerable();
 
     /// <summary>
@@ -132,7 +132,7 @@ public interface IModernQueryInMemoryService<TEntityDto, out TEntityDbo, in TId>
     /// <remarks>
     /// IMPORTANT: The members of the returned <see cref="IQueryable{TEntityDto}"/> instance can throw implementation specific exceptions
     /// </remarks>
-    /// <returns>The object typed as <see cref="IQueryable{TEntityDto}"/></returns>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+    /// <returns>The object typed as <see cref="IQueryable{TEntityDto}"/></returns>
     IQueryable<TEntityDbo> AsQueryable();
 }

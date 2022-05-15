@@ -11,8 +11,8 @@ namespace Modern.CQRS.DataStore.QueryHandlers;
 /// The mediator query handler that returns all entities.<br/>
 /// IMPORTANT: there can be performance issues when retrieving large amount of entities
 /// </summary>
-/// <returns>A list of all entities</returns>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+/// <returns>A list of all entities</returns>
 public class GetAllQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     BaseMediatorHandler<TEntityDto, TEntityDbo>,
     IRequestHandler<GetAllQuery<TEntityDto, TId>, List<TEntityDto>>

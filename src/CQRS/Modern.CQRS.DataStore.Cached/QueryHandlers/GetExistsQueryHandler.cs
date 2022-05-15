@@ -10,9 +10,9 @@ namespace Modern.CQRS.DataStore.Cached.QueryHandlers;
 /// <summary>
 /// The mediator query handler that determines whether the data store contains at least one entity that matches the given predicate
 /// </summary>
-/// <returns><see langword="true"/> if at least one entity exists; otherwise, <see langword="false"/></returns>
 /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+/// <returns><see langword="true"/> if at least one entity exists; otherwise, <see langword="false"/></returns>
 public class GetExistsQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     BaseMediatorHandler<TEntityDto, TEntityDbo, TId>,
     IRequestHandler<GetExistsQuery<TEntityDbo, TId>, bool>

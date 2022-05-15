@@ -15,9 +15,10 @@ namespace Modern.CQRS.DataStore.CommandHandlers;
 /// </summary>
 /// <exception cref="ArgumentNullException">Thrown if provided list of entities is null or has no entities in the list</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while deleting the entities in the data store</exception>
+/// <returns><see langword="true"/> if all entities were deleted; otherwise, <see langword="false"/></returns>
 public class DeleteEntitiesCommandHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     BaseMediatorHandler<TEntityDto, TEntityDbo>,
-    IRequestHandler<DeleteEntitiesCommand<TId>>
+    IRequestHandler<DeleteEntitiesCommand<TId>, bool>
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
@@ -52,7 +53,7 @@ public class DeleteEntitiesCommandHandler<TEntityDto, TEntityDbo, TId, TReposito
     /// <summary>
     /// <inheritdoc cref="IRequestHandler{TRequest,TResponse}.Handle"/>
     /// </summary>
-    public async Task<Unit> Handle(DeleteEntitiesCommand<TId> request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteEntitiesCommand<TId> request, CancellationToken cancellationToken)
     {
         try
         {
@@ -62,12 +63,17 @@ public class DeleteEntitiesCommandHandler<TEntityDto, TEntityDbo, TId, TReposito
             cancellationToken.ThrowIfCancellationRequested();
 
             Logger.LogTrace("{serviceName}.{method} ids: {@ids}", EntityName, HandlerName, request.Ids);
-
             Logger.LogDebug("Updating {name} entities in db...", EntityName);
-            await Repository.DeleteAsync(request.Ids, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Deleted {name} entities with ids: {@ids}", EntityName, request.Ids);
 
-            return Unit.Value;
+            var result = await Repository.DeleteAsync(request.Ids, cancellationToken).ConfigureAwait(false);
+            if (!result)
+            {
+                Logger.LogDebug("Not all {name} entities with ids: {@ids} were found for deletion", EntityName, request.Ids);
+                return result;
+            }
+
+            Logger.LogDebug("Deleted {name} entities with ids: {@ids}. Result: {result}", EntityName, request.Ids, result);
+            return result;
         }
         catch (Exception ex)
         {

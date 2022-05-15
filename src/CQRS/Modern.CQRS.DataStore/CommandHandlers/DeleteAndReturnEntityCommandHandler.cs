@@ -11,10 +11,10 @@ namespace Modern.CQRS.DataStore.CommandHandlers;
 /// The mediator command handler that deletes and returns an entity in the data store with the given entity id.<br/>
 /// This method queries the entity from the data store before deletion
 /// </summary>
-/// <returns>Deleted entity</returns>
 /// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
 /// <exception cref="EntityNotFoundException">Thrown if an entity does not exist in the data store</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while deleting the entity in the data store</exception>
+/// <returns>Deleted entity</returns>
 public class DeleteAndReturnEntityCommandHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     BaseMediatorHandler<TEntityDto, TEntityDbo>,
     IRequestHandler<DeleteAndReturnEntityCommand<TEntityDto, TId>, TEntityDto>

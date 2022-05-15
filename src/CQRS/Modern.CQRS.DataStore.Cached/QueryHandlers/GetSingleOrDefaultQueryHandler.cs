@@ -10,10 +10,10 @@ namespace Modern.CQRS.DataStore.Cached.QueryHandlers;
 /// <summary>
 /// The mediator query handler that returns the single entity that matches the given predicate
 /// </summary>
-/// <returns>Entity that matches the given predicate or <see langword="null"/> if entity not found</returns>
 /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
 /// <exception cref="InvalidOperationException">Thrown if the data store contains more than one entity that matches the condition</exception>
+/// <returns>Entity that matches the given predicate or <see langword="null"/> if entity not found</returns>
 public class GetSingleOrDefaultQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     BaseMediatorHandler<TEntityDto, TEntityDbo, TId>,
     IRequestHandler<GetSingleOrDefaultQuery<TEntityDto, TEntityDbo, TId>, TEntityDto?>

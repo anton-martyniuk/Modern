@@ -10,9 +10,9 @@ namespace Modern.CQRS.DataStore.QueryHandlers;
 /// <summary>
 /// The mediator query handler that returns the first entity that matches the given predicate
 /// </summary>
-/// <returns>Entity that matches the given predicate or <see langword="null"/> if entity not found</returns>
 /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+/// <returns>Entity that matches the given predicate or <see langword="null"/> if entity not found</returns>
 public class GetFirstOrDefaultQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     BaseMediatorHandler<TEntityDto, TEntityDbo>,
     IRequestHandler<GetFirstOrDefaultQuery<TEntityDto, TEntityDbo, TId>, TEntityDto?>

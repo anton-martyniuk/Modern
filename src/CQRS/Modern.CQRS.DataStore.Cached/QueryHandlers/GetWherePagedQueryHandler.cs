@@ -12,9 +12,9 @@ namespace Modern.CQRS.DataStore.Cached.QueryHandlers;
 /// <summary>
 /// The mediator query handler that returns certain amount of paged entities from the data store that match the given predicate
 /// </summary>
-/// <returns>A list of entities that match the condition</returns>
 /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+/// <returns>A list of entities that match the condition</returns>
 public class GetWherePagedQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     BaseMediatorHandler<TEntityDto, TEntityDbo, TId>,
     IRequestHandler<GetWherePagedQuery<TEntityDto, TEntityDbo, TId>, PagedResult<TEntityDto>>

@@ -21,10 +21,10 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// <param name="id">The entity id</param>
     /// <param name="includeQuery">Expression that describes included entities</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>Found entity</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
     /// <exception cref="EntityNotFoundException">Thrown if an entity does is not found in the data store</exception>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
+    /// <returns>Found entity</returns>
     Task<TEntity> GetByIdAsync(TId id, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -36,9 +36,9 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// <param name="id">The entity id</param>
     /// <param name="includeQuery">Expression that describes included entities</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>Found entity</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
+    /// <returns>Found entity</returns>
     Task<TEntity?> TryGetByIdAsync(TId id, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -47,15 +47,15 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// </summary>
     /// <param name="includeQuery">Expression that describes included entities</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>The list of all entities</returns>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
+    /// <returns>The list of all entities</returns>
     Task<List<TEntity>> GetAllAsync(EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns the total count of entities in the data store
     /// </summary>
-    /// <returns>Count of entities</returns>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
+    /// <returns>Count of entities</returns>
     Task<int> CountAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -64,9 +64,9 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <param name="includeQuery">Expression that describes included entities</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>Count of entities</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
+    /// <returns>Count of entities</returns>
     Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -75,9 +75,9 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <param name="includeQuery">Expression that describes included entities</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns><see langword="true"/> if at least one entity exists; otherwise, <see langword="false"/></returns>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
+    /// <returns><see langword="true"/> if at least one entity exists; otherwise, <see langword="false"/></returns>
     Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -86,9 +86,9 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <param name="includeQuery">Expression that describes included entities</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>Entity that matches the given <paramref name="predicate"/> or <see langword="null"/> if entity not found</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
+    /// <returns>Entity that matches the given <paramref name="predicate"/> or <see langword="null"/> if entity not found</returns>
     Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -97,10 +97,10 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <param name="includeQuery">Expression that describes included entities</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>Entity that matches the given <paramref name="predicate"/> or <see langword="null"/> if entity not found</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="InvalidOperationException">Thrown if the data store contains more than one entity that matches the condition</exception>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
+    /// <returns>Entity that matches the given <paramref name="predicate"/> or <see langword="null"/> if entity not found</returns>
     Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -109,9 +109,9 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// <param name="predicate">A function to test each element for condition</param>
     /// <param name="includeQuery">Expression that describes included entities</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>A list of entities that match the condition</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
+    /// <returns>A list of entities that match the condition</returns>
     Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -122,9 +122,9 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// <param name="pageSize">The total number of items to select</param>
     /// <param name="includeQuery">Expression that describes included entities</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>A list of entities that match the condition</returns>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
+    /// <returns>A list of entities that match the condition</returns>
     Task<PagedResult<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, int pageNumber, int pageSize, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -133,7 +133,7 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// <remarks>
     /// IMPORTANT: The members of the returned <see cref="IQueryable{TEntity}"/> instance can throw implementation specific exceptions
     /// </remarks>
-    /// <returns>The object typed as <see cref="IQueryable{TEntity}"/></returns>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
+    /// <returns>The object typed as <see cref="IQueryable{TEntity}"/></returns>
     IQueryable<TEntity> AsQueryable();
 }

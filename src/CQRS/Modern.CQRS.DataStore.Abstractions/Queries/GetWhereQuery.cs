@@ -7,9 +7,9 @@ namespace Modern.CQRS.DataStore.Abstractions.Queries;
 /// <summary>
 /// The mediator query model that returns all entities that match the given predicate
 /// </summary>
-/// <returns>A list of entities that match the condition</returns>
 /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+/// <returns>A list of entities that match the condition</returns>
 public record GetWhereQuery<TEntityDto, TEntityDbo, TId>(Expression<Func<TEntityDbo, bool>> Predicate) : IRequest<List<TEntityDto>>
     where TEntityDto : class
     where TEntityDbo : class

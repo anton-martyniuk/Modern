@@ -33,17 +33,6 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
     /// </summary>
     protected IDbContextFactory<TDbContext> DbContextFactory { get; }
 
-    ///// <summary>
-    ///// Initializes a new instance of the class
-    ///// </summary>
-    ///// <param name="createDbContext">The DbContext creation delegate</param>
-    ///// <param name="configuration">Repository configuration</param>
-    //public ModernEfCoreRepository(Func<TDbContext> createDbContext, EfCoreRepositoryConfiguration? configuration = null)
-    //    : base(createDbContext)
-    //{
-    //    _configuration = configuration;
-    //}
-
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
@@ -237,7 +226,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity, TId}.DeleteAsync(TId,CancellationToken)"/>
     /// </summary>
-    public virtual async Task DeleteAsync(TId id, CancellationToken cancellationToken = default)
+    public virtual async Task<bool> DeleteAsync(TId id, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -247,15 +236,16 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.DeleteConfiguration?.NeedExecuteInTransaction != true)
             {
-                await PerformDeleteAsync(context, id, cancellationToken).ConfigureAwait(false);
-                return;
+                return await PerformDeleteAsync(context, id, cancellationToken).ConfigureAwait(false);
             }
 
             var isolationLevel = _configuration?.DeleteConfiguration?.TransactionIsolationLevel ?? IsolationLevel.Unspecified;
             await using var transaction = await context.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
 
-            await PerformDeleteAsync(context, id, cancellationToken).ConfigureAwait(false);
+            var result = await PerformDeleteAsync(context, id, cancellationToken).ConfigureAwait(false);
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+
+            return result;
         }
         catch (Exception ex)
         {
@@ -266,7 +256,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity, TId}.DeleteAsync(List{TId},CancellationToken)"/>
     /// </summary>
-    public virtual async Task DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default)
+    public virtual async Task<bool> DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -277,15 +267,16 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.DeleteConfiguration?.NeedExecuteInTransaction != true)
             {
-                await PerformDeleteAsync(context, ids, cancellationToken).ConfigureAwait(false);
-                return;
+                return await PerformDeleteAsync(context, ids, cancellationToken).ConfigureAwait(false);
             }
 
             var isolationLevel = _configuration?.DeleteConfiguration?.TransactionIsolationLevel ?? IsolationLevel.Unspecified;
             await using var transaction = await context.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
 
-            await PerformDeleteAsync(context, ids, cancellationToken).ConfigureAwait(false);
+            var result = await PerformDeleteAsync(context, ids, cancellationToken).ConfigureAwait(false);
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+
+            return result;
         }
         catch (Exception ex)
         {
@@ -630,33 +621,31 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
     private async Task<List<TEntity>> PerformUpdateAsync(TDbContext context, List<TEntity> entities, CancellationToken cancellationToken)
     {
         var idName = GetEntityIdColumnOrThrow(context);
+        var idProperty = typeof(TEntity).GetProperty(idName);
 
-        //var newExpression = Expression.New(typeof(TEntity));
-        //var members = typeof(TEntity).GetMembers();
+        var list = new List<TEntity>();
 
-        foreach (var entity in entities)
+        // ChunkBy 200 entities. Databases have limitation of performing WHERE IN clause
+        var entityIdChunks = entities.Select(x => GetEntityId(x)).Chunk(200).ToList();
+        foreach (var entityIdChunk in entityIdChunks)
         {
-            //var bindings = new List<MemberBinding>(members.Length);
+            var entityDbos = await context.Set<TEntity>()
+                .Where(x => entityIdChunk.Contains(EF.Property<TId>(x, idName)))
+                .ToListAsync(cancellationToken).ConfigureAwait(false);
 
-            //foreach (var propertyInfo in members.Select(x => x as PropertyInfo).Where(x => x?.CanWrite == true))
-            //{
-            //    if (propertyInfo is null)
-            //    {
-            //        continue;
-            //    }
+            list.AddRange(entityDbos);
+        }
 
-            //    var entityMemberValue = propertyInfo.GetValue(entity);
-            //    var binding = Expression.Bind(propertyInfo, Expression.Constant(entityMemberValue));
-            //    bindings.Add(binding);
-            //}
+        if (list.Count != entities.Count)
+        {
+            throw new EntityNotFoundException($"Not all {_entityName} entities were found!");
+        }
 
-            //var memberInitExpression = Expression.MemberInit(newExpression, bindings);
-
-            // TODO: System.Exception: Invalid Cast. The update expression must be of type MemberInitExpression
-            // see: https://github.com/zzzprojects/EntityFramework-Plus/issues/357
-            // the object must be constructed something like this: x => new User() { IsSoftDeleted = 1 }
+        foreach (var entity in list)
+        {
             var entityId = GetEntityId(entity);
-            await context.Set<TEntity>().Where(x => entityId.Equals(EF.Property<TId>(x, idName))).UpdateFromQueryAsync(_ => entity, cancellationToken).ConfigureAwait(false);
+            var updatedEntity = entities.Single(x => entityId.Equals(idProperty?.GetValue(x, null)));
+            context.Entry(entity).CurrentValues.SetValues(updatedEntity);
         }
 
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -693,10 +682,11 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
     /// <param name="id">Entity id</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <returns>Deleted entity</returns>
-    private async Task PerformDeleteAsync(TDbContext context, TId id, CancellationToken cancellationToken)
+    private async Task<bool> PerformDeleteAsync(TDbContext context, TId id, CancellationToken cancellationToken)
     {
         var idName = GetEntityIdColumnOrThrow(context);
-        await context.Set<TEntity>().Where(x => id.Equals(EF.Property<TId>(x, idName))).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
+        var result = await context.Set<TEntity>().Where(x => id.Equals(EF.Property<TId>(x, idName))).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
+        return result == 1;
     }
 
     /// <summary>
@@ -707,10 +697,11 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <exception cref="ArgumentException">Thrown when entity does not have any primary key defined</exception>
     /// <returns>Deleted entity</returns>
-    private async Task PerformDeleteAsync(TDbContext context, List<TId> ids, CancellationToken cancellationToken)
+    private async Task<bool> PerformDeleteAsync(TDbContext context, List<TId> ids, CancellationToken cancellationToken)
     {
         var idName = GetEntityIdColumnOrThrow(context);
-        await context.Set<TEntity>().Where(x => ids.Contains(EF.Property<TId>(x, idName))).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
+        var result = await context.Set<TEntity>().Where(x => ids.Contains(EF.Property<TId>(x, idName))).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
+        return result == ids.Count;
     }
 
     /// <summary>

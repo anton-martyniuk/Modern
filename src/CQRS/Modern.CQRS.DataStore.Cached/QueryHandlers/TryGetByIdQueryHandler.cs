@@ -11,9 +11,9 @@ namespace Modern.CQRS.DataStore.Cached.QueryHandlers;
 /// <summary>
 /// The mediator query handler that returns an entity with the given id
 /// </summary>
-/// <returns>The entity</returns>
 /// <exception cref="ArgumentNullException">Thrown if provided id is null</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+/// <returns>The entity</returns>
 public class TryGetByIdQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     BaseMediatorHandler<TEntityDto, TEntityDbo, TId>,
     IRequestHandler<TryGetByIdQuery<TEntityDto, TId>, TEntityDto?>

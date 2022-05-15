@@ -10,8 +10,8 @@ namespace Modern.CQRS.DataStore.Cached.QueryHandlers;
 /// <summary>
 /// The mediator query handler that returns the total count of entities
 /// </summary>
-/// <returns>Count of entities</returns>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
+/// <returns>Count of entities</returns>
 public class GetCountAllQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     BaseMediatorHandler<TEntityDto, TEntityDbo, TId>,
     IRequestHandler<GetCountAllQuery<TEntityDto, TId>, int>

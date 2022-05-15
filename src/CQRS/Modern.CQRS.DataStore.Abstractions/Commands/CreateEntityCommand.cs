@@ -6,10 +6,10 @@ namespace Modern.CQRS.DataStore.Abstractions.Commands;
 /// <summary>
 /// The mediator command model that creates the new entity
 /// </summary>
-/// <returns>Updated entity by the data store (primary key, for example)</returns>
 /// <exception cref="ArgumentNullException">Thrown if provided entity is null</exception>
 /// <exception cref="EntityAlreadyExistsException">Thrown if an entity already exists in the data store</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while saving the entity in the data store</exception>
+/// <returns>Updated entity by the data store (primary key, for example)</returns>
 public record CreateEntityCommand<TEntityDto>(TEntityDto Entity) : IRequest<TEntityDto>
     where TEntityDto : class
 {

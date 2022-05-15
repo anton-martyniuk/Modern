@@ -10,7 +10,8 @@ namespace Modern.CQRS.DataStore.Abstractions.Commands;
 /// </summary>
 /// <exception cref="ArgumentNullException">Thrown if provided list of entities is null or has no entities in the list</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while deleting the entities in the data store</exception>
-public record DeleteEntitiesCommand<TId>(List<TId> Ids) : IRequest
+/// <returns><see langword="true"/> if all entities were deleted; otherwise, <see langword="false"/></returns>
+public record DeleteEntitiesCommand<TId>(List<TId> Ids) : IRequest<bool>
     where TId : IEquatable<TId>
 {
     /// <summary>
