@@ -8,7 +8,7 @@ namespace Modern.Controllers.DataStore.OData;
 /// <summary>
 /// The OData controller for entity service
 /// </summary>
-public abstract class ModernODataController<TEntityDto, TEntityDbo, TId> : ODataController
+public class ModernODataController<TEntityDto, TEntityDbo, TId> : ODataController
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>

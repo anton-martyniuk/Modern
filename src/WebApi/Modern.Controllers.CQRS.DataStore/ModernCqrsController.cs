@@ -231,17 +231,15 @@ public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     [HttpDelete("delete/{id}")]
     public virtual async Task<IActionResult> Delete([Required] TId id)
     {
-        try
+        var command = new DeleteEntityCommand<TId>(id);
+        var result = await _mediator.Send(command).ConfigureAwait(false);
+        if (!result)
         {
-            var command = new DeleteEntityCommand<TId>(id);
-            await _mediator.Send(command).ConfigureAwait(false);
-            
-            return NoContent();
+            var entityName = typeof(TEntityDto).Name;
+            return NotFound($"{entityName} entity with id '{id}' not found");
         }
-        catch (EntityNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+
+        return NoContent();
     }
 
     /// <summary>
@@ -257,16 +255,14 @@ public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     [HttpDelete("delete-many")]
     public virtual async Task<IActionResult> DeleteMany([Required] List<TId> ids)
     {
-        try
+        var command = new DeleteEntitiesCommand<TId>(ids);
+        var result = await _mediator.Send(command).ConfigureAwait(false);
+        if (!result)
         {
-            var command = new DeleteEntitiesCommand<TId>(ids);
-            await _mediator.Send(command).ConfigureAwait(false);
-            
-            return NoContent();
+            var entityName = typeof(TEntityDto).Name;
+            return NotFound($"Not all {entityName} entities were found for deletion");
         }
-        catch (EntityNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+
+        return NoContent();
     }
 }

@@ -8,7 +8,7 @@ namespace Modern.Controllers.DataStore.InMemory.OData;
 /// <summary>
 /// The OData controller for cached service
 /// </summary>
-public abstract class ModernInMemoryODataController<TEntityDto, TEntityDbo, TId> : ODataController
+public class ModernInMemoryODataController<TEntityDto, TEntityDbo, TId> : ODataController
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>

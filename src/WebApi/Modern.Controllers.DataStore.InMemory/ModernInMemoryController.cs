@@ -222,15 +222,14 @@ public class ModernInMemoryController<TEntityDto, TEntityDbo, TId> : ControllerB
     [HttpDelete("delete/{id}")]
     public virtual async Task<IActionResult> Delete([Required] TId id)
     {
-        try
+        var result = await _service.DeleteAsync(id).ConfigureAwait(false);
+        if (!result)
         {
-            await _service.DeleteAsync(id).ConfigureAwait(false);
-            return NoContent();
+            var entityName = typeof(TEntityDto).Name;
+            return NotFound($"{entityName} entity with id '{id}' not found");
         }
-        catch (EntityNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+
+        return NoContent();
     }
 
     /// <summary>
@@ -246,14 +245,13 @@ public class ModernInMemoryController<TEntityDto, TEntityDbo, TId> : ControllerB
     [HttpDelete("delete-many")]
     public virtual async Task<IActionResult> DeleteMany([Required] List<TId> ids)
     {
-        try
+        var result = await _service.DeleteAsync(ids).ConfigureAwait(false);
+        if (!result)
         {
-            await _service.DeleteAsync(ids).ConfigureAwait(false);
-            return NoContent();
+            var entityName = typeof(TEntityDto).Name;
+            return NotFound($"Not all {entityName} entities were found for deletion");
         }
-        catch (EntityNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+
+        return NoContent();
     }
 }
