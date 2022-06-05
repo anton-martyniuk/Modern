@@ -1,4 +1,6 @@
-﻿using Modern.Cache.DependencyInjection.Definitions.Configuration;
+﻿using Modern.Cache.Abstractions.Configuration;
+using Modern.Cache.DependencyInjection.Definitions.Configuration;
+using StackExchange.Redis.Extensions.Core.Configuration;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -6,12 +8,33 @@ namespace Microsoft.Extensions.DependencyInjection;
 /// <summary>
 /// Represents a modern cache options for registering in DI
 /// </summary>
-public class ModernCacheOptions
+public class ModernRedisCacheOptions
 {
     /// <summary>
     /// Collection of modern cache specifications
     /// </summary>
-    public List<ModernCacheSpecification> Caches { get; } = new();
+    internal List<ModernCacheSpecification> Caches { get; } = new();
+
+    /// <summary>
+    /// Cache settings
+    /// </summary>
+    public ModernCacheSettings CacheSettings { get; init; } = new();
+
+    /// <summary>
+    /// Redis configuration
+    /// </summary>
+    public RedisConfiguration RedisConfiguration { get; init; }
+
+    /// <summary>
+    /// Initializes a new instance of the class
+    /// </summary>
+    public ModernRedisCacheOptions()
+    {
+        RedisConfiguration = new RedisConfiguration
+        {
+            ConnectionString = "localhost"
+        };
+    }
 
     /// <summary>
     /// Adds cache

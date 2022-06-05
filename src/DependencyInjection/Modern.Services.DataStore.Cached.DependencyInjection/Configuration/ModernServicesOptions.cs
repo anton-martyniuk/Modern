@@ -12,12 +12,12 @@ public class ModernServicesOptions
     /// <summary>
     /// Collection of modern services specifications
     /// </summary>
-    public List<ModernServiceSpecification> Services { get; } = new();
+    internal List<ModernServiceSpecification> Services { get; } = new();
 
     /// <summary>
     /// Collection of modern services specifications
     /// </summary>
-    public List<ModernServiceConcreteSpecification> ConcreteServices { get; } = new();
+    internal List<ModernServiceConcreteSpecification> ConcreteServices { get; } = new();
 
     /// <summary>
     /// Adds service

@@ -85,9 +85,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Cache.Redis.Dependen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Cache.DependencyInjection.Definitions", "DependencyInjection\Definitions\Modern.Cache.DependencyInjection.Definitions\Modern.Cache.DependencyInjection.Definitions.csproj", "{A58FCCFA-A09E-4D53-A5E7-3B70E0F6E824}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.CQRS.DataStore.DependencyInjection", "DependencyInjection\Modern.CQRS.DataStore.DependencyInjection\Modern.CQRS.DataStore.DependencyInjection.csproj", "{898A4185-168F-42B9-9E26-7AA3077F8A2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.CQRS.DataStore.DependencyInjection", "DependencyInjection\Modern.CQRS.DataStore.DependencyInjection\Modern.CQRS.DataStore.DependencyInjection.csproj", "{898A4185-168F-42B9-9E26-7AA3077F8A2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.CQRS.DependencyInjection.Definitions", "DependencyInjection\Definitions\Modern.CQRS.DependencyInjection.Definitions\Modern.CQRS.DependencyInjection.Definitions.csproj", "{3E9FB719-091C-448F-990E-F8839133C137}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.CQRS.DependencyInjection.Definitions", "DependencyInjection\Definitions\Modern.CQRS.DependencyInjection.Definitions\Modern.CQRS.DependencyInjection.Definitions.csproj", "{3E9FB719-091C-448F-990E-F8839133C137}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.CQRS.DataStore.Cached.DependencyInjection", "DependencyInjection\Modern.CQRS.DataStore.Cached.DependencyInjection\Modern.CQRS.DataStore.Cached.DependencyInjection.csproj", "{4D964E51-0BDE-46D4-BB8E-421ACE9233AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -235,6 +237,10 @@ Global
 		{3E9FB719-091C-448F-990E-F8839133C137}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E9FB719-091C-448F-990E-F8839133C137}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E9FB719-091C-448F-990E-F8839133C137}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D964E51-0BDE-46D4-BB8E-421ACE9233AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D964E51-0BDE-46D4-BB8E-421ACE9233AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D964E51-0BDE-46D4-BB8E-421ACE9233AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D964E51-0BDE-46D4-BB8E-421ACE9233AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -275,6 +281,7 @@ Global
 		{A58FCCFA-A09E-4D53-A5E7-3B70E0F6E824} = {C38633BF-FD8C-479F-8674-CBACE398A96F}
 		{898A4185-168F-42B9-9E26-7AA3077F8A2E} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
 		{3E9FB719-091C-448F-990E-F8839133C137} = {C38633BF-FD8C-479F-8674-CBACE398A96F}
+		{4D964E51-0BDE-46D4-BB8E-421ACE9233AE} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94D244EE-259E-401A-A55F-7D833CA4DC5E}

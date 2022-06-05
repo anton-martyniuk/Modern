@@ -2,8 +2,8 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Modern.CQRS.DataStore.Abstractions.Commands;
 using Modern.CQRS.DataStore.Abstractions.Queries;
-using Modern.CQRS.DataStore.CommandHandlers;
-using Modern.CQRS.DataStore.QueryHandlers;
+using Modern.CQRS.DataStore.Cached.CommandHandlers;
+using Modern.CQRS.DataStore.Cached.QueryHandlers;
 using Modern.CQRS.DependencyInjection.Definitions.Configuration;
 using Modern.Data.Paging;
 using Modern.Extensions.Microsoft.DependencyInjection.Models;
@@ -22,7 +22,7 @@ public static class ServicesExtensions
     /// <param name="builder">Modern services builder</param>
     /// <param name="configure">Services configure delegate</param>
     /// <returns>IServiceCollection</returns>
-    public static ModernServicesBuilder AddCqrs(this ModernServicesBuilder builder, Action<ModernCqrsOptions> configure)
+    public static ModernServicesBuilder AddCachedCqrs(this ModernServicesBuilder builder, Action<ModernCqrsOptions> configure)
     {
         var options = new ModernCqrsOptions();
         configure(options);
@@ -40,7 +40,7 @@ public static class ServicesExtensions
             builder.Services.AddDoubleArityRequestAndHandler(typeof(GetCountQuery<,>), typeof(GetCountQueryHandler<,,,>), typeof(int), c);
             builder.Services.AddDoubleArityRequestAndHandler(typeof(GetExistsQuery<,>), typeof(GetExistsQueryHandler<,,,>), typeof(bool), c);
             builder.Services.AddTripleArityRequestAndHandler(typeof(GetFirstOrDefaultQuery<,,>), typeof(GetFirstOrDefaultQueryHandler<,,,>), nullableType, c);
-            builder.Services.AddTripleArityRequestAndHandler(typeof(GetSingleOrDefaultQuery<,,>), typeof(GetSingleOrDefaultQueryHandler<,,,>), nullableType, c);
+            builder.Services.AddTripleArityRequestAndHandler(typeof(GetSingleOrDefaultQuery<,,>), typeof(GetSingleOrDefaultQueryHandler<,,,>), nullableType, c); 
             builder.Services.AddTripleArityRequestAndHandler(typeof(GetWhereQuery<,,>), typeof(GetWhereQueryHandler<,,,>), listType, c);
             builder.Services.AddTripleArityRequestAndHandler(typeof(GetWherePagedQuery<,,>), typeof(GetWherePagedQueryHandler<,,,>), pagedType, c);
 

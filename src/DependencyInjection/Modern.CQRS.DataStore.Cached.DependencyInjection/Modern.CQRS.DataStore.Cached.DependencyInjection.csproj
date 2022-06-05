@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MediatR" Version="10.0.1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\CQRS\Modern.CQRS.DataStore.Abstractions\Modern.CQRS.DataStore.Abstractions.csproj" />
+		<ProjectReference Include="..\..\CQRS\Modern.CQRS.DataStore.Cached\Modern.CQRS.DataStore.Cached.csproj" />
+		<ProjectReference Include="..\..\Repositories\Modern.Repositories.Abstractions\Modern.Repositories.Abstractions.csproj" />
+		<ProjectReference Include="..\Definitions\Modern.CQRS.DependencyInjection.Definitions\Modern.CQRS.DependencyInjection.Definitions.csproj" />
+		<ProjectReference Include="..\Modern.Extensions.Microsoft.DependencyInjection\Modern.Extensions.Microsoft.DependencyInjection.csproj" />
+	</ItemGroup>
+
+</Project>

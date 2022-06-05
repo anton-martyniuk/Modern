@@ -17,10 +17,8 @@ public static class ServicesExtensions
     /// </summary>
     /// <param name="builder">Modern services builder</param>
     /// <param name="configure">Cache configure delegate</param>
-    /// <param name="configureSettings">Cache settings configure delegate</param>
     /// <returns>IServiceCollection</returns>
-    public static ModernServicesBuilder AddInMemoryCache(this ModernServicesBuilder builder, Action<ModernCacheOptions> configure,
-        Action<ModernCacheSettings> configureSettings)
+    public static ModernServicesBuilder AddInMemoryCache(this ModernServicesBuilder builder, Action<ModernCacheOptions> configure)
     {
         var options = new ModernCacheOptions();
         configure(options);
@@ -33,7 +31,7 @@ public static class ServicesExtensions
             builder.Services.TryAdd(new ServiceDescriptor(interfaceType, implementationType, c.Lifetime));
         }
 
-        builder.Services.Configure(configureSettings);
+        builder.Services.Configure<ModernCacheSettings>(x => x.ExpiresIn = options.CacheSettings.ExpiresIn);
         builder.Services.AddMemoryCache();
         return builder;
     }
