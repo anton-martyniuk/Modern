@@ -91,6 +91,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.CQRS.DependencyInjec
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.CQRS.DataStore.Cached.DependencyInjection", "DependencyInjection\Modern.CQRS.DataStore.Cached.DependencyInjection\Modern.CQRS.DataStore.Cached.DependencyInjection.csproj", "{4D964E51-0BDE-46D4-BB8E-421ACE9233AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.DataStore.DependencyInjection", "DependencyInjection\Modern.Controllers.DataStore.DependencyInjection\Modern.Controllers.DataStore.DependencyInjection.csproj", "{22460EA0-A2A8-4FAB-A97D-4E7AE49A900F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.DataStore.InMemory.DependencyInjection", "DependencyInjection\Modern.Controllers.DataStore.InMemory.DependencyInjection\Modern.Controllers.DataStore.InMemory.DependencyInjection.csproj", "{410D814D-EDC3-4A6B-8448-97C5B29E882D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.CQRS.DataStore.DependencyInjection", "DependencyInjection\Modern.Controllers.CQRS.DataStore.DependencyInjection\Modern.Controllers.CQRS.DataStore.DependencyInjection.csproj", "{82A8E394-D346-451E-9247-435986C9F6AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.DataStore.OData.DependencyInjection", "DependencyInjection\Modern.Controllers.DataStore.OData.DependencyInjection\Modern.Controllers.DataStore.OData.DependencyInjection.csproj", "{9B5C84FD-B7BE-4512-BD50-854F78F9DEFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.DataStore.InMemory.OData.DependencyInjection", "DependencyInjection\Modern.Controllers.DataStore.InMemory.OData.DependencyInjection\Modern.Controllers.DataStore.InMemory.OData.DependencyInjection.csproj", "{A163B08A-133E-40A9-855B-A04882DA3E13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.DependencyInjection.Definitions", "DependencyInjection\Definitions\Modern.Controllers.DependencyInjection.Definitions\Modern.Controllers.DependencyInjection.Definitions.csproj", "{C85171A9-EBB9-4EDA-82F6-0221D5F5724A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -241,6 +253,30 @@ Global
 		{4D964E51-0BDE-46D4-BB8E-421ACE9233AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D964E51-0BDE-46D4-BB8E-421ACE9233AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D964E51-0BDE-46D4-BB8E-421ACE9233AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22460EA0-A2A8-4FAB-A97D-4E7AE49A900F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22460EA0-A2A8-4FAB-A97D-4E7AE49A900F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22460EA0-A2A8-4FAB-A97D-4E7AE49A900F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22460EA0-A2A8-4FAB-A97D-4E7AE49A900F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{410D814D-EDC3-4A6B-8448-97C5B29E882D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{410D814D-EDC3-4A6B-8448-97C5B29E882D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{410D814D-EDC3-4A6B-8448-97C5B29E882D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{410D814D-EDC3-4A6B-8448-97C5B29E882D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82A8E394-D346-451E-9247-435986C9F6AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82A8E394-D346-451E-9247-435986C9F6AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82A8E394-D346-451E-9247-435986C9F6AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82A8E394-D346-451E-9247-435986C9F6AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B5C84FD-B7BE-4512-BD50-854F78F9DEFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B5C84FD-B7BE-4512-BD50-854F78F9DEFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B5C84FD-B7BE-4512-BD50-854F78F9DEFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B5C84FD-B7BE-4512-BD50-854F78F9DEFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A163B08A-133E-40A9-855B-A04882DA3E13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A163B08A-133E-40A9-855B-A04882DA3E13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A163B08A-133E-40A9-855B-A04882DA3E13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A163B08A-133E-40A9-855B-A04882DA3E13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C85171A9-EBB9-4EDA-82F6-0221D5F5724A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C85171A9-EBB9-4EDA-82F6-0221D5F5724A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C85171A9-EBB9-4EDA-82F6-0221D5F5724A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C85171A9-EBB9-4EDA-82F6-0221D5F5724A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -282,6 +318,12 @@ Global
 		{898A4185-168F-42B9-9E26-7AA3077F8A2E} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
 		{3E9FB719-091C-448F-990E-F8839133C137} = {C38633BF-FD8C-479F-8674-CBACE398A96F}
 		{4D964E51-0BDE-46D4-BB8E-421ACE9233AE} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
+		{22460EA0-A2A8-4FAB-A97D-4E7AE49A900F} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
+		{410D814D-EDC3-4A6B-8448-97C5B29E882D} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
+		{82A8E394-D346-451E-9247-435986C9F6AA} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
+		{9B5C84FD-B7BE-4512-BD50-854F78F9DEFF} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
+		{A163B08A-133E-40A9-855B-A04882DA3E13} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
+		{C85171A9-EBB9-4EDA-82F6-0221D5F5724A} = {C38633BF-FD8C-479F-8674-CBACE398A96F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94D244EE-259E-401A-A55F-7D833CA4DC5E}
