@@ -1,27 +1,29 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
-using Modern.Services.DataStore.Abstractions;
+using Modern.Repositories.Abstractions;
 
 namespace Modern.Controllers.DataStore.OData;
 
 /// <summary>
 /// The OData controller for entity service
 /// </summary>
-public class ModernODataController<TEntityDto, TEntityDbo, TId> : ODataController
-    where TEntityDto : class
+/// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
+/// <typeparam name="TId">The type of entity identifier</typeparam>
+public class ModernODataController<TEntityDbo, TId> : ODataController
     where TEntityDbo : class
     where TId : IEquatable<TId>
 {
-    private readonly IModernService<TEntityDto, TEntityDbo, TId> _service;
+    private readonly IModernRepository<TEntityDbo, TId> _repository;
 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    /// <param name="service">Entity service</param>
-    protected ModernODataController(IModernService<TEntityDto, TEntityDbo, TId> service)
+    /// <param name="repository">The generic query repository</param>
+    //protected ModernODataController(IModernService<TEntityDto, TEntityDbo, TId> service)
+    protected ModernODataController(IModernRepository<TEntityDbo, TId> repository)
     {
-        _service = service;
+        _repository = repository;
     }
 
     /// <summary>
@@ -40,6 +42,6 @@ public class ModernODataController<TEntityDto, TEntityDbo, TId> : ODataControlle
     //[ProducesResponseType(typeof(IQueryable<TEntity>), (int)HttpStatusCode.OK)] TODO: // create attribute
     public virtual IActionResult Get()
     {
-        return Ok(_service.AsQueryable());
+        return Ok(_repository.AsQueryable());
     }
 }
