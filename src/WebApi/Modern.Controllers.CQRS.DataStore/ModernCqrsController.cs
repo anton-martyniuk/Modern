@@ -12,6 +12,9 @@ namespace Modern.Controllers.CQRS.DataStore;
 /// <summary>
 /// The base entity controller for entity service
 /// </summary>
+/// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
+/// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
+/// <typeparam name="TId">The type of entity identifier</typeparam>
 public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     where TEntityDto : class
     where TEntityDbo : class
@@ -27,14 +30,6 @@ public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     {
         _mediator = mediator;
     }
-
-    /// <summary>
-    /// Returns entity id of type <typeparamref name="TId"/>
-    /// </summary>
-    /// <param name="entityDto">Entity Dto</param>
-    /// <returns>Entity id</returns>
-    // TODO: use source generators for this
-    protected virtual TId GetEntityId(TEntityDto entityDto) => (TId)(entityDto.GetType().GetProperty("Id")?.GetValue(entityDto, null) ?? 0);
 
     /// <summary>
     /// Returns an entity with the given <paramref name="id"/>
@@ -77,16 +72,9 @@ public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public virtual async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
-        try
-        {
-            var query = new GetAllQuery<TEntityDto, TId>();
-            var entities = await _mediator.Send(query, cancellationToken).ConfigureAwait(false);
-            return Ok(entities);
-        }
-        catch (EntityNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        var query = new GetAllQuery<TEntityDto, TId>();
+        var entities = await _mediator.Send(query, cancellationToken).ConfigureAwait(false);
+        return Ok(entities);
     }
 
     /// <summary>
@@ -143,11 +131,6 @@ public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     [HttpPut("update/{id}")]
     public virtual async Task<IActionResult> Update([Required] TId id, [FromBody, Required] TEntityDto entity)
     {
-        if (!Equals(GetEntityId(entity), id))
-        {
-            return BadRequest("Entity 'id' doesn't match 'id' in request URL");
-        }
-
         try
         {
             var command = new UpdateEntityCommand<TEntityDto, TId>(id, entity);

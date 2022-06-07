@@ -8,6 +8,9 @@ namespace Modern.Controllers.DataStore.InMemory.OData;
 /// <summary>
 /// The OData controller for cached service
 /// </summary>
+/// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
+/// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
+/// <typeparam name="TId">The type of entity identifier</typeparam>
 public class ModernInMemoryODataController<TEntityDto, TEntityDbo, TId> : ODataController
     where TEntityDto : class
     where TEntityDbo : class

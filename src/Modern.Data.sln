@@ -89,19 +89,27 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.CQRS.DataStore.Depen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.CQRS.DependencyInjection.Definitions", "DependencyInjection\Definitions\Modern.CQRS.DependencyInjection.Definitions\Modern.CQRS.DependencyInjection.Definitions.csproj", "{3E9FB719-091C-448F-990E-F8839133C137}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.CQRS.DataStore.Cached.DependencyInjection", "DependencyInjection\Modern.CQRS.DataStore.Cached.DependencyInjection\Modern.CQRS.DataStore.Cached.DependencyInjection.csproj", "{4D964E51-0BDE-46D4-BB8E-421ACE9233AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.CQRS.DataStore.Cached.DependencyInjection", "DependencyInjection\Modern.CQRS.DataStore.Cached.DependencyInjection\Modern.CQRS.DataStore.Cached.DependencyInjection.csproj", "{4D964E51-0BDE-46D4-BB8E-421ACE9233AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.DataStore.DependencyInjection", "DependencyInjection\Modern.Controllers.DataStore.DependencyInjection\Modern.Controllers.DataStore.DependencyInjection.csproj", "{22460EA0-A2A8-4FAB-A97D-4E7AE49A900F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Controllers.DataStore.DependencyInjection", "DependencyInjection\Modern.Controllers.DataStore.DependencyInjection\Modern.Controllers.DataStore.DependencyInjection.csproj", "{22460EA0-A2A8-4FAB-A97D-4E7AE49A900F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.DataStore.InMemory.DependencyInjection", "DependencyInjection\Modern.Controllers.DataStore.InMemory.DependencyInjection\Modern.Controllers.DataStore.InMemory.DependencyInjection.csproj", "{410D814D-EDC3-4A6B-8448-97C5B29E882D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Controllers.DataStore.InMemory.DependencyInjection", "DependencyInjection\Modern.Controllers.DataStore.InMemory.DependencyInjection\Modern.Controllers.DataStore.InMemory.DependencyInjection.csproj", "{410D814D-EDC3-4A6B-8448-97C5B29E882D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.CQRS.DataStore.DependencyInjection", "DependencyInjection\Modern.Controllers.CQRS.DataStore.DependencyInjection\Modern.Controllers.CQRS.DataStore.DependencyInjection.csproj", "{82A8E394-D346-451E-9247-435986C9F6AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Controllers.CQRS.DataStore.DependencyInjection", "DependencyInjection\Modern.Controllers.CQRS.DataStore.DependencyInjection\Modern.Controllers.CQRS.DataStore.DependencyInjection.csproj", "{82A8E394-D346-451E-9247-435986C9F6AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.DataStore.OData.DependencyInjection", "DependencyInjection\Modern.Controllers.DataStore.OData.DependencyInjection\Modern.Controllers.DataStore.OData.DependencyInjection.csproj", "{9B5C84FD-B7BE-4512-BD50-854F78F9DEFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Controllers.DataStore.OData.DependencyInjection", "DependencyInjection\Modern.Controllers.DataStore.OData.DependencyInjection\Modern.Controllers.DataStore.OData.DependencyInjection.csproj", "{9B5C84FD-B7BE-4512-BD50-854F78F9DEFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.DataStore.InMemory.OData.DependencyInjection", "DependencyInjection\Modern.Controllers.DataStore.InMemory.OData.DependencyInjection\Modern.Controllers.DataStore.InMemory.OData.DependencyInjection.csproj", "{A163B08A-133E-40A9-855B-A04882DA3E13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Controllers.DataStore.InMemory.OData.DependencyInjection", "DependencyInjection\Modern.Controllers.DataStore.InMemory.OData.DependencyInjection\Modern.Controllers.DataStore.InMemory.OData.DependencyInjection.csproj", "{A163B08A-133E-40A9-855B-A04882DA3E13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.DependencyInjection.Definitions", "DependencyInjection\Definitions\Modern.Controllers.DependencyInjection.Definitions\Modern.Controllers.DependencyInjection.Definitions.csproj", "{C85171A9-EBB9-4EDA-82F6-0221D5F5724A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Controllers.DependencyInjection.Definitions", "DependencyInjection\Definitions\Modern.Controllers.DependencyInjection.Definitions\Modern.Controllers.DependencyInjection.Definitions.csproj", "{C85171A9-EBB9-4EDA-82F6-0221D5F5724A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GraphQL", "GraphQL", "{3529D61E-E1F3-4098-A668-60F904092871}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.GraphQL.HotChocolate.DataStore", "GraphQL\Modern.GraphQL.DataStore\Modern.GraphQL.HotChocolate.DataStore.csproj", "{B95D712A-EEF7-4B12-80A7-04C7F6D30678}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.GraphQL.HotChocolate.DataStore.DependencyInjection", "DependencyInjection\Modern.GraphQL.HotChocolate.DataStore.DependencyInjection\Modern.GraphQL.HotChocolate.DataStore.DependencyInjection.csproj", "{E8687E46-1A09-48D1-AED1-B500CA51F59F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.GraphQL.HotChocolate.DependencyInjection.Definitions", "DependencyInjection\Definitions\Modern.GraphQL.HotChocolate.DependencyInjection.Definitions\Modern.GraphQL.HotChocolate.DependencyInjection.Definitions.csproj", "{C7A8AC5E-EED1-4BA7-B059-C92D8627363D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -277,6 +285,18 @@ Global
 		{C85171A9-EBB9-4EDA-82F6-0221D5F5724A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C85171A9-EBB9-4EDA-82F6-0221D5F5724A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C85171A9-EBB9-4EDA-82F6-0221D5F5724A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B95D712A-EEF7-4B12-80A7-04C7F6D30678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B95D712A-EEF7-4B12-80A7-04C7F6D30678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B95D712A-EEF7-4B12-80A7-04C7F6D30678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B95D712A-EEF7-4B12-80A7-04C7F6D30678}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8687E46-1A09-48D1-AED1-B500CA51F59F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8687E46-1A09-48D1-AED1-B500CA51F59F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8687E46-1A09-48D1-AED1-B500CA51F59F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8687E46-1A09-48D1-AED1-B500CA51F59F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7A8AC5E-EED1-4BA7-B059-C92D8627363D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7A8AC5E-EED1-4BA7-B059-C92D8627363D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7A8AC5E-EED1-4BA7-B059-C92D8627363D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7A8AC5E-EED1-4BA7-B059-C92D8627363D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -324,6 +344,9 @@ Global
 		{9B5C84FD-B7BE-4512-BD50-854F78F9DEFF} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
 		{A163B08A-133E-40A9-855B-A04882DA3E13} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
 		{C85171A9-EBB9-4EDA-82F6-0221D5F5724A} = {C38633BF-FD8C-479F-8674-CBACE398A96F}
+		{B95D712A-EEF7-4B12-80A7-04C7F6D30678} = {3529D61E-E1F3-4098-A668-60F904092871}
+		{E8687E46-1A09-48D1-AED1-B500CA51F59F} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
+		{C7A8AC5E-EED1-4BA7-B059-C92D8627363D} = {C38633BF-FD8C-479F-8674-CBACE398A96F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94D244EE-259E-401A-A55F-7D833CA4DC5E}

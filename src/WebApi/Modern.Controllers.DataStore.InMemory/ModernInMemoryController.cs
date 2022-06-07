@@ -10,6 +10,9 @@ namespace Modern.Controllers.DataStore.InMemory;
 /// <summary>
 /// The base controller for cached service
 /// </summary>
+/// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
+/// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
+/// <typeparam name="TId">The type of entity identifier</typeparam>
 public class ModernInMemoryController<TEntityDto, TEntityDbo, TId> : ControllerBase
     where TEntityDto : class
     where TEntityDbo : class
@@ -25,14 +28,6 @@ public class ModernInMemoryController<TEntityDto, TEntityDbo, TId> : ControllerB
     {
         _service = service;
     }
-
-    /// <summary>
-    /// Returns entity id of type <typeparamref name="TId"/>
-    /// </summary>
-    /// <param name="entityDto">Entity Dto</param>
-    /// <returns>Entity id</returns>
-    // TODO: use source generators for this
-    protected virtual TId GetEntityId(TEntityDto entityDto) => (TId)(entityDto.GetType().GetProperty("Id")?.GetValue(entityDto, null) ?? 0);
 
     /// <summary>
     /// Returns an entity with the given <paramref name="id"/>
@@ -74,15 +69,8 @@ public class ModernInMemoryController<TEntityDto, TEntityDbo, TId> : ControllerB
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public virtual async Task<IActionResult> GetAll()
     {
-        try
-        {
-            var entities = await _service.GetAllAsync().ConfigureAwait(false);
-            return Ok(entities);
-        }
-        catch (EntityNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        var entities = await _service.GetAllAsync().ConfigureAwait(false);
+        return Ok(entities);
     }
 
     /// <summary>
@@ -137,11 +125,6 @@ public class ModernInMemoryController<TEntityDto, TEntityDbo, TId> : ControllerB
     [HttpPut("update/{id}")]
     public virtual async Task<IActionResult> Update([Required] TId id, [FromBody, Required] TEntityDto entity)
     {
-        if (!Equals(GetEntityId(entity), id))
-        {
-            return BadRequest("Entity 'id' doesn't match 'id' in request URL");
-        }
-
         try
         {
             await _service.UpdateAsync(id, entity).ConfigureAwait(false);

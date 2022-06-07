@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="HotChocolate.AspNetCore" Version="12.10.0" />
+		<PackageReference Include="HotChocolate.Data" Version="12.10.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\GraphQL\Modern.GraphQL.DataStore\Modern.GraphQL.HotChocolate.DataStore.csproj" />
+		<ProjectReference Include="..\Definitions\Modern.GraphQL.HotChocolate.DependencyInjection.Definitions\Modern.GraphQL.HotChocolate.DependencyInjection.Definitions.csproj" />
+		<ProjectReference Include="..\Modern.Extensions.Microsoft.DependencyInjection\Modern.Extensions.Microsoft.DependencyInjection.csproj" />
+	</ItemGroup>
+
+</Project>

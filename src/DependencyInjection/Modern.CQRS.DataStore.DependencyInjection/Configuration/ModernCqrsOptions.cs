@@ -15,7 +15,7 @@ public class ModernCqrsOptions
     internal List<ModernCqrsSpecification> CqrsRequests { get; } = new();
 
     /// <summary>
-    /// Adds CQRS queries, commands and their handlers
+    /// Adds CQRS queries, commands and their handlers for specified Entity type
     /// </summary>
     /// <param name="lifetime">Services lifetime in DI</param>
     /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>

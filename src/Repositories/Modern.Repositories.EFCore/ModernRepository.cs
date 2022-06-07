@@ -52,6 +52,13 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
     protected virtual TId GetEntityId(TEntity entity) => (TId)(entity.GetType().GetProperty("Id")?.GetValue(entity, null) ?? 0);
 
     /// <summary>
+    /// Returns entity include query for all repository methods. <see cref="EntityIncludeQuery{TEntity}"/>
+    /// </summary>
+    /// <returns>Expression that describes included entities</returns>
+    protected virtual EntityIncludeQuery<TEntity>? GetEntityIncludeQuery() =>
+        null;
+
+    /// <summary>
     /// Returns standardized repository exception
     /// </summary>
     /// <param name="ex">Original exception</param>
@@ -323,7 +330,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
-            var entity = await GetEntityByIdImpl(context, id, includeQuery, cancellationToken).ConfigureAwait(false);
+            var entity = await GetEntityByIdImpl(context, id, includeQuery ?? GetEntityIncludeQuery(), cancellationToken).ConfigureAwait(false);
             if (entity is null)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
@@ -347,7 +354,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
             cancellationToken.ThrowIfCancellationRequested();
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
-            return await GetEntityByIdImpl(context, id, includeQuery, cancellationToken).ConfigureAwait(false);
+            return await GetEntityByIdImpl(context, id, includeQuery ?? GetEntityIncludeQuery(), cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -366,6 +373,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
+            includeQuery ??= GetEntityIncludeQuery();
             if (includeQuery is null)
             {
                 return await context.Set<TEntity>().ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -411,6 +419,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
 
+            includeQuery ??= GetEntityIncludeQuery();
             if (includeQuery is null)
             {
                 return await context.Set<TEntity>().AsNoTracking().CountAsync(predicate, cancellationToken).ConfigureAwait(false);
@@ -438,6 +447,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
 
+            includeQuery ??= GetEntityIncludeQuery();
             if (includeQuery is null)
             {
                 return await context.Set<TEntity>().AsNoTracking().AnyAsync(predicate, cancellationToken).ConfigureAwait(false);
@@ -465,6 +475,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
 
+            includeQuery ??= GetEntityIncludeQuery();
             if (includeQuery is null)
             {
                 return await context.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
@@ -492,6 +503,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
 
+            includeQuery ??= GetEntityIncludeQuery();
             if (includeQuery is null)
             {
                 return await context.Set<TEntity>().AsNoTracking().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
@@ -519,6 +531,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
 
+            includeQuery ??= GetEntityIncludeQuery();
             if (includeQuery is null)
             {
                 return await context.Set<TEntity>().AsNoTracking().Where(predicate).ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -555,6 +568,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
             };
 
             var query = context.Set<TEntity>().AsNoTracking();
+            includeQuery ??= GetEntityIncludeQuery();
             query = includeQuery is null ? query : includeQuery.GetExpression(query);
 
             pagedResult.Items = await query
@@ -562,7 +576,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync(cancellationToken).ConfigureAwait(false);
-            
+
             return pagedResult;
         }
         catch (Exception ex)
