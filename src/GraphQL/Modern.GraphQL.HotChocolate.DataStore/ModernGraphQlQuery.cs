@@ -9,6 +9,7 @@ namespace Modern.GraphQL.HotChocolate.DataStore;
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
+//[ExtendObjectType(typeof(IModernGraphQlMarker))]
 public class ModernGraphQlQuery<TEntityDto, TEntityDbo, TId>
     where TEntityDto : class
     where TEntityDbo : class

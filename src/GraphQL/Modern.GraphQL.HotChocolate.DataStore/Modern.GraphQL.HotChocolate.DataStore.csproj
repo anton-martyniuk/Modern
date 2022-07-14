@@ -16,13 +16,13 @@
 		<ProjectReference Include="..\..\Common\Modern.Exceptions\Modern.Exceptions.csproj" />
 		<ProjectReference Include="..\..\Repositories\Modern.Repositories.Abstractions\Modern.Repositories.Abstractions.csproj" />
 		<ProjectReference Include="..\..\Services\Modern.Services.DataStore.Abstractions\Modern.Services.DataStore.Abstractions.csproj" />
+		<ProjectReference Include="..\Modern.GraphQL.HotChocolate.Abstractions\Modern.GraphQL.HotChocolate.Abstractions.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="HotChocolate" Version="12.10.0" />
-		<PackageReference Include="HotChocolate.Data" Version="12.10.0" />
+		<PackageReference Include="HotChocolate" Version="12.11.1" />
+		<PackageReference Include="HotChocolate.Data" Version="12.11.1" />
 		<PackageReference Include="Mapster" Version="7.3.0" />
-		<PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="6.0.4" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
 	</ItemGroup>
 </Project>

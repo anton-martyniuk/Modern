@@ -26,15 +26,30 @@ public static class ServicesExtensions
             .AddProjections()
             .AddFiltering()
             .AddSorting()
+            //.ModifyOptions(x => x.StrictValidation = false)
             .InitializeOnStartup();
 
-        foreach (var c in options.GraphQlSpecifications)
+        var firstSpecification = options.GraphQlSpecifications.FirstOrDefault();
+        if (firstSpecification is not null)
         {
-            var queryType = typeof(ModernGraphQlQuery<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
+            var s = firstSpecification;
+            var queryType = typeof(ModernGraphQlQuery<,,>).MakeGenericType(s.EntityDtoType, s.EntityDboType, s.EntityIdType);
             graphQlBuilder.AddQueryType(queryType);
 
-            var mutationType = typeof(ModernGraphQlMutation<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
+            var mutationType = typeof(ModernGraphQlMutation<,,>).MakeGenericType(s.EntityDtoType, s.EntityDboType, s.EntityIdType);
             graphQlBuilder.AddMutationType(mutationType);
+        }
+
+        //graphQlBuilder.AddQueryType(x => x.Name("Query"));
+        //graphQlBuilder.AddMutationType(x => x.Name("Mutation"));
+
+        foreach (var c in options.GraphQlSpecifications.Skip(1))
+        {
+            var queryType = typeof(ModernGraphQlQuery<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
+            graphQlBuilder.AddType(queryType);
+
+            var mutationType = typeof(ModernGraphQlMutation<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
+            graphQlBuilder.AddType(mutationType);
         }
 
         return builder;

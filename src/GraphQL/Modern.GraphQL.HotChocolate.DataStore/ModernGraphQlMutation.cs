@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using HotChocolate.Types;
-using Microsoft.AspNetCore.JsonPatch;
 using Modern.Exceptions;
 using Modern.Services.DataStore.Abstractions;
 
