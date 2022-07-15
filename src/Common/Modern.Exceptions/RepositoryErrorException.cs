@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Modern.Repositories.Abstractions.Exceptions;
+namespace Modern.Exceptions;
 
 /// <summary>
 /// The exception that is thrown when an unhandled error occurs in repository

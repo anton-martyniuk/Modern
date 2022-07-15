@@ -5,7 +5,6 @@ using MapsterMapper;
 using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
-using Modern.Repositories.Abstractions.Exceptions;
 using Modern.Services.DataStore.Abstractions;
 
 namespace Modern.Services.DataStore;
@@ -80,11 +79,13 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             EntityAlreadyExistsException _ => ex,
             EntityNotFoundException _ => ex,
             EntityNotModifiedException _ => ex,
-            _ => new RepositoryErrorException(ex.Message, ex)
+            RepositoryErrorException _ => ex,
+            TaskCanceledException _ => ex,
+            _ => new InternalErrorException(ex.Message, ex)
         };
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.GetByIdAsync"/>
+    /// <inheritdoc cref="IModernQueryService{TEntityDto,TEntityDbo,TId}.GetByIdAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
@@ -109,7 +110,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.TryGetByIdAsync"/>
+    /// <inheritdoc cref="IModernQueryService{TEntityDto,TEntityDbo,TId}.TryGetByIdAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto?> TryGetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
@@ -134,7 +135,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.GetAllAsync"/>
+    /// <inheritdoc cref="IModernQueryService{TEntityDto,TEntityDbo,TId}.GetAllAsync"/>
     /// </summary>
     public virtual async Task<List<TEntityDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
@@ -155,7 +156,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.CountAsync(CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryService{TEntityDto,TEntityDbo,TId}.CountAsync(CancellationToken)"/>
     /// </summary>
     public virtual async Task<int> CountAsync(CancellationToken cancellationToken = default)
     {
@@ -178,7 +179,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.CountAsync(Expression{Func{TEntityDbo, bool}},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryService{TEntityDto,TEntityDbo,TId}.CountAsync(Expression{Func{TEntityDbo, bool}},CancellationToken)"/>
     /// </summary>
     public virtual async Task<int> CountAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
     {
@@ -199,7 +200,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.ExistsAsync"/>
+    /// <inheritdoc cref="IModernQueryService{TEntityDto,TEntityDbo,TId}.ExistsAsync"/>
     /// </summary>
     public virtual async Task<bool> ExistsAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
     {
@@ -220,7 +221,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.FirstOrDefaultAsync"/>
+    /// <inheritdoc cref="IModernQueryService{TEntityDto,TEntityDbo,TId}.FirstOrDefaultAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto?> FirstOrDefaultAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
     {
@@ -242,7 +243,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.SingleOrDefaultAsync"/>
+    /// <inheritdoc cref="IModernQueryService{TEntityDto,TEntityDbo,TId}.SingleOrDefaultAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto?> SingleOrDefaultAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
     {
@@ -264,7 +265,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.WhereAsync(Expression{Func{TEntityDbo, bool}},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryService{TEntityDto,TEntityDbo,TId}.WhereAsync(Expression{Func{TEntityDbo, bool}},CancellationToken)"/>
     /// </summary>
     public virtual async Task<List<TEntityDto>> WhereAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
     {
@@ -286,7 +287,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.WhereAsync(Expression{Func{TEntityDbo, bool}},int,int,CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryService{TEntityDto,TEntityDbo,TId}.WhereAsync(Expression{Func{TEntityDbo, bool}},int,int,CancellationToken)"/>
     /// </summary>
     public virtual async Task<PagedResult<TEntityDto>> WhereAsync(Expression<Func<TEntityDbo, bool>> predicate, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
@@ -319,7 +320,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryService{TEntityDto, TEntityDbo,TId}.AsQueryable"/>
+    /// <inheritdoc cref="IModernQueryService{TEntityDto,TEntityDbo,TId}.AsQueryable"/>
     /// </summary>
     public virtual IQueryable<TEntityDbo> AsQueryable()
     {

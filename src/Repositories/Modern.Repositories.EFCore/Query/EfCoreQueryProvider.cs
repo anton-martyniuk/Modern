@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Query;
 using System.Collections;
 using System.Linq.Expressions;
 using System.Reflection;
-using Modern.Repositories.Abstractions.Exceptions;
+using Modern.Exceptions;
 
 namespace Modern.Repositories.EFCore.Query;
 

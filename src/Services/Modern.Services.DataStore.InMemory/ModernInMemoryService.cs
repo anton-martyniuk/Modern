@@ -1,38 +1,33 @@
 ﻿using Ardalis.GuardClauses;
-using MapsterMapper;
 using Microsoft.Extensions.Logging;
 using Modern.Data.Paging;
 using Modern.Exceptions;
-using Modern.Repositories.Abstractions;
-using Modern.Repositories.Abstractions.Exceptions;
+using Modern.Services.DataStore.Abstractions;
 using Modern.Services.DataStore.InMemory.Abstractions;
 using Modern.Services.DataStore.InMemory.Abstractions.Cache;
 
 namespace Modern.Services.DataStore.InMemory;
 
 /// <summary>
-/// Represents an <see cref="IModernInMemoryService{TEntityDto,TEntityDbo,TId}"/> implementation
-/// with data access with caching and through generic repository
+/// Represents a decorator over <see cref="IModernService{TEntityDto,TEntityDbo,TId}"/> entity implementation
+/// that adds full InMemory caching of all entities
 /// </summary>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
-/// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
+public class ModernInMemoryService<TEntityDto, TEntityDbo, TId> :
     IModernInMemoryService<TEntityDto, TEntityDbo, TId>
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
-    where TRepository : class, IModernQueryRepository<TEntityDbo, TId>, IModernCrudRepository<TEntityDbo, TId>
 {
     private readonly string _entityName = typeof(TEntityDto).Name;
     private readonly string _serviceName = $"{typeof(TEntityDto).Name}Service";
-    private readonly IMapper _mapper = new Mapper();
 
     /// <summary>
-    /// The repository instance
+    /// The entity service
     /// </summary>
-    protected readonly TRepository Repository;
+    protected readonly IModernService<TEntityDto, TEntityDbo, TId> Service;
 
     /// <summary>
     /// The service cache
@@ -40,40 +35,27 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     protected readonly IModernServiceCache<TEntityDto, TId> Cache;
 
     /// <summary>
-    /// The repository instance
+    /// The logger
     /// </summary>
     protected readonly ILogger Logger;
 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    /// <param name="repository">The generic repository</param>
+    /// <param name="service">The entity service</param>
     /// <param name="cache">The service cache of entities</param>
     /// <param name="logger">The logger</param>
-    public ModernInMemoryService(TRepository repository, IModernServiceCache<TEntityDto, TId> cache,
-        ILogger<ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
+    public ModernInMemoryService(IModernService<TEntityDto, TEntityDbo, TId> service,
+        IModernServiceCache<TEntityDto, TId> cache,
+        ILogger<ModernInMemoryService<TEntityDto, TEntityDbo, TId>> logger)
     {
-        ArgumentNullException.ThrowIfNull(repository, nameof(repository));
+        ArgumentNullException.ThrowIfNull(service, nameof(service));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
-        Repository = repository;
+        Service = service;
         Cache = cache;
         Logger = logger;
     }
-
-    /// <summary>
-    /// Returns <typeparamref name="TEntityDto"/> mapped from <typeparamref name="TEntityDbo"/>
-    /// </summary>
-    /// <param name="entityDto">Entity Dto</param>
-    /// <returns>Entity Dbo</returns>
-    protected virtual TEntityDbo MapToDbo(TEntityDto entityDto) => _mapper.Map<TEntityDbo>(entityDto);
-
-    /// <summary>
-    /// Returns <typeparamref name="TEntityDbo"/> mapped from <typeparamref name="TEntityDto"/>
-    /// </summary>
-    /// <param name="entityDbo">Entity Dbo</param>
-    /// <returns>Entity Dto</returns>
-    protected virtual TEntityDto MapToDto(TEntityDbo entityDbo) => _mapper.Map<TEntityDto>(entityDbo);
 
     /// <summary>
     /// Returns entity id of type <typeparamref name="TId"/>
@@ -87,7 +69,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// Returns standardized service exception
     /// </summary>
     /// <param name="ex">Original exception</param>
-    /// <returns>Repository exception which holds original exception as InnerException</returns>
+    /// <returns>Standardized service exception</returns>
     protected virtual Exception CreateProperException(Exception ex)
         => ex switch
         {
@@ -96,11 +78,13 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
             EntityAlreadyExistsException _ => ex,
             EntityNotFoundException _ => ex,
             EntityNotModifiedException _ => ex,
-            _ => new RepositoryErrorException(ex.Message, ex)
+            RepositoryErrorException _ => ex,
+            TaskCanceledException _ => ex,
+            _ => new InternalErrorException(ex.Message, ex)
         };
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.GetByIdAsync"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto,TEntityDbo,TId}.GetByIdAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
@@ -114,7 +98,16 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
                 Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(GetByIdAsync), id);
             }
 
-            return await Cache.GetByIdAsync(id).ConfigureAwait(false);
+            var entityDto = await Cache.TryGetByIdAsync(id).ConfigureAwait(false);
+            if (entityDto is not null)
+            {
+                return entityDto;
+            }
+
+            entityDto = await Service.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
+            await Cache.AddOrUpdateAsync(GetEntityId(entityDto), entityDto).ConfigureAwait(false);
+
+            return entityDto;
         }
         catch (Exception ex)
         {
@@ -124,7 +117,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.TryGetByIdAsync"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto,TEntityDbo,TId}.TryGetByIdAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto?> TryGetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
@@ -138,7 +131,21 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
                 Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(TryGetByIdAsync), id);
             }
 
-            return await Cache.TryGetByIdAsync(id).ConfigureAwait(false);
+            var entityDto = await Cache.TryGetByIdAsync(id).ConfigureAwait(false);
+            if (entityDto is not null)
+            {
+                return entityDto;
+            }
+
+            entityDto = await Service.TryGetByIdAsync(id, cancellationToken).ConfigureAwait(false);
+            if (entityDto is null)
+            {
+                return null;
+            }
+
+            await Cache.AddOrUpdateAsync(GetEntityId(entityDto), entityDto).ConfigureAwait(false);
+
+            return entityDto;
         }
         catch (Exception ex)
         {
@@ -148,7 +155,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.GetAllAsync"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto,TEntityDbo,TId}.GetAllAsync"/>
     /// </summary>
     public virtual async Task<List<TEntityDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
@@ -168,7 +175,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.CountAsync(CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto,TEntityDbo,TId}.CountAsync(CancellationToken)"/>
     /// </summary>
     public virtual async Task<int> CountAsync(CancellationToken cancellationToken = default)
     {
@@ -191,7 +198,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.CountAsync(Func{TEntityDto, bool},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto,TEntityDbo,TId}.CountAsync(Func{TEntityDto, bool},CancellationToken)"/>
     /// </summary>
     public virtual async Task<int> CountAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
@@ -212,7 +219,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.ExistsAsync"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto,TEntityDbo,TId}.ExistsAsync"/>
     /// </summary>
     public virtual async Task<bool> ExistsAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
@@ -233,7 +240,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.FirstOrDefaultAsync"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto,TEntityDbo,TId}.FirstOrDefaultAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto?> FirstOrDefaultAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
@@ -254,7 +261,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.SingleOrDefaultAsync"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto,TEntityDbo,TId}.SingleOrDefaultAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto?> SingleOrDefaultAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
@@ -275,7 +282,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.WhereAsync(Func{TEntityDto, bool},CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto,TEntityDbo,TId}.WhereAsync(Func{TEntityDto, bool},CancellationToken)"/>
     /// </summary>
     public virtual async Task<List<TEntityDto>> WhereAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
@@ -323,7 +330,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.AsQueryable"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto,TEntityDbo,TId}.AsQueryable"/>
     /// </summary>
     public virtual IEnumerable<TEntityDto> AsEnumerable()
     {
@@ -341,7 +348,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto, TEntityDbo, TId}.AsQueryable"/>
+    /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto,TEntityDbo,TId}.AsQueryable"/>
     /// </summary>
     public virtual IQueryable<TEntityDbo> AsQueryable()
     {
@@ -349,7 +356,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
         {
             LogMethod(nameof(AsQueryable));
 
-            return Repository.AsQueryable();
+            return Service.AsQueryable();
         }
         catch (Exception ex)
         {
@@ -359,7 +366,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.CreateAsync(TEntity,CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudInMemoryService{TEntityDto,TId}.CreateAsync(TEntityDto,CancellationToken)"/>
     /// </summary>
     public virtual async Task<TEntityDto> CreateAsync(TEntityDto entity, CancellationToken cancellationToken = default)
     {
@@ -370,13 +377,10 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             Logger.LogTrace("{serviceName}.{method} entity: {@entity}", _serviceName, nameof(CreateAsync), entity);
 
-            var entityDbo = MapToDbo(entity);
-
             Logger.LogDebug("Creating {name} entity in db...", _entityName);
-            entityDbo = await Repository.CreateAsync(entityDbo, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Created {name} entity. {@entityDbo}", _entityName, entityDbo);
+            var entityDto = await Service.CreateAsync(entity, cancellationToken).ConfigureAwait(false);
+            Logger.LogDebug("Created {name} entity. {@entityDbo}", _entityName, entityDto);
 
-            var entityDto = MapToDto(entityDbo);
             var entityId = GetEntityId(entityDto);
 
             Logger.LogDebug("Creating {name} entity with id '{id}' in cache...", _entityName, entityId);
@@ -393,7 +397,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.CreateAsync(List{TEntity},CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudInMemoryService{TEntityDto,TId}.CreateAsync(List{TEntityDto},CancellationToken)"/>
     /// </summary>
     public virtual async Task<List<TEntityDto>> CreateAsync(List<TEntityDto> entities, CancellationToken cancellationToken = default)
     {
@@ -405,14 +409,11 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(CreateAsync), entities);
 
-            var entitiesDbo = entities.ConvertAll(MapToDbo);
-
             Logger.LogDebug("Creating {name} entities in db...", _entityName);
-            entitiesDbo = await Repository.CreateAsync(entitiesDbo, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Created {name} entities. {@entitiesDbo}", _entityName, entitiesDbo);
+            var entitiesDto = await Service.CreateAsync(entities, cancellationToken).ConfigureAwait(false);
+            Logger.LogDebug("Created {name} entities. {@entitiesDbo}", _entityName, entitiesDto);
 
-            var entitiesDto = entitiesDbo.ConvertAll(MapToDto);
-            var dictionary = entitiesDto.ToDictionary(key => GetEntityId(key), value => value);
+            var dictionary = entitiesDto.ToDictionary(entity => GetEntityId(entity), entity => entity);
 
             Logger.LogDebug("Creating {name} entities in cache...", _entityName);
             await Cache.AddOrUpdateAsync(dictionary).ConfigureAwait(false);
@@ -428,7 +429,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(TId,TEntity,CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudInMemoryService{TEntityDto,TId}.UpdateAsync(TId,TEntityDto,CancellationToken)"/>
     /// </summary>
     public virtual async Task<TEntityDto> UpdateAsync(TId id, TEntityDto entity, CancellationToken cancellationToken = default)
     {
@@ -440,13 +441,10 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             Logger.LogTrace("{serviceName}.{method} id: {id}, entity: {@entity}", _serviceName, nameof(UpdateAsync), id, entity);
 
-            var entityDbo = MapToDbo(entity);
-
             Logger.LogDebug("Updating {name} entity with id '{id}' in db...", _entityName, id);
-            entityDbo = await Repository.UpdateAsync(id, entityDbo, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Updated {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDbo);
+            var entityDto = await Service.UpdateAsync(id, entity, cancellationToken).ConfigureAwait(false);
+            Logger.LogDebug("Updated {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDto);
 
-            var entityDto = MapToDto(entityDbo);
             var entityId = GetEntityId(entityDto);
 
             Logger.LogDebug("Updating {name} entity with id '{id}' in cache...", _entityName, entityId);
@@ -463,7 +461,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(List{TEntity},CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudInMemoryService{TEntityDto,TId}.UpdateAsync(List{TEntityDto},CancellationToken)"/>
     /// </summary>
     public virtual async Task<List<TEntityDto>> UpdateAsync(List<TEntityDto> entities, CancellationToken cancellationToken = default)
     {
@@ -475,14 +473,11 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(UpdateAsync), entities);
 
-            var entitiesDbo = entities.ConvertAll(MapToDbo);
-
             Logger.LogDebug("Updating entity in db...");
-            entitiesDbo = await Repository.UpdateAsync(entitiesDbo, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Updated {name} entities. {@entitiesDbo}", _entityName, entitiesDbo);
+            var entitiesDto = await Service.UpdateAsync(entities, cancellationToken).ConfigureAwait(false);
+            Logger.LogDebug("Updated {name} entities. {@entitiesDbo}", _entityName, entitiesDto);
 
-            var entitiesDto = entitiesDbo.ConvertAll(MapToDto);
-            var dictionary = entitiesDto.ToDictionary(key => GetEntityId(key), value => value);
+            var dictionary = entitiesDto.ToDictionary(entity => GetEntityId(entity), entity => entity);
 
             Logger.LogDebug("Updating {name} entities from cache with ids: {@ids}...", _entityName, dictionary);
             await Cache.AddOrUpdateAsync(dictionary).ConfigureAwait(false);
@@ -498,7 +493,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(TId,Action{TEntity},CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudInMemoryService{TEntityDto,TId}.UpdateAsync(TId,Action{TEntityDto},CancellationToken)"/>
     /// </summary>
     public virtual async Task<TEntityDto> UpdateAsync(TId id, Action<TEntityDto> update, CancellationToken cancellationToken = default)
     {
@@ -513,15 +508,13 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
             var entityDto = await Cache.GetByIdAsync(id).ConfigureAwait(false);
             update(entityDto);
 
+            Logger.LogDebug("Updating {name} entity with id '{id}' in db...", _entityName, id);
+            entityDto = await Service.UpdateAsync(id, entityDto, cancellationToken).ConfigureAwait(false);
+            Logger.LogDebug("Updated {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDto);
+
             Logger.LogDebug("Updating {name} entity with id '{id}' in cache...", _entityName, id);
             await Cache.AddOrUpdateAsync(id, entityDto).ConfigureAwait(false);
             Logger.LogDebug("Updated {name} entity with id '{id}'. {@entityDto}", _entityName, id, entityDto);
-
-            var entityDbo = MapToDbo(entityDto);
-
-            Logger.LogDebug("Updating {name} entity with id '{id}' in db...", _entityName, id);
-            entityDbo = await Repository.UpdateAsync(id, entityDbo, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Updated {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDbo);
 
             return entityDto;
         }
@@ -533,7 +526,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAsync(TId,CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudInMemoryService{TEntityDto,TId}.DeleteAsync(TId,CancellationToken)"/>
     /// </summary>
     public virtual async Task<bool> DeleteAsync(TId id, CancellationToken cancellationToken = default)
     {
@@ -545,7 +538,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
             Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(DeleteAsync), id);
             Logger.LogDebug("Deleting {name} entity with id '{id}' in db...", _entityName, id);
 
-            var result = await Repository.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
+            var result = await Service.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
             if (!result)
             {
                 Logger.LogDebug("{name} entity with id {id} was not found for deletion", _entityName, id);
@@ -568,7 +561,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAsync(List{TId},CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudInMemoryService{TEntityDto,TId}.DeleteAsync(List{TId},CancellationToken)"/>
     /// </summary>
     public virtual async Task<bool> DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default)
     {
@@ -581,7 +574,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
             Logger.LogTrace("{serviceName}.{method} ids: {@ids}", _serviceName, nameof(DeleteAsync), ids);
             Logger.LogDebug("Updating {name} entities in db...", _entityName);
 
-            var result = await Repository.DeleteAsync(ids, cancellationToken).ConfigureAwait(false);
+            var result = await Service.DeleteAsync(ids, cancellationToken).ConfigureAwait(false);
             if (!result)
             {
                 Logger.LogDebug("Not all {name} entities with ids: {@ids} were found for deletion", _entityName, ids);
@@ -604,7 +597,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAndReturnAsync"/>
+    /// <inheritdoc cref="IModernCrudInMemoryService{TEntityDto,TId}.DeleteAndReturnAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto> DeleteAndReturnAsync(TId id, CancellationToken cancellationToken = default)
     {
@@ -616,11 +609,9 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId, TRepository> :
             Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(DeleteAndReturnAsync), id);
 
             // Check if entity exists in cache. If not - exception will be thrown.
-            var entityDto = await Cache.GetByIdAsync(id).ConfigureAwait(false);
-
             Logger.LogDebug("Deleting {name} entity with id '{id}' in db...", _entityName, id);
-            var entityDbo = await Repository.DeleteAndReturnAsync(id, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Deleted {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDbo);
+            var entityDto = await Service.DeleteAndReturnAsync(id, cancellationToken).ConfigureAwait(false);
+            Logger.LogDebug("Deleted {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDto);
 
             Logger.LogDebug("Deleting {name} entity with id '{id}' from cache...", _entityName, id);
             await Cache.DeleteAsync(id).ConfigureAwait(false);

@@ -25,9 +25,10 @@ public static class ServicesExtensions
         foreach (var c in options.Services)
         {
             var interfaceType = typeof(IModernService<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
-            var implementationType = typeof(ModernCachedService<,,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType, c.RepositoryType);
+            var decoratorType = typeof(ModernCachedService<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
 
-            builder.Services.TryAdd(new ServiceDescriptor(interfaceType, implementationType, c.Lifetime));
+            //builder.Services.TryAdd(new ServiceDescriptor(interfaceType, implementationType, c.Lifetime));
+            builder.Services.Decorate(interfaceType, decoratorType);
         }
 
         foreach (var c in options.ConcreteServices)

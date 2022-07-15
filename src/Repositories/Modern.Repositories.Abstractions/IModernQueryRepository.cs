@@ -1,7 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Modern.Data.Paging;
 using Modern.Exceptions;
-using Modern.Repositories.Abstractions.Exceptions;
 using Modern.Repositories.Abstractions.Infrastracture;
 
 namespace Modern.Repositories.Abstractions;

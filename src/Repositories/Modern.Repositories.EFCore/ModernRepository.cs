@@ -7,7 +7,6 @@ using Microsoft.Extensions.Options;
 using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
-using Modern.Repositories.Abstractions.Exceptions;
 using Modern.Repositories.Abstractions.Infrastracture;
 using Modern.Repositories.EFCore.Query;
 

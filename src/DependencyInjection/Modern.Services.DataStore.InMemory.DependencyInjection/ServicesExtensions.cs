@@ -27,7 +27,7 @@ public static class ServicesExtensions
         foreach (var c in options.Services)
         {
             var serviceInterfaceType = typeof(IModernInMemoryService<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
-            var serviceImplementationType = typeof(ModernInMemoryService<,,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType, c.RepositoryType);
+            var serviceImplementationType = typeof(ModernInMemoryService<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
 
             var cacheInterfaceType = typeof(IModernServiceCache<,>).MakeGenericType(c.EntityDtoType, c.EntityIdType);
             var cacheImplementationType = typeof(ModernInMemoryServiceCache<,>).MakeGenericType(c.EntityDtoType, c.EntityIdType);

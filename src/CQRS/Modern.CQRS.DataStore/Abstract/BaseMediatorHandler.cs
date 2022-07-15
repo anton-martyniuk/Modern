@@ -1,6 +1,5 @@
 ﻿using MapsterMapper;
 using Modern.Exceptions;
-using Modern.Repositories.Abstractions.Exceptions;
 
 namespace Modern.CQRS.DataStore.Abstract;
 

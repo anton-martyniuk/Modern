@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace Modern.GraphQL.HotChocolate.DependencyInjection.Definitions.Configuration;
+﻿namespace Modern.GraphQL.HotChocolate.DependencyInjection.Definitions.Configuration;
 
 /// <summary>
 /// The modern GraphQL specification model
