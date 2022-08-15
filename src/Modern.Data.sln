@@ -111,7 +111,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.GraphQL.HotChocolate
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.GraphQL.HotChocolate.DependencyInjection.Definitions", "DependencyInjection\Definitions\Modern.GraphQL.HotChocolate.DependencyInjection.Definitions\Modern.GraphQL.HotChocolate.DependencyInjection.Definitions.csproj", "{C7A8AC5E-EED1-4BA7-B059-C92D8627363D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.GraphQL.HotChocolate.Abstractions", "GraphQL\Modern.GraphQL.HotChocolate.Abstractions\Modern.GraphQL.HotChocolate.Abstractions.csproj", "{337FC649-2FE2-44C1-8F00-BC7BBEBEACBE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.GraphQL.HotChocolate.Abstractions", "GraphQL\Modern.GraphQL.HotChocolate.Abstractions\Modern.GraphQL.HotChocolate.Abstractions.csproj", "{337FC649-2FE2-44C1-8F00-BC7BBEBEACBE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Repositories.Dapper", "Repositories\Modern.Repositories.Dapper\Modern.Repositories.Dapper.csproj", "{C5C6CA4E-494B-4AC5-ABAB-0DF6DE9FF668}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -303,6 +305,10 @@ Global
 		{337FC649-2FE2-44C1-8F00-BC7BBEBEACBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{337FC649-2FE2-44C1-8F00-BC7BBEBEACBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{337FC649-2FE2-44C1-8F00-BC7BBEBEACBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5C6CA4E-494B-4AC5-ABAB-0DF6DE9FF668}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5C6CA4E-494B-4AC5-ABAB-0DF6DE9FF668}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5C6CA4E-494B-4AC5-ABAB-0DF6DE9FF668}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5C6CA4E-494B-4AC5-ABAB-0DF6DE9FF668}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -354,6 +360,7 @@ Global
 		{E8687E46-1A09-48D1-AED1-B500CA51F59F} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
 		{C7A8AC5E-EED1-4BA7-B059-C92D8627363D} = {C38633BF-FD8C-479F-8674-CBACE398A96F}
 		{337FC649-2FE2-44C1-8F00-BC7BBEBEACBE} = {3529D61E-E1F3-4098-A668-60F904092871}
+		{C5C6CA4E-494B-4AC5-ABAB-0DF6DE9FF668} = {79927B92-F532-469C-9E86-76E84C16584E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94D244EE-259E-401A-A55F-7D833CA4DC5E}

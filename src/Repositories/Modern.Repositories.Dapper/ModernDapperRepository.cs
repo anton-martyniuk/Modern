@@ -1,46 +1,48 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Modern.Repositories.EFCore.Configuration;
-using System.Data;
+﻿using System.Data;
 using System.Linq.Expressions;
+using System.Text;
 using Ardalis.GuardClauses;
-using Microsoft.Extensions.Options;
+using Dapper;
 using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Infrastracture;
-using Modern.Repositories.EFCore.Query;
+using Modern.Repositories.Dapper.Mapping;
 
-namespace Modern.Repositories.EFCore;
+namespace Modern.Repositories.Dapper;
 
 /// <summary>
-/// Represents an <see cref="IModernCrudRepository{TEntity, TId}"/> and <see cref="IModernQueryRepository{TEntity, TId}"/> implementation using EFCore
+/// Represents an <see cref="IModernCrudRepository{TEntity, TId}"/> and <see cref="IModernQueryRepository{TEntity, TId}"/> implementation using Dapper
 /// </summary>
-/// <typeparam name="TDbContext">The type of EF Core DbContext</typeparam>
+/// <typeparam name="TEntityMapping">The type of entity mapping</typeparam>
 /// <typeparam name="TEntity">The type of entity</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
-public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEntity, TId>
-    where TDbContext : DbContext
+public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepository<TEntity, TId>
+    where TEntityMapping : DapperEntityMapping
     where TEntity : class
     where TId : IEquatable<TId>
 {
     private readonly string _entityName = typeof(TEntity).Name;
 
-    private readonly EfCoreRepositoryConfiguration? _configuration;
+    /// <summary>
+    /// The database connection
+    /// </summary>
+    public IDbConnection DbConnection { get; }
 
     /// <summary>
-    /// The <typeparamref name="TDbContext"/> factory
+    /// Dapper entity mapping
     /// </summary>
-    protected IDbContextFactory<TDbContext> DbContextFactory { get; }
+    public TEntityMapping Mapping { get; }
 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    /// <param name="dbContextFactory">The <see cref="IDbContextFactory{TDbContext}"/> implementation</param>
-    /// <param name="configuration">Repository configuration</param>
-    public ModernRepository(IDbContextFactory<TDbContext> dbContextFactory, IOptions<EfCoreRepositoryConfiguration?> configuration)
+    /// <param name="dbConnection">The database connection</param>
+    /// <param name="mapping">The Dapper entity mapping</param>
+    public ModernDapperRepository(IDbConnection dbConnection, TEntityMapping mapping)
     {
-        DbContextFactory = dbContextFactory;
-        _configuration = configuration.Value;
+        DbConnection = dbConnection;
+        Mapping = mapping;
     }
 
     /// <summary>
@@ -67,7 +69,6 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
         return ex switch
         {
             ArgumentException _ => ex,
-            DbUpdateConcurrencyException _ => new EntityConcurrentUpdateException(ex.Message, ex),
             EntityAlreadyExistsException _ => ex,
             EntityNotFoundException _ => ex,
             EntityNotModifiedException _ => ex,
@@ -327,9 +328,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
-            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
-
-            var entity = await GetEntityByIdImpl(context, id, includeQuery ?? GetEntityIncludeQuery(), cancellationToken).ConfigureAwait(false);
+            var entity = await DbConnection.QuerySingleOrDefaultAsync<TEntity>($"SELECT {GetSelectColumnsQuery()} FROM {Mapping.TableName} WHERE {Mapping.IdColumnName}=@Id", new { Id = id });
             if (entity is null)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
@@ -352,8 +351,8 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
-            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
-            return await GetEntityByIdImpl(context, id, includeQuery ?? GetEntityIncludeQuery(), cancellationToken).ConfigureAwait(false);
+            var entity = await DbConnection.QuerySingleOrDefaultAsync<TEntity>($"SELECT {GetSelectColumnsQuery()} FROM {Mapping.TableName} WHERE {Mapping.IdColumnName}=@Id", new { Id = id });
+            return entity;
         }
         catch (Exception ex)
         {
@@ -369,18 +368,8 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
-
-            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
-
-            includeQuery ??= GetEntityIncludeQuery();
-            if (includeQuery is null)
-            {
-                return await context.Set<TEntity>().ToListAsync(cancellationToken).ConfigureAwait(false);
-            }
-
-            var query = context.Set<TEntity>().AsNoTracking();
-            query = includeQuery.GetExpression(query);
-            return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+            var enumerable = await DbConnection.QueryAsync<TEntity>($"SELECT {GetSelectColumnsQuery()} FROM {Mapping.TableName}");
+            return enumerable.ToList();
         }
         catch (Exception ex)
         {
@@ -396,9 +385,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
-
-            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
-            return await context.Set<TEntity>().AsNoTracking().CountAsync(cancellationToken).ConfigureAwait(false);
+            return await DbConnection.QueryFirstAsync<int>($"SELECT COUNT(*) FROM {Mapping.TableName}");
         }
         catch (Exception ex)
         {
@@ -444,6 +431,7 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             cancellationToken.ThrowIfCancellationRequested();
 
+            var entity = await DbConnection.QuerySingleOrDefaultAsync<TEntity>($"SELECT {GetSelectColumnsQuery()} FROM {Mapping.TableName} WHERE {Mapping.IdColumnName}=@Id", new { Id = id });
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
 
             includeQuery ??= GetEntityIncludeQuery();
@@ -738,28 +726,6 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
     }
 
     /// <summary>
-    /// Returns entity by id
-    /// </summary>
-    /// <param name="context">DbContext</param>
-    /// <param name="id">Entity id</param>
-    /// <param name="includeQuery">Expression that describes included entities</param>
-    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
-    /// <returns>Entity</returns>
-    private async Task<TEntity?> GetEntityByIdImpl(TDbContext context, TId id, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
-    {
-        if (includeQuery is null)
-        {
-            return await context.Set<TEntity>().FindAsync(new object?[] { id }, cancellationToken).ConfigureAwait(false);
-        }
-
-        var query = context.Set<TEntity>().AsQueryable();
-        query = includeQuery.GetExpression(query);
-
-        var idName = GetEntityIdColumnOrThrow(context);
-        return await query.SingleOrDefaultAsync(x => id.Equals(EF.Property<TId>(x, idName)), cancellationToken).ConfigureAwait(false);
-    }
-
-    /// <summary>
     /// Return entity id column name or throws exception if entity does not have any primary key defined
     /// </summary>
     /// <param name="context">DbContext</param>
@@ -775,4 +741,12 @@ public class ModernRepository<TDbContext, TEntity, TId> : IModernRepository<TEnt
 
         return idName;
     }
+
+    /// <summary>
+    /// Returns a query that selects all columns of the entity table
+    /// </summary>
+    /// <returns>Select query</returns>
+    private string GetSelectColumnsQuery()
+        => Mapping.ColumnMappings.Aggregate(new StringBuilder(), (builder, mapping) => builder.AppendFormat("{0}{1} as {2}",
+            builder.Length > 0 ? ", " : "", mapping.Key, mapping.Value), builder => builder.ToString());
 }

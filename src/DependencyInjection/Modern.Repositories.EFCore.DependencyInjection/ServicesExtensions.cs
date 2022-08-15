@@ -25,7 +25,7 @@ public static class ServicesExtensions
         foreach (var c in options.Repositories)
         {
             var interfaceType = typeof(IModernRepository<,>).MakeGenericType(c.EntityType, c.EntityIdType);
-            var implementationType = typeof(ModernRepository<,,>).MakeGenericType(c.DbContextType, c.EntityType, c.EntityIdType);
+            var implementationType = typeof(ModernEfCoreRepository<,,>).MakeGenericType(c.DbContextType, c.EntityType, c.EntityIdType);
 
             builder.Services.TryAdd(new ServiceDescriptor(interfaceType, implementationType, c.Lifetime));
         }
