@@ -8,7 +8,7 @@ namespace Modern.CQRS.DataStore.Abstractions.Queries;
 /// </summary>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
 /// <returns>Count of entities</returns>
-public record GetCountAllQuery<TEntityDto, TId> : IRequest<int>
+public record GetCountAllQuery<TEntityDto, TId> : IRequest<long>
     where TEntityDto : class
     where TId : IEquatable<TId>
 {

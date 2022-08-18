@@ -63,8 +63,7 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
     /// <param name="ex">Original exception</param>
     /// <returns>Repository exception which holds original exception as InnerException</returns>
     protected virtual Exception CreateProperException(Exception ex)
-    {
-        return ex switch
+        => ex switch
         {
             ArgumentException _ => ex,
             DbUpdateConcurrencyException _ => new EntityConcurrentUpdateException(ex.Message, ex),
@@ -73,7 +72,6 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             EntityNotModifiedException _ => ex,
             _ => new RepositoryErrorException(ex.Message, ex)
         };
-    }
 
     /// <summary>
     /// <inheritdoc cref="IModernCrudRepository{TEntity, TId}.CreateAsync(TEntity,CancellationToken)"/>
@@ -391,7 +389,7 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.CountAsync(CancellationToken)"/>
     /// </summary>
-    public virtual async Task<int> CountAsync(CancellationToken cancellationToken = default)
+    public virtual async Task<long> CountAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -409,7 +407,8 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.CountAsync(Expression{Func{TEntity, bool}},EntityIncludeQuery{TEntity},CancellationToken)"/>
     /// </summary>
-    public virtual async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
+    public virtual async Task<long> CountAsync(Expression<Func<TEntity, bool>> predicate,
+        EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -559,22 +558,25 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
 
             await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
 
-            var pagedResult = new PagedResult<TEntity>
-            {
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-                TotalCount = await context.Set<TEntity>().AsNoTracking().CountAsync(predicate, cancellationToken).ConfigureAwait(false)
-            };
-
             var query = context.Set<TEntity>().AsNoTracking();
             includeQuery ??= GetEntityIncludeQuery();
             query = includeQuery is null ? query : includeQuery.GetExpression(query);
 
-            pagedResult.Items = await query
+            var countTask = context.Set<TEntity>().AsNoTracking().CountAsync(predicate, cancellationToken);
+
+            var queryTask = query
                 .Where(predicate)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .ToListAsync(cancellationToken).ConfigureAwait(false);
+                .ToListAsync(cancellationToken);
+
+            var pagedResult = new PagedResult<TEntity>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = await countTask.ConfigureAwait(false),
+                Items = await queryTask.ConfigureAwait(false)
+            };
 
             return pagedResult;
         }
@@ -634,6 +636,8 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
     private async Task<List<TEntity>> PerformUpdateAsync(TDbContext context, List<TEntity> entities, CancellationToken cancellationToken)
     {
         var idName = GetEntityIdColumnOrThrow(context);
+
+        // TODO: no reflection here if possible
         var idProperty = typeof(TEntity).GetProperty(idName);
 
         var list = new List<TEntity>();
@@ -682,6 +686,7 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             throw new EntityNotFoundException($"Entity with id '{id}' not found");
         }
 
+        // Perform update action
         update(entity);
 
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

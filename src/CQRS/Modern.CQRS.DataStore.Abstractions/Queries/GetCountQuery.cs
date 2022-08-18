@@ -10,7 +10,7 @@ namespace Modern.CQRS.DataStore.Abstractions.Queries;
 /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
 /// <returns>Count of entities</returns>
-public record GetCountQuery<TEntityDbo, TId>(Expression<Func<TEntityDbo, bool>> Predicate) : IRequest<int>
+public record GetCountQuery<TEntityDbo, TId>(Expression<Func<TEntityDbo, bool>> Predicate) : IRequest<long>
     where TEntityDbo : class
     where TId : IEquatable<TId>
 {

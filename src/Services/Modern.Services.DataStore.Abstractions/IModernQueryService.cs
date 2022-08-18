@@ -53,7 +53,7 @@ public interface IModernQueryService<TEntityDto, TEntityDbo, in TId>
     /// </summary>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
     /// <returns>Count of entities</returns>
-    Task<int> CountAsync(CancellationToken cancellationToken = default);
+    Task<long> CountAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns the total count of entities that match the given <paramref name="predicate"/>
@@ -63,7 +63,7 @@ public interface IModernQueryService<TEntityDto, TEntityDbo, in TId>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
     /// <returns>Count of entities</returns>
-    Task<int> CountAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default);
+    Task<long> CountAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Determines whether the data store contains at least one entity that matches the given <paramref name="predicate"/>

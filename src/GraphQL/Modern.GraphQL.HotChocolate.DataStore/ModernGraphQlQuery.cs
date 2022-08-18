@@ -51,7 +51,7 @@ public class ModernGraphQlQuery<TEntityDto, TEntityDbo, TId>
     /// Returns the total count of entities
     /// </summary>
     /// <returns>Count of entities</returns>
-    public virtual async Task<int> GetCountAllAsync()
+    public virtual async Task<long> GetCountAllAsync()
     {
         var count = await _service.CountAsync().ConfigureAwait(false);
         return count;

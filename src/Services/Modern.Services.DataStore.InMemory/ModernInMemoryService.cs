@@ -177,7 +177,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId> :
     /// <summary>
     /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto,TEntityDbo,TId}.CountAsync(CancellationToken)"/>
     /// </summary>
-    public virtual async Task<int> CountAsync(CancellationToken cancellationToken = default)
+    public virtual async Task<long> CountAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -200,7 +200,7 @@ public class ModernInMemoryService<TEntityDto, TEntityDbo, TId> :
     /// <summary>
     /// <inheritdoc cref="IModernQueryInMemoryService{TEntityDto,TEntityDbo,TId}.CountAsync(Func{TEntityDto, bool},CancellationToken)"/>
     /// </summary>
-    public virtual async Task<int> CountAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<long> CountAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default)
     {
         try
         {

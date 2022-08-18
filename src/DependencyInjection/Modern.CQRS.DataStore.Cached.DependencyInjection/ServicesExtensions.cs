@@ -36,8 +36,8 @@ public static class ServicesExtensions
             builder.Services.AddDoubleArityRequestAndHandler(typeof(GetByIdQuery<,>), typeof(GetByIdQueryHandler<,,,>), c.EntityDtoType, c);
             builder.Services.AddDoubleArityRequestAndHandler(typeof(TryGetByIdQuery<,>), typeof(TryGetByIdQueryHandler<,,,>), nullableType, c);
             builder.Services.AddDoubleArityRequestAndHandler(typeof(GetAllQuery<,>), typeof(GetAllQueryHandler<,,,>), listType, c);
-            builder.Services.AddDoubleArityRequestAndHandler(typeof(GetCountAllQuery<,>), typeof(GetCountAllQueryHandler<,,,>), typeof(int), c);
-            builder.Services.AddDoubleArityRequestAndHandler(typeof(GetCountQuery<,>), typeof(GetCountQueryHandler<,,,>), typeof(int), c);
+            builder.Services.AddDoubleArityRequestAndHandler(typeof(GetCountAllQuery<,>), typeof(GetCountAllQueryHandler<,,,>), typeof(long), c);
+            builder.Services.AddDoubleArityRequestAndHandler(typeof(GetCountQuery<,>), typeof(GetCountQueryHandler<,,,>), typeof(long), c);
             builder.Services.AddDoubleArityRequestAndHandler(typeof(GetExistsQuery<,>), typeof(GetExistsQueryHandler<,,,>), typeof(bool), c);
             builder.Services.AddTripleArityRequestAndHandler(typeof(GetFirstOrDefaultQuery<,,>), typeof(GetFirstOrDefaultQueryHandler<,,,>), nullableType, c);
             builder.Services.AddTripleArityRequestAndHandler(typeof(GetSingleOrDefaultQuery<,,>), typeof(GetSingleOrDefaultQueryHandler<,,,>), nullableType, c); 

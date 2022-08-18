@@ -14,7 +14,7 @@ namespace Modern.CQRS.DataStore.QueryHandlers;
 /// <returns>Count of entities</returns>
 public class GetCountAllQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     BaseMediatorHandler<TEntityDto, TEntityDbo>,
-    IRequestHandler<GetCountAllQuery<TEntityDto, TId>, int>
+    IRequestHandler<GetCountAllQuery<TEntityDto, TId>, long>
 
     where TEntityDto : class
     where TEntityDbo : class
@@ -50,7 +50,7 @@ public class GetCountAllQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     /// <summary>
     /// <inheritdoc cref="IRequestHandler{TRequest,TResponse}.Handle"/>
     /// </summary>
-    public async Task<int> Handle(GetCountAllQuery<TEntityDto, TId> request, CancellationToken cancellationToken)
+    public async Task<long> Handle(GetCountAllQuery<TEntityDto, TId> request, CancellationToken cancellationToken)
     {
         try
         {

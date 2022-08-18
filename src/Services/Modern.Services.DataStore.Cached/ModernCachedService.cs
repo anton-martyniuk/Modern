@@ -175,7 +175,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// <summary>
     /// <inheritdoc cref="IModernQueryService{TEntityDto,TEntityDbo,TId}.CountAsync(CancellationToken)"/>
     /// </summary>
-    public virtual async Task<int> CountAsync(CancellationToken cancellationToken = default)
+    public virtual async Task<long> CountAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -198,7 +198,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// <summary>
     /// <inheritdoc cref="IModernQueryService{TEntityDto,TEntityDbo,TId}.CountAsync(Expression{Func{TEntityDbo, bool}},CancellationToken)"/>
     /// </summary>
-    public virtual async Task<int> CountAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<long> CountAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
     {
         try
         {

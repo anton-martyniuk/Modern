@@ -52,7 +52,7 @@ public interface IModernQueryInMemoryService<TEntityDto, out TEntityDbo, in TId>
     /// </summary>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
     /// <returns>Count of entities</returns>
-    Task<int> CountAsync(CancellationToken cancellationToken = default);
+    Task<long> CountAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns the total count of entities that match the given <paramref name="predicate"/>
@@ -62,7 +62,7 @@ public interface IModernQueryInMemoryService<TEntityDto, out TEntityDbo, in TId>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while retrieving entities</exception>
     /// <returns>Count of entities</returns>
-    Task<int> CountAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default);
+    Task<long> CountAsync(Func<TEntityDto, bool> predicate, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Determines whether the data store contains at least one entity that matches the given <paramref name="predicate"/>
