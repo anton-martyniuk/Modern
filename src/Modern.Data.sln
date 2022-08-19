@@ -117,6 +117,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Repositories.Dapper"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Repositories.MongoDB", "Repositories\Modern.Repositories.MongoDB\Modern.Repositories.MongoDB.csproj", "{CCD58475-A841-4319-B44A-1333A42BD6CA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Repositories.MongoDB.DependencyInjection", "DependencyInjection\Modern.Repositories.MongoDB.DependencyInjection\Modern.Repositories.MongoDB.DependencyInjection.csproj", "{3A7DBA52-ABBE-4970-9816-F7013EA76A7E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -315,6 +317,10 @@ Global
 		{CCD58475-A841-4319-B44A-1333A42BD6CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCD58475-A841-4319-B44A-1333A42BD6CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCD58475-A841-4319-B44A-1333A42BD6CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A7DBA52-ABBE-4970-9816-F7013EA76A7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A7DBA52-ABBE-4970-9816-F7013EA76A7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A7DBA52-ABBE-4970-9816-F7013EA76A7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A7DBA52-ABBE-4970-9816-F7013EA76A7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -368,6 +374,7 @@ Global
 		{337FC649-2FE2-44C1-8F00-BC7BBEBEACBE} = {3529D61E-E1F3-4098-A668-60F904092871}
 		{C5C6CA4E-494B-4AC5-ABAB-0DF6DE9FF668} = {79927B92-F532-469C-9E86-76E84C16584E}
 		{CCD58475-A841-4319-B44A-1333A42BD6CA} = {79927B92-F532-469C-9E86-76E84C16584E}
+		{3A7DBA52-ABBE-4970-9816-F7013EA76A7E} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94D244EE-259E-401A-A55F-7D833CA4DC5E}
