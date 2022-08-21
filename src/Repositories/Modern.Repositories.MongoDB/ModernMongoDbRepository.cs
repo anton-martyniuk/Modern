@@ -452,7 +452,7 @@ public class ModernMongoDbRepository<TEntity, TId> : IModernRepository<TEntity, 
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.WhereAsync(Expression{Func{TEntity, bool}},int,int,EntityIncludeQuery{TEntity},CancellationToken)"/>
     /// </summary>
-    public async Task<PagedResult<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, int pageNumber, int pageSize, EntityIncludeQuery<TEntity>? includeQuery = null,
+    public virtual async Task<PagedResult<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, int pageNumber, int pageSize, EntityIncludeQuery<TEntity>? includeQuery = null,
         CancellationToken cancellationToken = default)
     {
         try
@@ -483,8 +483,6 @@ public class ModernMongoDbRepository<TEntity, TId> : IModernRepository<TEntity, 
             throw CreateProperException(ex);
         }
     }
-
-    // TODO: TEST AsQueryable in async mode!
 
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.AsQueryable"/>

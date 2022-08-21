@@ -548,7 +548,7 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.WhereAsync(Expression{Func{TEntity, bool}},int,int,EntityIncludeQuery{TEntity},CancellationToken)"/>
     /// </summary>
-    public async Task<PagedResult<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, int pageNumber, int pageSize, EntityIncludeQuery<TEntity>? includeQuery = null,
+    public virtual async Task<PagedResult<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, int pageNumber, int pageSize, EntityIncludeQuery<TEntity>? includeQuery = null,
         CancellationToken cancellationToken = default)
     {
         try
@@ -718,8 +718,18 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
     private async Task<bool> PerformDeleteAsync(TDbContext context, List<TId> ids, CancellationToken cancellationToken)
     {
         var idName = GetEntityIdColumnOrThrow(context);
-        var result = await context.Set<TEntity>().Where(x => ids.Contains(EF.Property<TId>(x, idName))).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
-        return result == ids.Count;
+
+        var isAllDeleted = true;
+
+        // ChunkBy 200 entities. Databases have limitation of performing WHERE IN clause
+        var entityIdChunks = ids.Chunk(200).ToList();
+        foreach (var entityIdChunk in entityIdChunks)
+        {
+            var result = await context.Set<TEntity>().Where(x => entityIdChunk.Contains(EF.Property<TId>(x, idName))).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
+            isAllDeleted &= result == ids.Count;
+        }
+
+        return isAllDeleted;
     }
 
     /// <summary>
