@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using Modern.Cache.Abstractions;
-using Modern.Cache.Abstractions.Configuration;
 using Modern.Cache.Redis;
+using Modern.Cache.Redis.Configuration;
 using Modern.Extensions.Microsoft.DependencyInjection.Models;
 using StackExchange.Redis.Extensions.Newtonsoft;
 
@@ -32,7 +32,7 @@ public static class ServicesExtensions
             builder.Services.TryAdd(new ServiceDescriptor(interfaceType, implementationType, c.Lifetime));
         }
 
-        builder.Services.Configure<ModernCacheSettings>(x => x.ExpiresIn = options.CacheSettings.ExpiresIn);
+        builder.Services.Configure<ModernRedisCacheSettings>(x => x.ExpiresIn = options.RedisCacheSettings.ExpiresIn);
         builder.Services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(options.RedisConfiguration);
         return builder;
     }

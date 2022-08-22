@@ -1,9 +1,9 @@
-﻿namespace Modern.Cache.Abstractions.Configuration;
+﻿namespace Modern.Cache.Redis.Configuration;
 
 /// <summary>
-/// The cache settings model
+/// The redis cache settings model
 /// </summary>
-public class ModernCacheSettings
+public class ModernRedisCacheSettings
 {
     /// <summary>
     /// Time after which an item is deleted from cache.<br/>

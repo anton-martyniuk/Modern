@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Modern.Cache.Abstractions;
-using Modern.Cache.Abstractions.Configuration;
 using Modern.Exceptions;
 
 namespace Modern.Cache.InMemory;
@@ -17,7 +16,7 @@ public class ModernInMemoryCache<TEntity, TId> : IModernCache<TEntity, TId>
     where TId : IEquatable<TId>
 {
     private readonly IMemoryCache _cache;
-    private readonly ModernCacheSettings _cacheSettings;
+    private readonly MemoryCacheEntryOptions? _cacheOptions;
 
     private readonly string _redisKeyPrefix = $"modern_cache_{typeof(TEntity).Name}".ToLower();
 
@@ -25,11 +24,11 @@ public class ModernInMemoryCache<TEntity, TId> : IModernCache<TEntity, TId>
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="cache">In-memory cache</param>
-    /// <param name="cacheSettings">Cache settings</param>
-    public ModernInMemoryCache(IMemoryCache cache, IOptions<ModernCacheSettings> cacheSettings)
+    /// <param name="cacheOptions">Memory cache options</param>
+    public ModernInMemoryCache(IMemoryCache cache, IOptions<MemoryCacheEntryOptions>? cacheOptions)
     {
         _cache = cache;
-        _cacheSettings = cacheSettings.Value;
+        _cacheOptions = cacheOptions?.Value;
     }
 
     /// <summary>
@@ -82,13 +81,13 @@ public class ModernInMemoryCache<TEntity, TId> : IModernCache<TEntity, TId>
 
         var key = GetKey(id);
 
-        if (_cacheSettings.ExpiresIn is null)
+        if (_cacheOptions is null)
         {
             _cache.Set(key, entity);
             return ValueTask.CompletedTask;
         }
 
-        _cache.Set(key, entity, _cacheSettings.ExpiresIn.Value);
+        _cache.Set(key, entity, _cacheOptions);
         return ValueTask.CompletedTask;
     }
 
@@ -104,13 +103,13 @@ public class ModernInMemoryCache<TEntity, TId> : IModernCache<TEntity, TId>
         {
             var key = GetKey(id);
 
-            if (_cacheSettings.ExpiresIn is null)
+            if (_cacheOptions is null)
             {
                 _cache.Set(key, value);
             }
             else
             {
-                _cache.Set(key, value, _cacheSettings.ExpiresIn.Value);
+                _cache.Set(key, value, _cacheOptions);
             }
         }
 

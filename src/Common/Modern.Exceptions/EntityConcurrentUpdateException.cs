@@ -4,7 +4,7 @@ namespace Modern.Exceptions;
 
 /// <summary>
 /// The exception that is thrown when entity is not updated because of concurrent update issue.<br/>
-/// See <see href="https://docs.microsoft.com/en-us/ef/core/saving/concurrency"/> for more information
+/// For example: see <see href="https://docs.microsoft.com/en-us/ef/core/saving/concurrency"/> for more information
 /// </summary>
 [Serializable]
 public class EntityConcurrentUpdateException : Exception

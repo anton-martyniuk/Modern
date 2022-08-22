@@ -77,8 +77,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Services.DataStore.I
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Repositories.EFCore.DependencyInjection", "DependencyInjection\Modern.Repositories.EFCore.DependencyInjection\Modern.Repositories.EFCore.DependencyInjection.csproj", "{51CD36B5-A92F-4813-AFCA-2016770CA9EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Repositories.DependencyInjection.Definitions", "DependencyInjection\Definitions\Modern.Repositories.DependencyInjection.Definitions\Modern.Repositories.DependencyInjection.Definitions.csproj", "{973DED74-D9DF-492D-ABF4-77ECD68C112B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Cache.InMemory.DependencyInjection", "DependencyInjection\Modern.Cache.InMemory.DependencyInjection\Modern.Cache.InMemory.DependencyInjection.csproj", "{01BBF4B1-E8BF-431A-97CE-E879F60985CC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Cache.Redis.DependencyInjection", "DependencyInjection\Modern.Cache.Redis.DependencyInjection\Modern.Cache.Redis.DependencyInjection.csproj", "{98B3E4E4-95D6-4A77-BF25-570C9B99320B}"
@@ -243,10 +241,6 @@ Global
 		{51CD36B5-A92F-4813-AFCA-2016770CA9EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51CD36B5-A92F-4813-AFCA-2016770CA9EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51CD36B5-A92F-4813-AFCA-2016770CA9EE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{973DED74-D9DF-492D-ABF4-77ECD68C112B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{973DED74-D9DF-492D-ABF4-77ECD68C112B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{973DED74-D9DF-492D-ABF4-77ECD68C112B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{973DED74-D9DF-492D-ABF4-77ECD68C112B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{01BBF4B1-E8BF-431A-97CE-E879F60985CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{01BBF4B1-E8BF-431A-97CE-E879F60985CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01BBF4B1-E8BF-431A-97CE-E879F60985CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -361,7 +355,6 @@ Global
 		{10CFF0AA-6236-4182-90F2-28EAC4D2848F} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
 		{9BE40DC0-028A-46DF-9B5F-7F5B8501496E} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
 		{51CD36B5-A92F-4813-AFCA-2016770CA9EE} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
-		{973DED74-D9DF-492D-ABF4-77ECD68C112B} = {C38633BF-FD8C-479F-8674-CBACE398A96F}
 		{01BBF4B1-E8BF-431A-97CE-E879F60985CC} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
 		{98B3E4E4-95D6-4A77-BF25-570C9B99320B} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
 		{A58FCCFA-A09E-4D53-A5E7-3B70E0F6E824} = {C38633BF-FD8C-479F-8674-CBACE398A96F}

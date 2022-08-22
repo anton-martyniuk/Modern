@@ -1,4 +1,4 @@
-﻿using Modern.Cache.Abstractions.Configuration;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Modern.Cache.DependencyInjection.Definitions.Configuration;
 
 // ReSharper disable once CheckNamespace
@@ -15,9 +15,9 @@ public class ModernCacheOptions
     internal List<ModernCacheSpecification> Caches { get; } = new();
 
     /// <summary>
-    /// Cache settings
+    /// Memory cache settings
     /// </summary>
-    public ModernCacheSettings CacheSettings { get; init; } = new();
+    public MemoryCacheEntryOptions CacheSettings { get; init; } = new();
 
     /// <summary>
     /// Adds cache

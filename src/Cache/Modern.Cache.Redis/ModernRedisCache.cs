@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using Microsoft.Extensions.Options;
 using Modern.Cache.Abstractions;
-using Modern.Cache.Abstractions.Configuration;
+using Modern.Cache.Redis.Configuration;
 using Modern.Exceptions;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 
@@ -17,7 +17,7 @@ public class ModernRedisCache<TEntity, TId> : IModernCache<TEntity, TId>
     where TId : IEquatable<TId>
 {
     private readonly IRedisClient _redisClient;
-    private readonly ModernCacheSettings _cacheSettings;
+    private readonly ModernRedisCacheSettings _cacheSettings;
 
     private readonly string _redisKeyPrefix = $"modern_cache_{typeof(TEntity).Name}".ToLower();
 
@@ -26,7 +26,7 @@ public class ModernRedisCache<TEntity, TId> : IModernCache<TEntity, TId>
     /// </summary>
     /// <param name="redisClient">Redis client (wrapper around Redis Core)</param>
     /// <param name="cacheSettings">Cache settings</param>
-    public ModernRedisCache(IRedisClient redisClient, IOptions<ModernCacheSettings> cacheSettings)
+    public ModernRedisCache(IRedisClient redisClient, IOptions<ModernRedisCacheSettings> cacheSettings)
     {
         _redisClient = redisClient;
         _cacheSettings = cacheSettings.Value;

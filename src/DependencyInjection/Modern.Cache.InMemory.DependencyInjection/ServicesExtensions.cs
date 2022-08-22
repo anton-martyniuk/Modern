@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Modern.Cache.Abstractions;
-using Modern.Cache.Abstractions.Configuration;
 using Modern.Cache.InMemory;
 using Modern.Extensions.Microsoft.DependencyInjection.Models;
 
@@ -31,7 +31,15 @@ public static class ServicesExtensions
             builder.Services.TryAdd(new ServiceDescriptor(interfaceType, implementationType, c.Lifetime));
         }
 
-        builder.Services.Configure<ModernCacheSettings>(x => x.ExpiresIn = options.CacheSettings.ExpiresIn);
+        builder.Services.Configure<MemoryCacheEntryOptions>(x =>
+        {
+            x.Priority = options.CacheSettings.Priority;
+            x.Size = options.CacheSettings.Size;
+            x.AbsoluteExpiration = options.CacheSettings.AbsoluteExpiration;
+            x.AbsoluteExpirationRelativeToNow = options.CacheSettings.AbsoluteExpirationRelativeToNow;
+            x.SlidingExpiration = options.CacheSettings.SlidingExpiration;
+        });
+
         builder.Services.AddMemoryCache();
         return builder;
     }
