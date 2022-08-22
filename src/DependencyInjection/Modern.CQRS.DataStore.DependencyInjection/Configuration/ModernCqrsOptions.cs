@@ -28,8 +28,6 @@ public class ModernCqrsOptions
         where TId : IEquatable<TId>
         where TRepository : class, IModernQueryRepository<TEntityDbo, TId>, IModernCrudRepository<TEntityDbo, TId>
     {
-        // TODO: check if type is assignable
-
         var configuration = new ModernCqrsSpecification
         {
             EntityDtoType = typeof(TEntityDto),

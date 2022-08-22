@@ -7,10 +7,10 @@ using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Infrastracture;
-using Modern.Repositories.Dapper.Adapters;
+using Modern.Repositories.Dapper.Connection;
 using Modern.Repositories.Dapper.Extensions;
 using Modern.Repositories.Dapper.Mapping;
-using static Dapper.SqlMapper;
+using Modern.Repositories.Dapper.Providers;
 
 namespace Modern.Repositories.Dapper;
 
@@ -27,10 +27,12 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
 {
     private readonly string _entityName = typeof(TEntity).Name;
 
+    private readonly IQueryProviderFactory _queryProviderFactory;
+
     /// <summary>
     /// The database connection
     /// </summary>
-    public IDbConnection DbConnection { get; }
+    public IDbConnectionFactory DbConnectionFactory { get; }
 
     /// <summary>
     /// Dapper entity mapping
@@ -40,11 +42,14 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    /// <param name="dbConnection">The database connection</param>
+    /// <param name="dbConnectionFactory">The database connection</param>
     /// <param name="mapping">The Dapper entity mapping</param>
-    public ModernDapperRepository(IDbConnection dbConnection, TEntityMapping mapping)
+    /// <param name="queryProviderFactory">Query provider factory</param>
+    public ModernDapperRepository(IDbConnectionFactory dbConnectionFactory, TEntityMapping mapping, IQueryProviderFactory queryProviderFactory)
     {
-        DbConnection = dbConnection;
+        _queryProviderFactory = queryProviderFactory;
+
+        DbConnectionFactory = dbConnectionFactory;
         Mapping = mapping;
         Mapping.Build();
     }
@@ -81,8 +86,11 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
             cancellationToken.ThrowIfCancellationRequested();
 
-            var insertQuery = GetInsertQuery();
-            var createdEntity = await DbConnection.QueryFirstWithTokenAsync<TEntity>(insertQuery, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
+            await using var dbConnection = DbConnectionFactory.CreateDbConnection();
+            await dbConnection.OpenAsync(cancellationToken);
+
+            var insertQuery = GetInsertQuery(dbConnection);
+            var createdEntity = await dbConnection.QueryFirstWithTokenAsync<TEntity>(insertQuery, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
             return createdEntity;
         }
         catch (Exception ex)
@@ -102,11 +110,14 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
             Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var dbConnection = DbConnectionFactory.CreateDbConnection();
+            await dbConnection.OpenAsync(cancellationToken);
+
             var createdEntities = new List<TEntity>(entities.Count);
             foreach (var entity in entities)
             {
-                var insertQuery = GetInsertQuery();
-                var createdEntity = await DbConnection.QueryFirstWithTokenAsync<TEntity>(insertQuery, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
+                var insertQuery = GetInsertQuery(dbConnection);
+                var createdEntity = await dbConnection.QueryFirstWithTokenAsync<TEntity>(insertQuery, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
                 createdEntities.Add(createdEntity);
             }
 
@@ -129,8 +140,11 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var dbConnection = DbConnectionFactory.CreateDbConnection();
+            await dbConnection.OpenAsync(cancellationToken);
+
             var updateQuery = GetUpdateQuery();
-            var result = await DbConnection.ExecuteWithTokenAsync(updateQuery, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var result = await dbConnection.ExecuteWithTokenAsync(updateQuery, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
             if (result != 1)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
@@ -155,10 +169,13 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
             Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var dbConnection = DbConnectionFactory.CreateDbConnection();
+            await dbConnection.OpenAsync(cancellationToken);
+
             foreach (var entity in entities)
             {
                 var updateQuery = GetUpdateQuery();
-                var result = await DbConnection.ExecuteWithTokenAsync(updateQuery, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
+                var result = await dbConnection.ExecuteWithTokenAsync(updateQuery, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
                 if (result != 1)
                 {
                     throw new EntityNotFoundException($"{_entityName} entity with id '{GetEntityId(entity)}' not found");
@@ -183,10 +200,13 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var dbConnection = DbConnectionFactory.CreateDbConnection();
+            await dbConnection.OpenAsync(cancellationToken);
+
             var whereQuery = GetWhereByIdQuery();
             var columnsQuery = GetSelectColumnsQuery();
 
-            var entity = await DbConnection.QueryFirstOrDefaultWithTokenAsync<TEntity>($"SELECT {columnsQuery} FROM {Mapping.TableName} {whereQuery}", new { Id = id }, cancellationToken: cancellationToken);
+            var entity = await dbConnection.QueryFirstOrDefaultWithTokenAsync<TEntity>($"SELECT {columnsQuery} FROM {Mapping.TableName} {whereQuery}", new { Id = id }, cancellationToken: cancellationToken);
             if (entity is null)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
@@ -196,7 +216,7 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
             update(entity);
 
             var updateQuery = GetUpdateQuery();
-            var result = await DbConnection.ExecuteWithTokenAsync(updateQuery, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var result = await dbConnection.ExecuteWithTokenAsync(updateQuery, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
             if (result != 1)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
@@ -220,8 +240,11 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var dbConnection = DbConnectionFactory.CreateDbConnection();
+            await dbConnection.OpenAsync(cancellationToken);
+
             var whereQuery = GetWhereByIdQuery();
-            var result = await DbConnection.ExecuteWithTokenAsync($"DELETE FROM {Mapping.TableName} {whereQuery}", new { Id = id }, cancellationToken: cancellationToken);
+            var result = await dbConnection.ExecuteWithTokenAsync($"DELETE FROM {Mapping.TableName} {whereQuery}", new { Id = id }, cancellationToken: cancellationToken);
             return result == 1;
         }
         catch (Exception ex)
@@ -241,13 +264,16 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
             Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var dbConnection = DbConnectionFactory.CreateDbConnection();
+            await dbConnection.OpenAsync(cancellationToken);
+
             var isAllDeleted = true;
 
             // ChunkBy 200 entities. Databases have limitation of performing WHERE IN clause
             var entityIdChunks = ids.Chunk(200).ToList();
             foreach (var entityIdChunk in entityIdChunks)
             {
-                var result = await DbConnection.ExecuteWithTokenAsync($"DELETE FROM {Mapping.TableName} WHERE {Mapping.IdColumnName} IN ({string.Join(",", entityIdChunk)})", cancellationToken: cancellationToken);
+                var result = await dbConnection.ExecuteWithTokenAsync($"DELETE FROM {Mapping.TableName} WHERE {Mapping.IdColumnName} IN ({string.Join(",", entityIdChunk)})", cancellationToken: cancellationToken);
                 isAllDeleted &= result == ids.Count;
             }
 
@@ -267,16 +293,19 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var dbConnection = DbConnectionFactory.CreateDbConnection();
+            await dbConnection.OpenAsync(cancellationToken);
+
             var whereQuery = GetWhereByIdQuery();
             var columnsQuery = GetSelectColumnsQuery();
 
-            var entity = await DbConnection.QueryFirstOrDefaultWithTokenAsync<TEntity>($"SELECT {columnsQuery} FROM {Mapping.TableName} {whereQuery}", new { Id = id }, cancellationToken: cancellationToken);
+            var entity = await dbConnection.QueryFirstOrDefaultWithTokenAsync<TEntity>($"SELECT {columnsQuery} FROM {Mapping.TableName} {whereQuery}", new { Id = id }, cancellationToken: cancellationToken);
             if (entity is null)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
             }
 
-            await DbConnection.ExecuteWithTokenAsync($"DELETE FROM {Mapping.TableName} {whereQuery}", new { Id = id }, cancellationToken: cancellationToken);
+            await dbConnection.ExecuteWithTokenAsync($"DELETE FROM {Mapping.TableName} {whereQuery}", new { Id = id }, cancellationToken: cancellationToken);
             return entity;
         }
         catch (Exception ex)
@@ -295,10 +324,13 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var dbConnection = DbConnectionFactory.CreateDbConnection();
+            await dbConnection.OpenAsync(cancellationToken);
+
             var whereQuery = GetWhereByIdQuery();
             var columnsQuery = GetSelectColumnsQuery();
 
-            var entity = await DbConnection.QueryFirstOrDefaultWithTokenAsync<TEntity>($"SELECT {columnsQuery} FROM {Mapping.TableName} {whereQuery}", new { Id = id }, cancellationToken: cancellationToken);
+            var entity = await dbConnection.QueryFirstOrDefaultWithTokenAsync<TEntity>($"SELECT {columnsQuery} FROM {Mapping.TableName} {whereQuery}", new { Id = id }, cancellationToken: cancellationToken);
             if (entity is null)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
@@ -321,10 +353,13 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var dbConnection = DbConnectionFactory.CreateDbConnection();
+            await dbConnection.OpenAsync(cancellationToken);
+
             var whereQuery = GetWhereByIdQuery();
             var columnsQuery = GetSelectColumnsQuery();
 
-            var entity = await DbConnection.QueryFirstOrDefaultWithTokenAsync<TEntity>($"SELECT {columnsQuery} FROM {Mapping.TableName} {whereQuery}", new { Id = id }, cancellationToken: cancellationToken);
+            var entity = await dbConnection.QueryFirstOrDefaultWithTokenAsync<TEntity>($"SELECT {columnsQuery} FROM {Mapping.TableName} {whereQuery}", new { Id = id }, cancellationToken: cancellationToken);
             return entity;
         }
         catch (Exception ex)
@@ -342,8 +377,11 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var dbConnection = DbConnectionFactory.CreateDbConnection();
+            await dbConnection.OpenAsync(cancellationToken);
+
             var columnsQuery = GetSelectColumnsQuery();
-            var enumerable = await DbConnection.QueryAsync<TEntity>($"SELECT {columnsQuery} FROM {Mapping.TableName}");
+            var enumerable = await dbConnection.QueryAsync<TEntity>($"SELECT {columnsQuery} FROM {Mapping.TableName}");
             return enumerable.ToList();
         }
         catch (Exception ex)
@@ -360,7 +398,11 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await DbConnection.QueryFirstAsync<int>($"SELECT COUNT(*) FROM {Mapping.TableName}");
+
+            await using var dbConnection = DbConnectionFactory.CreateDbConnection();
+            await dbConnection.OpenAsync(cancellationToken);
+
+            return await dbConnection.QueryFirstAsync<int>($"SELECT COUNT(*) FROM {Mapping.TableName}");
         }
         catch (Exception ex)
         {
@@ -422,6 +464,7 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
     /// </summary>
     public virtual IQueryable<TEntity> AsQueryable()
     {
+        // TODO ???
         throw new NotImplementedException();
     }
 
@@ -444,12 +487,9 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
     /// Returns an insert SQL query for a single entity
     /// </summary>
     /// <returns>Insert SQL query</returns>
-    private string GetInsertQuery()
-    {
-        // TODO: different providers
-        return new PostgresSqlQueryProvider().GetInsertWithOutputCommand(Mapping);
-    }
-    
+    private string GetInsertQuery(IDbConnection dbConnection)
+        => _queryProviderFactory.Get(dbConnection).GetInsertWithOutputCommand(Mapping);
+
     /// <summary>
     /// Returns update SQL query for a single entity
     /// </summary>
@@ -462,40 +502,6 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
         var queryBuilder = new StringBuilder();
         queryBuilder.AppendFormat("update {0} SET {1}", Mapping.TableName, columns);
         queryBuilder.AppendFormat(" WHERE {0}=@{1}", Mapping.IdColumn.Key, Mapping.IdColumn.Value);
-
-        return queryBuilder.ToString();
-    }
-
-    /// <summary>
-    /// Returns insert query for multiple entities
-    /// </summary>
-    /// <returns>Insert sql query</returns>
-    private string GetInsertManyQuery(int count)
-    {
-        var columns = Mapping.ColumnMappings.Aggregate(new StringBuilder(), (builder, mapping) => builder.AppendFormat("{0}\"{1}\"",
-            builder.Length > 0 ? ", " : "", mapping.Key), builder => builder.ToString());
-
-        //var values = Mapping.ColumnMappings.Aggregate(new StringBuilder(), (builder, mapping) => builder.AppendFormat("{0}@{1}",
-        //    builder.Length > 0 ? ", " : "", mapping.Value), builder => builder.ToString());
-
-        var valueBuilder = new StringBuilder();
-
-        for (var i = 0; i < count; i++)
-        {
-            valueBuilder.Append(valueBuilder.Length > 0 ? ", " : "");
-
-            var values = Mapping.ColumnMappings.Aggregate(new StringBuilder(), (builder, mapping) => builder.AppendFormat("{0}@{1}{2}",
-                builder.Length > 0 ? ", " : "", mapping.Value, i), builder => builder.ToString());
-
-            valueBuilder.AppendFormat("({0})", values);
-        }
-
-        var outputString = Mapping.ColumnMappingsWithId.Aggregate(new StringBuilder(), (builder, mapping) => builder.AppendFormat("{0}\"{1}\" as {2}",
-            builder.Length > 0 ? ", " : "", mapping.Key, mapping.Value), builder => builder.ToString());
-
-        var queryBuilder = new StringBuilder();
-        queryBuilder.AppendFormat("insert into {0} ({1}) values ({2})", Mapping.TableName, columns, valueBuilder);
-        queryBuilder.AppendFormat(" RETURNING {0}", outputString);
 
         return queryBuilder.ToString();
     }

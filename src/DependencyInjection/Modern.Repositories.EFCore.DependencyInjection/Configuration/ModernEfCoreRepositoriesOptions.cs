@@ -12,12 +12,12 @@ public class ModernEfCoreRepositoriesOptions
     /// <summary>
     /// Collection of modern repository specifications
     /// </summary>
-    public List<ModernEfCoreRepositorySpecification> Repositories { get; } = new();
+    internal List<ModernEfCoreRepositorySpecification> Repositories { get; } = new();
 
     /// <summary>
     /// Collection of modern repository specifications
     /// </summary>
-    public List<ModernEfCoreRepositoryConcreteSpecification> ConcreteRepositories { get; } = new();
+    internal List<ModernEfCoreRepositoryConcreteSpecification> ConcreteRepositories { get; } = new();
 
     /// <summary>
     /// Adds repository
@@ -48,12 +48,10 @@ public class ModernEfCoreRepositoriesOptions
     /// <param name="lifetime">Repository lifetime in DI</param>
     /// <typeparam name="TRepositoryInterface">The type of concrete repository interface</typeparam>
     /// <typeparam name="TRepositoryImplementation">The type of concrete repository implementation</typeparam>
-    public void AddRepository<TRepositoryInterface, TRepositoryImplementation>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddConcreteRepository<TRepositoryInterface, TRepositoryImplementation>(ServiceLifetime lifetime = ServiceLifetime.Transient)
         where TRepositoryInterface : class
-        where TRepositoryImplementation : class
+        where TRepositoryImplementation : class, TRepositoryInterface
     {
-        // TODO: check if IModernService is assignable from types
-
         var configuration = new ModernEfCoreRepositoryConcreteSpecification
         {
             InterfaceType = typeof(TRepositoryInterface),

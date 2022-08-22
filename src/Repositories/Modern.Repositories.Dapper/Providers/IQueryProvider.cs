@@ -1,11 +1,11 @@
 ﻿using Modern.Repositories.Dapper.Mapping;
 
-namespace Modern.Repositories.Dapper.Adapters;
+namespace Modern.Repositories.Dapper.Providers;
 
 /// <summary>
 /// The SQL query provider definition
 /// </summary>
-internal interface ISqlQueryProvider
+public interface IQueryProvider
 {
     /// <summary>
     /// Returns an insert SQL query for a single entity

@@ -1,6 +1,6 @@
-﻿using Modern.Repositories.MongoDB.DependencyInjection.Configuration;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
+﻿using System.Data.Common;
+using Modern.Repositories.Dapper.DependencyInjection.Configuration;
+using Modern.Repositories.Dapper.Mapping;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -8,52 +8,49 @@ namespace Microsoft.Extensions.DependencyInjection;
 /// <summary>
 /// Represents a modern repository options for registering in DI
 /// </summary>
-public class ModernMongoDbRepositoriesOptions
+public class ModernDapperRepositoriesOptions
 {
     /// <summary>
-    /// The settings for a MongoDb client
+    /// A function that creates a database connection
     /// </summary>
-    internal MongoClientSettings? MongoClientSettings { get; set; }
+    internal Func<DbConnection>? CreateDbConnection;
 
     /// <summary>
     /// Collection of modern repository specifications
     /// </summary>
-    internal List<ModernMongoDbRepositorySpecification> Repositories { get; } = new();
+    internal List<ModernDapperRepositorySpecification> Repositories { get; } = new();
 
     /// <summary>
     /// Collection of modern repository specifications
     /// </summary>
-    internal List<ModernMongoDbRepositoryConcreteSpecification> ConcreteRepositories { get; } = new();
+    internal List<ModernDapperRepositoryConcreteSpecification> ConcreteRepositories { get; } = new();
 
     /// <summary>
-    /// Configures MongoDb Client settings
+    /// Adds a function to create database connection.<br/>
+    /// A dapper needs to know how to create a database connection. Since there are multiple database connection classes -  provide the needed one.<br />
+    /// Example: <code>() => new NpgsqlConnection(connectionString)</code>
     /// </summary>
-    /// <param name="connectionString">Connection string</param>
-    /// <param name="updateSettings">The MongoDb client settings update action</param>
-    public void ConfigureMongoDbClient(string connectionString, Action<MongoClientSettings>? updateSettings = null)
+    /// <param name="createDbConnection">A function that creates a database connection</param>
+    public void ProvideDatabaseConnection(Func<DbConnection> createDbConnection)
     {
-        MongoClientSettings = MongoClientSettings.FromConnectionString(connectionString);
-        MongoClientSettings.LinqProvider = LinqProvider.V3;
-
-        updateSettings?.Invoke(MongoClientSettings);
+        CreateDbConnection = createDbConnection;
     }
 
     /// <summary>
     /// Adds repository
     /// </summary>
     /// <param name="lifetime">Repository lifetime in DI</param>
-    /// <param name="databaseName">Name of the database</param>
-    /// <param name="collectionName">Name of the collection</param>
+    /// <typeparam name="TEntityMapping">The type of entity mapping</typeparam>
     /// <typeparam name="TEntity">The type of entity</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
-    public void AddRepository<TEntity, TId>(string databaseName, string collectionName, ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddRepository<TEntityMapping, TEntity, TId>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+        where TEntityMapping : DapperEntityMapping<TEntity>
         where TEntity : class
         where TId : IEquatable<TId>
     {
-        var configuration = new ModernMongoDbRepositorySpecification
+        var configuration = new ModernDapperRepositorySpecification
         {
-            DatabaseName = databaseName,
-            CollectionName = collectionName,
+            EntityMappingType = typeof(TEntityMapping),
             EntityType = typeof(TEntity),
             EntityIdType = typeof(TId),
             Lifetime = lifetime
@@ -72,10 +69,10 @@ public class ModernMongoDbRepositoriesOptions
         where TRepositoryInterface : class
         where TRepositoryImplementation : class, TRepositoryInterface
     {
-        var configuration = new ModernMongoDbRepositoryConcreteSpecification
+        var configuration = new ModernDapperRepositoryConcreteSpecification
         {
-            InterfaceType = typeof(TRepositoryInterface), 
-            ImplementationType = typeof(TRepositoryImplementation), 
+            InterfaceType = typeof(TRepositoryInterface),
+            ImplementationType = typeof(TRepositoryImplementation),
             Lifetime = lifetime
         };
 

@@ -22,16 +22,6 @@ public class ModernMongoDbRepository<TEntity, TId> : IModernRepository<TEntity, 
     private readonly string _entityName = typeof(TEntity).Name;
 
     /// <summary>
-    /// The MongoDB client
-    /// </summary>
-    protected IMongoClient MongoClient { get; }
-
-    /// <summary>
-    /// The MongoDB database
-    /// </summary>
-    protected IMongoDatabase MongoDatabase { get; set; }
-
-    /// <summary>
     /// The MongoDB collection of type <typeparamref name="TEntity"/>
     /// </summary>
     protected IMongoCollection<TEntity> MongoCollection { get; set; }
@@ -39,14 +29,14 @@ public class ModernMongoDbRepository<TEntity, TId> : IModernRepository<TEntity, 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    /// <param name="mongoClient">The MongoDB client</param>
-    /// <param name="mongoCollection">MongoDb collection</param>
-    public ModernMongoDbRepository(IMongoClient mongoClient, IMongoCollection<TEntity> mongoCollection)
+    /// <param name="mongoClient">MongoDb client</param>
+    /// <param name="databaseName">Name of the database</param>
+    /// <param name="collectionName">Name of the collection</param>
+    //public ModernMongoDbRepository(IMongoCollection<TEntity> mongoCollection)
+    public ModernMongoDbRepository(IMongoClient mongoClient, string databaseName, string collectionName)
     {
-        // TODO: remove client and database
-        MongoClient = mongoClient;
-        MongoDatabase = MongoClient.GetDatabase("tourism");
-        MongoCollection = mongoCollection;
+        var database = mongoClient.GetDatabase(databaseName);
+        MongoCollection = database.GetCollection<TEntity>(collectionName);
     }
 
     /// <summary>
@@ -55,13 +45,6 @@ public class ModernMongoDbRepository<TEntity, TId> : IModernRepository<TEntity, 
     /// <param name="entity">Entity</param>
     /// <returns>Entity id</returns>
     protected virtual TId GetEntityId(TEntity entity) => (TId)(entity.GetType().GetProperty("Id")?.GetValue(entity, null) ?? 0);
-
-    /// <summary>
-    /// Returns entity include query for all repository methods. <see cref="EntityIncludeQuery{TEntity}"/>
-    /// </summary>
-    /// <returns>Expression that describes included entities</returns>
-    protected virtual EntityIncludeQuery<TEntity>? GetEntityIncludeQuery() =>
-        null;
 
     /// <summary>
     /// Returns standardized repository exception

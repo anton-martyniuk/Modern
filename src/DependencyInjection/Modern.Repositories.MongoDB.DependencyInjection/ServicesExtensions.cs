@@ -2,6 +2,8 @@
 using Modern.Extensions.Microsoft.DependencyInjection.Models;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.MongoDB;
+using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -22,12 +24,24 @@ public static class ServicesExtensions
         var options = new ModernMongoDbRepositoriesOptions();
         configure(options);
 
+        if (options.MongoClientSettings is null)
+        {
+            throw new InvalidOperationException("MongoDb client settings should be provided using options.ConfigureMongoDbClient() method");
+        }
+
+        builder.Services.AddSingleton<IMongoClient>(_ => new MongoClient(options.MongoClientSettings));
+
         foreach (var c in options.Repositories)
         {
             var interfaceType = typeof(IModernRepository<,>).MakeGenericType(c.EntityType, c.EntityIdType);
             var implementationType = typeof(ModernMongoDbRepository<,>).MakeGenericType(c.EntityType, c.EntityIdType);
 
-            builder.Services.TryAdd(new ServiceDescriptor(interfaceType, implementationType, c.Lifetime));
+            // Dynamically create an instance of repository, providing database and collection name
+            builder.Services.Add(new ServiceDescriptor(interfaceType, provider =>
+            {
+                var mongoClient = provider.GetRequiredService<IMongoClient>();
+                return ActivatorUtilities.CreateInstance(provider, implementationType, mongoClient, c.DatabaseName, c.CollectionName);
+            }, c.Lifetime));
         }
 
         foreach (var c in options.ConcreteRepositories)

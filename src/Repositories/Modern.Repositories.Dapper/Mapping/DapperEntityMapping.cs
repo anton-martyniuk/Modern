@@ -53,7 +53,7 @@ public abstract class DapperEntityMapping<TEntity>
 
         foreach (var (key, value) in ColumnMappings)
         {
-            ColumnMappingsWithId.Add(key, value);
+            ColumnMappingsWithId.TryAdd(key, value);
         }
 
         ColumnMappingsWithId.TryAdd(IdColumn.Key, IdColumn.Value);

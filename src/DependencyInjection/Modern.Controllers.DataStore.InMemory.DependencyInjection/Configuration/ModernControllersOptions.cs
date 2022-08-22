@@ -46,8 +46,6 @@ public class ModernControllersOptions
     public void AddController<TServiceImplementation>()
         where TServiceImplementation : class
     {
-        // TODO: check if is assignable from types
-
         var configuration = new ModernControllerConcreteSpecification
         {
             ImplementationType = typeof(TServiceImplementation)

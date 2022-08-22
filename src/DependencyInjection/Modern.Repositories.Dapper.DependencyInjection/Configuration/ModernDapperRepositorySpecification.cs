@@ -1,21 +1,16 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Modern.Repositories.MongoDB.DependencyInjection.Configuration;
+namespace Modern.Repositories.Dapper.DependencyInjection.Configuration;
 
 /// <summary>
 /// The modern repository specification model
 /// </summary>
-public class ModernMongoDbRepositorySpecification
+public class ModernDapperRepositorySpecification
 {
     /// <summary>
-    /// Name of the database
+    /// The type of entity mapping
     /// </summary>
-    public string DatabaseName { get; set; } = default!;
-
-    /// <summary>
-    /// Name of the collection
-    /// </summary>
-    public string CollectionName { get; set; } = default!;
+    public Type EntityMappingType { get; set; } = default!;
 
     /// <summary>
     /// The type of entity contained in the data store

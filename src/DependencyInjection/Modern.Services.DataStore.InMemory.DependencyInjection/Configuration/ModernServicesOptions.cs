@@ -47,16 +47,14 @@ public class ModernServicesOptions
     /// <param name="lifetime">Repository lifetime in DI</param>
     /// <typeparam name="TServiceInterface">The type of concrete service interface</typeparam>
     /// <typeparam name="TServiceImplementation">The type of concrete service implementation</typeparam>
-    public void AddService<TServiceInterface, TServiceImplementation>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddConcreteService<TServiceInterface, TServiceImplementation>(ServiceLifetime lifetime = ServiceLifetime.Transient)
         where TServiceInterface : class
-        where TServiceImplementation : class
+        where TServiceImplementation : class, TServiceInterface
     {
-        // TODO: check if IModernService is assignable from types
-
         var configuration = new ModernServiceConcreteSpecification
         {
-            InterfaceType = typeof(TServiceInterface),
-            ImplementationType = typeof(TServiceImplementation),
+            InterfaceType = typeof(TServiceInterface), 
+            ImplementationType = typeof(TServiceImplementation), 
             Lifetime = lifetime
         };
 
