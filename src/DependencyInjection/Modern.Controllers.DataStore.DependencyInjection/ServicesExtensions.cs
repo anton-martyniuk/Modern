@@ -25,7 +25,7 @@ public static class ServicesExtensions
 
         foreach (var c in options.Controllers)
         {
-            var implementationType = typeof(ModernController<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
+            var implementationType = typeof(ModernController<,,,,>).MakeGenericType(c.CreateRequestType, c.UpdateRequestType, c.EntityDtoType, c.EntityDboType, c.EntityIdType);
             builder.Services.TryAdd(new ServiceDescriptor(implementationType, implementationType, ServiceLifetime.Scoped));
         }
 

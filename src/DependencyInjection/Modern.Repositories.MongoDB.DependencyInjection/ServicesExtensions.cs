@@ -3,7 +3,6 @@ using Modern.Extensions.Microsoft.DependencyInjection.Models;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.MongoDB;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;

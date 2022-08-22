@@ -371,7 +371,7 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.GetAllAsync"/>
     /// </summary>
-    public virtual async Task<List<TEntity>> GetAllAsync(EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
+    public virtual async Task<IEnumerable<TEntity>> GetAllAsync(EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -382,7 +382,7 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
 
             var columnsQuery = GetSelectColumnsQuery();
             var enumerable = await dbConnection.QueryAsync<TEntity>($"SELECT {columnsQuery} FROM {Mapping.TableName}");
-            return enumerable.ToList();
+            return enumerable;
         }
         catch (Exception ex)
         {
@@ -445,7 +445,7 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.WhereAsync(Expression{Func{TEntity, bool}},EntityIncludeQuery{TEntity},CancellationToken)"/>
     /// </summary>
-    public virtual Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
+    public virtual Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         throw new NotSupportedException("Current operation is not supported by ModernDapperRepository");
     }

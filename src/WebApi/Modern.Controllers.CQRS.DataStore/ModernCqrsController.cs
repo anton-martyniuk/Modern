@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
+using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -12,15 +13,20 @@ namespace Modern.Controllers.CQRS.DataStore;
 /// <summary>
 /// The base entity controller for entity service
 /// </summary>
+/// <typeparam name="TCreateRequest">The type of request that creates an entity</typeparam>
+/// <typeparam name="TUpdateRequest">The type of request that updates an entity</typeparam>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
-public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
+public class ModernCqrsController<TCreateRequest, TUpdateRequest, TEntityDto, TEntityDbo, TId> : ControllerBase
+    where TCreateRequest : class
+    where TUpdateRequest : class
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
 {
     private readonly IMediator _mediator;
+    private readonly IMapper _mapper = new Mapper();
 
     /// <summary>
     /// Initializes a new instance of the class
@@ -80,7 +86,7 @@ public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     /// <summary>
     /// Creates the new entity in the data store
     /// </summary>
-    /// <param name="entity">The entity to add to the data store</param>
+    /// <param name="request">The request that creates an entity</param>
     /// <response code="201">The entity was created</response>
     /// <response code="400">The entity model is invalid</response>
     /// <response code="500">Error occurred while creating entity</response>
@@ -89,9 +95,11 @@ public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Created)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public virtual async Task<IActionResult> Create([FromBody, Required] TEntityDto entity)
+    public virtual async Task<IActionResult> Create([FromBody, Required] TCreateRequest request)
     {
+        var entity = _mapper.Map<TEntityDto>(request);
         var command = new CreateEntityCommand<TEntityDto>(entity);
+
         var createdEntity = await _mediator.Send(command).ConfigureAwait(false);
         return Created(nameof(Create), createdEntity);
     }
@@ -99,7 +107,7 @@ public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     /// <summary>
     /// Creates a list of new entities in the data store
     /// </summary>
-    /// <param name="entities">The list of entities to add to the data store</param>
+    /// <param name="requests">The list of requests that create entities</param>
     /// <response code="201">The entities were created</response>
     /// <response code="400">One of entity models is invalid</response>
     /// <response code="500">Error occurred while creating entities</response>
@@ -108,9 +116,11 @@ public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Created)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public virtual async Task<IActionResult> CreateMany([FromBody, Required] List<TEntityDto> entities)
+    public virtual async Task<IActionResult> CreateMany([FromBody, Required] List<TCreateRequest> requests)
     {
+        var entities = _mapper.Map<List<TEntityDto>>(requests);
         var command = new CreateEntitiesCommand<TEntityDto>(entities);
+
         var createdEntities = await _mediator.Send(command).ConfigureAwait(false);
         return Created(nameof(Create), createdEntities);
     }
@@ -119,7 +129,7 @@ public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     /// Updates the entity in the data store with the given <paramref name="id"/>
     /// </summary>
     /// <param name="id">The entity id</param>
-    /// <param name="entity">The entity model</param>
+    /// <param name="request">The request that updates an entity</param>
     /// <response code="204">The entity was updated</response>
     /// <response code="400">The entity model is invalid</response>
     /// <response code="404">Entity with the given id not found</response>
@@ -129,11 +139,13 @@ public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [HttpPut("update/{id}")]
-    public virtual async Task<IActionResult> Update([Required] TId id, [FromBody, Required] TEntityDto entity)
+    public virtual async Task<IActionResult> Update([Required] TId id, [FromBody, Required] TUpdateRequest request)
     {
         try
         {
+            var entity = _mapper.Map<TEntityDto>(request);
             var command = new UpdateEntityCommand<TEntityDto, TId>(id, entity);
+
             await _mediator.Send(command).ConfigureAwait(false);
         }
         catch (EntityNotFoundException e)
@@ -145,9 +157,9 @@ public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     }
 
     /// <summary>
-    /// Updates the list of entities in the data store with the given list of <paramref name="entities"/>
+    /// Updates the list of entities in the data store with the given list of update <paramref name="requests"/>
     /// </summary>
-    /// <param name="entities">The entity model</param>
+    /// <param name="requests">The list of requests that updates entities</param>
     /// <response code="204">The entity was updated</response>
     /// <response code="400">The entity model is invalid</response>
     /// <response code="404">Entity with the given id not found</response>
@@ -157,11 +169,13 @@ public class ModernCqrsController<TEntityDto, TEntityDbo, TId> : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [HttpPut("update-many")]
-    public virtual async Task<IActionResult> UpdateMany([FromBody, Required] List<TEntityDto> entities)
+    public virtual async Task<IActionResult> UpdateMany([FromBody, Required] List<TUpdateRequest> requests)
     {
         try
         {
+            var entities = _mapper.Map<List<TEntityDto>>(requests);
             var command = new UpdateEntitiesCommand<TEntityDto>(entities);
+
             await _mediator.Send(command).ConfigureAwait(false);
         }
         catch (EntityNotFoundException e)

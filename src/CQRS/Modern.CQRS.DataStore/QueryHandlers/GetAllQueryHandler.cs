@@ -64,7 +64,7 @@ public class GetAllQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
             }
 
             var entitiesDbo = await Repository.GetAllAsync(null, cancellationToken).ConfigureAwait(false);
-            return entitiesDbo.ConvertAll(MapToDto);
+            return entitiesDbo.Select(MapToDto).ToList();
         }
         catch (Exception ex)
         {

@@ -6,6 +6,16 @@
 public class ModernControllerSpecification
 {
     /// <summary>
+    /// The type of request that creates an entity
+    /// </summary>
+    public Type CreateRequestType { get; set; } = default!;
+
+    /// <summary>
+    /// The type of request that updates an entity
+    /// </summary>
+    public Type UpdateRequestType { get; set; } = default!;
+
+    /// <summary>
     /// The type of entity returned from the controller
     /// </summary>
     public Type EntityDtoType { get; set; } = default!;

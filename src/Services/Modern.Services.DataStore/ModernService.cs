@@ -146,7 +146,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             LogMethod(nameof(GetAllAsync));
 
             var entitiesDbo = await Repository.GetAllAsync(null, cancellationToken).ConfigureAwait(false);
-            return entitiesDbo.ConvertAll(MapToDto);
+            return entitiesDbo.Select(MapToDto).ToList();
         }
         catch (Exception ex)
         {
@@ -277,7 +277,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             LogMethod(nameof(WhereAsync));
 
             var entitiesDbo = await Repository.WhereAsync(predicate, null, cancellationToken).ConfigureAwait(false);
-            return entitiesDbo.ConvertAll(MapToDto);
+            return entitiesDbo.Select(MapToDto).ToList();
         }
         catch (Exception ex)
         {

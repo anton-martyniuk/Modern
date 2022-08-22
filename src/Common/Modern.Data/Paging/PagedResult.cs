@@ -23,5 +23,5 @@ public class PagedResult<T>
     /// <summary>
     /// Selected items
     /// </summary>
-    public IEnumerable<T> Items { get; set; } = null!;
+    public IEnumerable<T> Items { get; set; } = Enumerable.Empty<T>();
 }

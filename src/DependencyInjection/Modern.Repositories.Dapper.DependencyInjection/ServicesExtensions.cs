@@ -1,5 +1,4 @@
-﻿using System.Data.Common;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using Modern.Extensions.Microsoft.DependencyInjection.Models;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Dapper;

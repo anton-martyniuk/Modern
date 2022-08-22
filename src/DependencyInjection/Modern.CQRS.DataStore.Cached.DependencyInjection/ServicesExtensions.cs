@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MediatR.Registration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Modern.CQRS.DataStore.Abstractions.Commands;
 using Modern.CQRS.DataStore.Abstractions.Queries;
@@ -26,6 +27,9 @@ public static class ServicesExtensions
     {
         var options = new ModernCqrsOptions();
         configure(options);
+
+        var serviceConfig = new MediatRServiceConfiguration();
+        ServiceRegistrar.AddRequiredServices(builder.Services, serviceConfig);
 
         foreach (var c in options.CqrsRequests)
         {
