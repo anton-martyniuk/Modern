@@ -473,9 +473,9 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudService{TEntityDto,TEntityDbo,TId}.UpdateAsync(TId,Action{TEntityDbo},CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudService{TEntityDto,TEntityDbo,TId}.UpdateAsync(TId,Action{TEntityDto},CancellationToken)"/>
     /// </summary>
-    public virtual async Task<TEntityDto> UpdateAsync(TId id, Action<TEntityDbo> update, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntityDto> UpdateAsync(TId id, Action<TEntityDto> update, CancellationToken cancellationToken = default)
     {
         try
         {

@@ -11,7 +11,7 @@ namespace Modern.CQRS.DataStore.Abstractions.Commands;
 /// <exception cref="EntityConcurrentUpdateException">If an entity concurrent update occurred</exception>
 /// <exception cref="InternalErrorException">Thrown if an error occurred while updating the entity in the data store</exception>
 /// <returns>Updated entity</returns>
-public record UpdateEntityByActionCommand<TEntityDto, TEntityDbo, TId>(TId Id, Action<TEntityDbo> UpdateAction) : IRequest<TEntityDto>
+public record UpdateEntityByActionCommand<TEntityDto, TId>(TId Id, Action<TEntityDto> UpdateAction) : IRequest<TEntityDto>
     where TEntityDto : class
     where TId : IEquatable<TId>
 {
@@ -23,5 +23,5 @@ public record UpdateEntityByActionCommand<TEntityDto, TEntityDbo, TId>(TId Id, A
     /// <summary>
     /// The entity update action
     /// </summary>
-    public Action<TEntityDbo> UpdateAction { get; init; } = UpdateAction ?? throw new ArgumentNullException(nameof(UpdateAction));
+    public Action<TEntityDto> UpdateAction { get; init; } = UpdateAction ?? throw new ArgumentNullException(nameof(UpdateAction));
 }

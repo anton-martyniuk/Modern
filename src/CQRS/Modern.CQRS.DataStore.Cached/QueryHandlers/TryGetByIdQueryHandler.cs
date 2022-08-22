@@ -86,7 +86,7 @@ public class TryGetByIdQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
             }
 
             entityDto = MapToDto(entityDbo);
-            await Cache.AddOrUpdateAsync(GetEntityId(entityDto), entityDto).ConfigureAwait(false);
+            await Cache.AddOrUpdateAsync(request.Id, entityDto).ConfigureAwait(false);
 
             return entityDto;
         }

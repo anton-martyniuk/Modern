@@ -18,11 +18,11 @@ namespace Modern.CQRS.DataStore.Cached.CommandHandlers;
 /// <returns>Updated entity</returns>
 public class UpdateEntityByActionCommandHandler<TEntityDto, TEntityDbo, TId, TRepository> :
     BaseMediatorHandler<TEntityDto, TEntityDbo, TId>,
-    IRequestHandler<UpdateEntityByActionCommand<TEntityDto, TEntityDbo, TId>, TEntityDto>
+    IRequestHandler<UpdateEntityByActionCommand<TEntityDto, TId>, TEntityDto>
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
-    where TRepository : class, IModernCrudRepository<TEntityDbo, TId>
+    where TRepository : class, IModernRepository<TEntityDbo, TId>
 {
     private const string HandlerName = nameof(UpdateEntityByActionCommandHandler<TEntityDto, TEntityDbo, TId, TRepository>);
 
@@ -61,7 +61,7 @@ public class UpdateEntityByActionCommandHandler<TEntityDto, TEntityDbo, TId, TRe
     /// <summary>
     /// <inheritdoc cref="IRequestHandler{TRequest,TResponse}.Handle"/>
     /// </summary>
-    public async Task<TEntityDto> Handle(UpdateEntityByActionCommand<TEntityDto, TEntityDbo, TId> request, CancellationToken cancellationToken)
+    public async Task<TEntityDto> Handle(UpdateEntityByActionCommand<TEntityDto, TId> request, CancellationToken cancellationToken)
     {
         try
         {
@@ -72,16 +72,22 @@ public class UpdateEntityByActionCommandHandler<TEntityDto, TEntityDbo, TId, TRe
 
             Logger.LogTrace("{serviceName}.{method} id: {id}", EntityName, HandlerName, request.Id);
 
+            var entityDbo = await Repository.GetByIdAsync(request.Id, null, cancellationToken).ConfigureAwait(false);
+            var entityDto = MapToDto(entityDbo);
+
+            // Perform update action
+            request.UpdateAction(entityDto);
+
             Logger.LogDebug("Updating {name} entity with id '{id}' in db...", EntityName, request.Id);
-            var entityDbo = await Repository.UpdateAsync(request.Id, request.UpdateAction, cancellationToken).ConfigureAwait(false);
+            entityDbo = MapToDbo(entityDto);
+            entityDbo = await Repository.UpdateAsync(request.Id, entityDbo, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Updated {name} entity with id {id}. {@entityDbo}", EntityName, request.Id, entityDbo);
 
-            var entityDto = MapToDto(entityDbo);
-            var entityId = GetEntityId(entityDto);
+            entityDto = MapToDto(entityDbo);
 
-            Logger.LogDebug("Updating {name} entity with id '{id}' in cache...", EntityName, entityId);
-            await Cache.AddOrUpdateAsync(entityId, entityDto).ConfigureAwait(false);
-            Logger.LogDebug("Updated {name} entity with id '{id}'. {@entityDto}", EntityName, entityId, entityDto);
+            Logger.LogDebug("Updating {name} entity with id '{id}' in cache...", EntityName, request.Id);
+            await Cache.AddOrUpdateAsync(request.Id, entityDto).ConfigureAwait(false);
+            Logger.LogDebug("Updated {name} entity with id '{id}'. {@entityDto}", EntityName, request.Id, entityDto);
 
             return entityDto;
         }

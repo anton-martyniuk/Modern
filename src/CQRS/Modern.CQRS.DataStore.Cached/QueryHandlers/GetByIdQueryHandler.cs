@@ -83,7 +83,7 @@ public class GetByIdQueryHandler<TEntityDto, TEntityDbo, TId, TRepository> :
             var entityDbo = await Repository.GetByIdAsync(request.Id, null, cancellationToken).ConfigureAwait(false);
 
             entityDto = MapToDto(entityDbo);
-            await Cache.AddOrUpdateAsync(GetEntityId(entityDto), entityDto).ConfigureAwait(false);
+            await Cache.AddOrUpdateAsync(request.Id, entityDto).ConfigureAwait(false);
 
             return entityDto;
         }

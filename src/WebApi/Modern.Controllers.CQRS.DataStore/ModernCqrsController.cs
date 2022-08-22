@@ -200,11 +200,11 @@ public class ModernCqrsController<TCreateRequest, TUpdateRequest, TEntityDto, TE
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [HttpPatch("patch/{id}")]
-    public virtual async Task<IActionResult> Patch([Required] TId id, [FromBody] JsonPatchDocument<TEntityDbo> patch)
+    public virtual async Task<IActionResult> Patch([Required] TId id, [FromBody] JsonPatchDocument<TEntityDto> patch)
     {
         try
         {
-            var command = new UpdateEntityByActionCommand<TEntityDto, TEntityDbo, TId>(id, patch.ApplyTo);
+            var command = new UpdateEntityByActionCommand<TEntityDto, TId>(id, patch.ApplyTo);
             await _mediator.Send(command).ConfigureAwait(false);
         }
         catch (EntityNotFoundException e)

@@ -79,11 +79,10 @@ public class UpdateEntityCommandHandler<TEntityDto, TEntityDbo, TId, TRepository
             Logger.LogDebug("Updated {name} entity with id {id}. {@entityDbo}", EntityName, request.Id, entityDbo);
 
             var entityDto = MapToDto(entityDbo);
-            var entityId = GetEntityId(entityDto);
 
-            Logger.LogDebug("Updating {name} entity with id '{id}' in cache...", EntityName, entityId);
-            await Cache.AddOrUpdateAsync(entityId, entityDto).ConfigureAwait(false);
-            Logger.LogDebug("Updated {name} entity with id '{id}'. {@entityDto}", EntityName, entityId, entityDto);
+            Logger.LogDebug("Updating {name} entity with id '{id}' in cache...", EntityName, request.Id);
+            await Cache.AddOrUpdateAsync(request.Id, entityDto).ConfigureAwait(false);
+            Logger.LogDebug("Updated {name} entity with id '{id}'. {@entityDto}", EntityName, request.Id, entityDto);
 
             return entityDto;
         }

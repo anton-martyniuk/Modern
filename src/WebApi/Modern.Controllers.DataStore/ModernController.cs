@@ -188,7 +188,7 @@ public class ModernController<TCreateRequest, TUpdateRequest, TEntityDto, TEntit
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [HttpPatch("patch/{id}")]
-    public virtual async Task<IActionResult> Patch([Required] TId id, [FromBody] JsonPatchDocument<TEntityDbo> patch)
+    public virtual async Task<IActionResult> Patch([Required] TId id, [FromBody] JsonPatchDocument<TEntityDto> patch)
     {
         try
         {

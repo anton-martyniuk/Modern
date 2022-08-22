@@ -338,7 +338,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.CreateAsync(TEntity,CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudService{TEntityDto,TEntityDbo,TId}.CreateAsync(TEntityDto,CancellationToken)"/>
     /// </summary>
     public virtual async Task<TEntityDto> CreateAsync(TEntityDto entity, CancellationToken cancellationToken = default)
     {
@@ -364,7 +364,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.CreateAsync(List{TEntity},CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudService{TEntityDto,TEntityDbo,TId}.CreateAsync(List{TEntityDto},CancellationToken)"/>
     /// </summary>
     public virtual async Task<List<TEntityDto>> CreateAsync(List<TEntityDto> entities, CancellationToken cancellationToken = default)
     {
@@ -391,7 +391,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(TId,TEntity,CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudService{TEntityDto,TEntityDbo,TId}.UpdateAsync(TId,TEntityDto,CancellationToken)"/>
     /// </summary>
     public virtual async Task<TEntityDto> UpdateAsync(TId id, TEntityDto entity, CancellationToken cancellationToken = default)
     {
@@ -419,7 +419,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(List{TEntity},CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudService{TEntityDto,TEntityDbo,TId}.UpdateAsync(List{TEntityDto},CancellationToken)"/>
     /// </summary>
     public virtual async Task<List<TEntityDto>> UpdateAsync(List<TEntityDto> entities, CancellationToken cancellationToken = default)
     {
@@ -447,9 +447,9 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.UpdateAsync(TId,Action{TEntity},CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudService{TEntityDto,TEntityDbo,TId}.UpdateAsync(TId,Action{TEntityDto},CancellationToken)"/>
     /// </summary>
-    public virtual async Task<TEntityDto> UpdateAsync(TId id, Action<TEntityDbo> update, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntityDto> UpdateAsync(TId id, Action<TEntityDto> update, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -459,8 +459,15 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(UpdateAsync), id);
 
+            var entityDbo = await Repository.GetByIdAsync(id, null, cancellationToken).ConfigureAwait(false);
+            var entityDto = MapToDto(entityDbo);
+
+            // Perform update action
+            update(entityDto);
+
             Logger.LogDebug("Updating {name} entity with id '{id}' in db...", _entityName, id);
-            var entityDbo = await Repository.UpdateAsync(id, update, cancellationToken).ConfigureAwait(false);
+            entityDbo = MapToDbo(entityDto);
+            entityDbo = await Repository.UpdateAsync(id, entityDbo, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Updated {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDbo);
 
             return MapToDto(entityDbo);
@@ -473,7 +480,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAsync(TId,CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudService{TEntityDto,TEntityDbo,TId}.DeleteAsync(TId,CancellationToken)"/>
     /// </summary>
     public virtual async Task<bool> DeleteAsync(TId id, CancellationToken cancellationToken = default)
     {
@@ -503,7 +510,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAsync(List{TId},CancellationToken)"/>
+    /// <inheritdoc cref="IModernCrudService{TEntityDto,TEntityDbo,TId}.DeleteAsync(List{TId},CancellationToken)"/>
     /// </summary>
     public virtual async Task<bool> DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default)
     {
@@ -534,7 +541,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernCrudRepository{TEntity,TId}.DeleteAndReturnAsync"/>
+    /// <inheritdoc cref="IModernCrudService{TEntityDto,TEntityDbo,TId}.DeleteAndReturnAsync"/>
     /// </summary>
     public virtual async Task<TEntityDto> DeleteAndReturnAsync(TId id, CancellationToken cancellationToken = default)
     {

@@ -51,7 +51,7 @@ public static class ServicesExtensions
             builder.Services.AddSingleArityRequestAndHandler(typeof(CreateEntityCommand<>), typeof(CreateEntityCommandHandler<,,,>), c.EntityDtoType, c);
             builder.Services.AddSingleArityRequestAndHandler(typeof(CreateEntitiesCommand<>), typeof(CreateEntitiesCommandHandler<,,,>), listType, c);
             builder.Services.AddDoubleArityRequestAndHandler(typeof(UpdateEntityCommand<,>), typeof(UpdateEntityCommandHandler<,,,>), c.EntityDtoType, c);
-            builder.Services.AddTripleArityRequestAndHandler(typeof(UpdateEntityByActionCommand<,,>), typeof(UpdateEntityByActionCommandHandler<,,,>), c.EntityDtoType, c);
+            builder.Services.AddDoubleArityRequestAndHandler(typeof(UpdateEntityByActionCommand<,>), typeof(UpdateEntityByActionCommandHandler<,,,>), c.EntityDtoType, c);
             builder.Services.AddSingleArityRequestAndHandler(typeof(UpdateEntitiesCommand<>), typeof(UpdateEntitiesCommandHandler<,,,>), listType, c);
             builder.Services.AddByIdRequestAndHandler(typeof(DeleteEntityCommand<>), typeof(DeleteEntityCommandHandler<,,,>), typeof(bool), c);
             builder.Services.AddByIdRequestAndHandler(typeof(DeleteEntitiesCommand<>), typeof(DeleteEntitiesCommandHandler<,,,>), typeof(bool), c);

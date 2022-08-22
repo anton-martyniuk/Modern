@@ -70,7 +70,7 @@ public interface IModernCrudService<TEntityDto, out TEntityDbo, TId>
     /// <exception cref="EntityConcurrentUpdateException">If an entity concurrent update occurred</exception>
     /// <exception cref="InternalErrorException">Thrown if an error occurred while updating the entity in the data store</exception>
     /// <returns>Updated entity</returns>
-    Task<TEntityDto> UpdateAsync(TId id, Action<TEntityDbo> update, CancellationToken cancellationToken = default);
+    Task<TEntityDto> UpdateAsync(TId id, Action<TEntityDto> update, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes the entity in the data store with the given <paramref name="id"/>.<br/>
