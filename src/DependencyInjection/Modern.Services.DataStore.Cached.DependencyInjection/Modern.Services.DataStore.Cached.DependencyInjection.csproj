@@ -16,6 +16,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Services\Modern.Services.DataStore.Abstractions\Modern.Services.DataStore.Abstractions.csproj" />
 		<ProjectReference Include="..\..\Services\Modern.Services.DataStore.Cached\Modern.Services.DataStore.Cached.csproj" />
+		<ProjectReference Include="..\..\Services\Modern.Services.DataStore\Modern.Services.DataStore.csproj" />
 		<ProjectReference Include="..\Definitions\Modern.Services.DependencyInjection.Definitions\Modern.Services.DependencyInjection.Definitions.csproj" />
 		<ProjectReference Include="..\Modern.Extensions.Microsoft.DependencyInjection\Modern.Extensions.Microsoft.DependencyInjection.csproj" />
 	</ItemGroup>

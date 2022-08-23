@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using Modern.Extensions.Microsoft.DependencyInjection.Models;
+using Modern.Services.DataStore;
 using Modern.Services.DataStore.Abstractions;
 using Modern.Services.DataStore.Cached;
 
@@ -25,10 +26,11 @@ public static class ServicesExtensions
         foreach (var c in options.Services)
         {
             var interfaceType = typeof(IModernService<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
+            var implementationType = typeof(ModernService<,,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType, c.RepositoryType);
             var decoratorType = typeof(ModernCachedService<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
 
-            //builder.Services.TryAdd(new ServiceDescriptor(interfaceType, implementationType, c.Lifetime));
-            builder.Services.Decorate(interfaceType, decoratorType);
+            builder.Services.TryAdd(new ServiceDescriptor(interfaceType, implementationType, c.Lifetime));
+            builder.Services.TryDecorate(interfaceType, decoratorType);
         }
 
         foreach (var c in options.ConcreteServices)
