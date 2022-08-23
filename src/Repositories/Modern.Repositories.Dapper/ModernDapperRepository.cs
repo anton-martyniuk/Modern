@@ -464,8 +464,7 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
     /// </summary>
     public virtual IQueryable<TEntity> AsQueryable()
     {
-        // TODO ???
-        throw new NotImplementedException();
+        throw new NotSupportedException("Current operation is not supported by ModernDapperRepository");
     }
 
     /// <summary>
