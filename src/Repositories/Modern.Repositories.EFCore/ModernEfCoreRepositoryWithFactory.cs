@@ -14,36 +14,33 @@ namespace Modern.Repositories.EFCore;
 
 /// <summary>
 /// Represents an <see cref="IModernCrudRepository{TEntity, TId}"/> and <see cref="IModernQueryRepository{TEntity, TId}"/> implementation using EFCore
-/// and <see cref="DbContext"/>
+/// and <see cref="IDbContextFactory{TDbContext}"/>
 /// </summary>
 /// <typeparam name="TDbContext">The type of EF Core DbContext</typeparam>
 /// <typeparam name="TEntity">The type of entity</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
-public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepository<TEntity, TId>
+public class ModernEfCoreRepositoryWithFactory<TDbContext, TEntity, TId> : IModernRepository<TEntity, TId>
     where TDbContext : DbContext
     where TEntity : class
     where TId : IEquatable<TId>
 {
     private readonly string _entityName = typeof(TEntity).Name;
 
-    private readonly IDbContextFactory<TDbContext> _dbContextFactory;
     private readonly EfCoreRepositoryConfiguration? _configuration;
 
     /// <summary>
-    /// The <typeparamref name="TDbContext"/> DbContext
+    /// The <typeparamref name="TDbContext"/> factory
     /// </summary>
-    protected TDbContext DbContext { get; }
+    protected IDbContextFactory<TDbContext> DbContextFactory { get; }
 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    /// <param name="dbContext">The <see cref="DbContext"/></param>
-    /// <param name="dbContextFactory">DbContextFactory</param>
+    /// <param name="dbContextFactory">The <see cref="IDbContextFactory{TDbContext}"/> implementation</param>
     /// <param name="configuration">Repository configuration</param>
-    public ModernEfCoreRepository(TDbContext dbContext, IDbContextFactory<TDbContext> dbContextFactory, IOptions<EfCoreRepositoryConfiguration?> configuration)
+    public ModernEfCoreRepositoryWithFactory(IDbContextFactory<TDbContext> dbContextFactory, IOptions<EfCoreRepositoryConfiguration?> configuration)
     {
-        _dbContextFactory = dbContextFactory;
-        DbContext = dbContext;
+        DbContextFactory = dbContextFactory;
         _configuration = configuration.Value;
     }
 
@@ -87,18 +84,19 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.CreateConfiguration?.NeedExecuteInTransaction is not true)
             {
-                await DbContext.Set<TEntity>().AddAsync(entity, cancellationToken).ConfigureAwait(false);
-                await DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                await context.Set<TEntity>().AddAsync(entity, cancellationToken).ConfigureAwait(false);
+                await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                 return entity;
             }
 
             var isolationLevel = _configuration?.CreateConfiguration?.TransactionIsolationLevel ?? IsolationLevel.Unspecified;
-            await using var transaction = await DbContext.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
+            await using var transaction = await context.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
 
-            await DbContext.Set<TEntity>().AddAsync(entity, cancellationToken).ConfigureAwait(false);
-            await DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await context.Set<TEntity>().AddAsync(entity, cancellationToken).ConfigureAwait(false);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             return entity;
         }
@@ -119,18 +117,19 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.CreateConfiguration?.NeedExecuteInTransaction is not true)
             {
-                await DbContext.Set<TEntity>().AddRangeAsync(entities, cancellationToken).ConfigureAwait(false);
-                await DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                await context.Set<TEntity>().AddRangeAsync(entities, cancellationToken).ConfigureAwait(false);
+                await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                 return entities;
             }
 
             var isolationLevel = _configuration?.CreateConfiguration?.TransactionIsolationLevel ?? IsolationLevel.Unspecified;
-            await using var transaction = await DbContext.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
+            await using var transaction = await context.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
 
-            await DbContext.Set<TEntity>().AddRangeAsync(entities, cancellationToken).ConfigureAwait(false);
-            await DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await context.Set<TEntity>().AddRangeAsync(entities, cancellationToken).ConfigureAwait(false);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             return entities;
         }
@@ -151,15 +150,16 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.UpdateConfiguration?.NeedExecuteInTransaction is not true)
             {
-                return await PerformUpdateAsync(DbContext, id, entity, cancellationToken).ConfigureAwait(false);
+                return await PerformUpdateAsync(context, id, entity, cancellationToken).ConfigureAwait(false);
             }
 
             var isolationLevel = _configuration?.UpdateConfiguration?.TransactionIsolationLevel ?? IsolationLevel.Unspecified;
-            await using var transaction = await DbContext.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
+            await using var transaction = await context.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
 
-            entity = await PerformUpdateAsync(DbContext, id, entity, cancellationToken).ConfigureAwait(false);
+            entity = await PerformUpdateAsync(context, id, entity, cancellationToken).ConfigureAwait(false);
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             return entity;
         }
@@ -180,15 +180,16 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.UpdateConfiguration?.NeedExecuteInTransaction is not true)
             {
-                return await PerformUpdateAsync(DbContext, entities, cancellationToken).ConfigureAwait(false);
+                return await PerformUpdateAsync(context, entities, cancellationToken).ConfigureAwait(false);
             }
 
             var isolationLevel = _configuration?.UpdateConfiguration?.TransactionIsolationLevel ?? IsolationLevel.Unspecified;
-            await using var transaction = await DbContext.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
+            await using var transaction = await context.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
 
-            entities = await PerformUpdateAsync(DbContext, entities, cancellationToken).ConfigureAwait(false);
+            entities = await PerformUpdateAsync(context, entities, cancellationToken).ConfigureAwait(false);
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             return entities;
         }
@@ -208,15 +209,16 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.UpdateConfiguration?.NeedExecuteInTransaction is not true)
             {
-                return await PerformUpdateAsync(DbContext, id, update, cancellationToken).ConfigureAwait(false);
+                return await PerformUpdateAsync(context, id, update, cancellationToken).ConfigureAwait(false);
             }
 
             var isolationLevel = _configuration?.UpdateConfiguration?.TransactionIsolationLevel ?? IsolationLevel.Unspecified;
-            await using var transaction = await DbContext.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
+            await using var transaction = await context.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
 
-            var entity = await PerformUpdateAsync(DbContext, id, update, cancellationToken).ConfigureAwait(false);
+            var entity = await PerformUpdateAsync(context, id, update, cancellationToken).ConfigureAwait(false);
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             return entity;
         }
@@ -236,15 +238,16 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.DeleteConfiguration?.NeedExecuteInTransaction != true)
             {
-                return await PerformDeleteAsync(DbContext, id, cancellationToken).ConfigureAwait(false);
+                return await PerformDeleteAsync(context, id, cancellationToken).ConfigureAwait(false);
             }
 
             var isolationLevel = _configuration?.DeleteConfiguration?.TransactionIsolationLevel ?? IsolationLevel.Unspecified;
-            await using var transaction = await DbContext.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
+            await using var transaction = await context.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
 
-            var result = await PerformDeleteAsync(DbContext, id, cancellationToken).ConfigureAwait(false);
+            var result = await PerformDeleteAsync(context, id, cancellationToken).ConfigureAwait(false);
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
 
             return result;
@@ -266,15 +269,16 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.DeleteConfiguration?.NeedExecuteInTransaction != true)
             {
-                return await PerformDeleteAsync(DbContext, ids, cancellationToken).ConfigureAwait(false);
+                return await PerformDeleteAsync(context, ids, cancellationToken).ConfigureAwait(false);
             }
 
             var isolationLevel = _configuration?.DeleteConfiguration?.TransactionIsolationLevel ?? IsolationLevel.Unspecified;
-            await using var transaction = await DbContext.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
+            await using var transaction = await context.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
 
-            var result = await PerformDeleteAsync(DbContext, ids, cancellationToken).ConfigureAwait(false);
+            var result = await PerformDeleteAsync(context, ids, cancellationToken).ConfigureAwait(false);
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
 
             return result;
@@ -293,15 +297,16 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             if (_configuration?.DeleteConfiguration?.NeedExecuteInTransaction != true)
             {
-                return await PerformDeleteAndReturnAsync(DbContext, id, cancellationToken).ConfigureAwait(false);
+                return await PerformDeleteAndReturnAsync(context, id, cancellationToken).ConfigureAwait(false);
             }
 
             var isolationLevel = _configuration?.DeleteConfiguration?.TransactionIsolationLevel ?? IsolationLevel.Unspecified;
-            await using var transaction = await DbContext.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
+            await using var transaction = await context.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
 
-            var entity = await PerformDeleteAndReturnAsync(DbContext, id, cancellationToken).ConfigureAwait(false);
+            var entity = await PerformDeleteAndReturnAsync(context, id, cancellationToken).ConfigureAwait(false);
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             return entity;
         }
@@ -321,7 +326,9 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
-            var entity = await GetEntityByIdImpl(DbContext, id, includeQuery ?? GetEntityIncludeQuery(), cancellationToken).ConfigureAwait(false);
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+            var entity = await GetEntityByIdImpl(context, id, includeQuery ?? GetEntityIncludeQuery(), cancellationToken).ConfigureAwait(false);
             if (entity is null)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
@@ -344,7 +351,8 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
-            return await GetEntityByIdImpl(DbContext, id, includeQuery ?? GetEntityIncludeQuery(), cancellationToken).ConfigureAwait(false);
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await GetEntityByIdImpl(context, id, includeQuery ?? GetEntityIncludeQuery(), cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -361,13 +369,15 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
             includeQuery ??= GetEntityIncludeQuery();
             if (includeQuery is null)
             {
-                return await DbContext.Set<TEntity>().ToListAsync(cancellationToken).ConfigureAwait(false);
+                return await context.Set<TEntity>().ToListAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            var query = DbContext.Set<TEntity>().AsNoTracking();
+            var query = context.Set<TEntity>().AsNoTracking();
             query = includeQuery.GetExpression(query);
             return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
         }
@@ -386,7 +396,8 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            return await DbContext.Set<TEntity>().AsNoTracking().CountAsync(cancellationToken).ConfigureAwait(false);
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
+            return await context.Set<TEntity>().AsNoTracking().CountAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -405,13 +416,15 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
+
             includeQuery ??= GetEntityIncludeQuery();
             if (includeQuery is null)
             {
-                return await DbContext.Set<TEntity>().AsNoTracking().CountAsync(predicate, cancellationToken).ConfigureAwait(false);
+                return await context.Set<TEntity>().AsNoTracking().CountAsync(predicate, cancellationToken).ConfigureAwait(false);
             }
 
-            var query = DbContext.Set<TEntity>().AsNoTracking();
+            var query = context.Set<TEntity>().AsNoTracking();
             query = includeQuery.GetExpression(query);
             return await query.CountAsync(predicate, cancellationToken).ConfigureAwait(false);
         }
@@ -431,13 +444,15 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
+
             includeQuery ??= GetEntityIncludeQuery();
             if (includeQuery is null)
             {
-                return await DbContext.Set<TEntity>().AsNoTracking().AnyAsync(predicate, cancellationToken).ConfigureAwait(false);
+                return await context.Set<TEntity>().AsNoTracking().AnyAsync(predicate, cancellationToken).ConfigureAwait(false);
             }
 
-            var query = DbContext.Set<TEntity>().AsNoTracking();
+            var query = context.Set<TEntity>().AsNoTracking();
             query = includeQuery.GetExpression(query);
             return await query.AnyAsync(predicate, cancellationToken).ConfigureAwait(false);
         }
@@ -457,13 +472,15 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
+
             includeQuery ??= GetEntityIncludeQuery();
             if (includeQuery is null)
             {
-                return await DbContext.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+                return await context.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
             }
 
-            var query = DbContext.Set<TEntity>().AsNoTracking();
+            var query = context.Set<TEntity>().AsNoTracking();
             query = includeQuery.GetExpression(query);
             return await query.FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
         }
@@ -483,13 +500,15 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
+
             includeQuery ??= GetEntityIncludeQuery();
             if (includeQuery is null)
             {
-                return await DbContext.Set<TEntity>().AsNoTracking().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+                return await context.Set<TEntity>().AsNoTracking().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
             }
 
-            var query = DbContext.Set<TEntity>().AsNoTracking();
+            var query = context.Set<TEntity>().AsNoTracking();
             query = includeQuery.GetExpression(query);
             return await query.SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
         }
@@ -509,13 +528,15 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             cancellationToken.ThrowIfCancellationRequested();
 
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
+
             includeQuery ??= GetEntityIncludeQuery();
             if (includeQuery is null)
             {
-                return await DbContext.Set<TEntity>().AsNoTracking().Where(predicate).ToListAsync(cancellationToken).ConfigureAwait(false);
+                return await context.Set<TEntity>().AsNoTracking().Where(predicate).ToListAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            var query = DbContext.Set<TEntity>().AsNoTracking();
+            var query = context.Set<TEntity>().AsNoTracking();
             query = includeQuery.GetExpression(query);
             return await query.Where(predicate).ToListAsync(cancellationToken).ConfigureAwait(false);
         }
@@ -536,11 +557,13 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             cancellationToken.ThrowIfCancellationRequested();
 
-            var query = DbContext.Set<TEntity>().AsNoTracking();
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
+
+            var query = context.Set<TEntity>().AsNoTracking();
             includeQuery ??= GetEntityIncludeQuery();
             query = includeQuery is null ? query : includeQuery.GetExpression(query);
 
-            var countTask = DbContext.Set<TEntity>().AsNoTracking().CountAsync(predicate, cancellationToken);
+            var countTask = context.Set<TEntity>().AsNoTracking().CountAsync(predicate, cancellationToken);
 
             var queryTask = query
                 .Where(predicate)
@@ -573,7 +596,7 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
     {
         try
         {
-            return new EfCoreQueryable<TEntity>(new EfCoreQueryProvider<TDbContext, TEntity>(_dbContextFactory));
+            return new EfCoreQueryable<TEntity>(new EfCoreQueryProvider<TDbContext, TEntity>(DbContextFactory));
         }
         catch (Exception ex)
         {
