@@ -26,7 +26,6 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
 {
     private readonly string _entityName = typeof(TEntity).Name;
 
-    private readonly IDbContextFactory<TDbContext> _dbContextFactory;
     private readonly EfCoreRepositoryConfiguration? _configuration;
 
     /// <summary>
@@ -38,11 +37,9 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="dbContext">The <see cref="DbContext"/></param>
-    /// <param name="dbContextFactory">DbContextFactory</param>
     /// <param name="configuration">Repository configuration</param>
-    public ModernEfCoreRepository(TDbContext dbContext, IDbContextFactory<TDbContext> dbContextFactory, IOptions<EfCoreRepositoryConfiguration?> configuration)
+    public ModernEfCoreRepository(TDbContext dbContext, IOptions<EfCoreRepositoryConfiguration?> configuration)
     {
-        _dbContextFactory = dbContextFactory;
         DbContext = dbContext;
         _configuration = configuration.Value;
     }
@@ -564,8 +561,6 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
         }
     }
 
-    // TODO: AsQueryable works only in NON async mode!
-
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.AsQueryable"/>
     /// </summary>
@@ -573,7 +568,7 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
     {
         try
         {
-            return new EfCoreQueryable<TEntity>(new EfCoreQueryProvider<TDbContext, TEntity>(_dbContextFactory));
+            return new EfCoreQueryable<TEntity>(new EfCoreQueryProvider<TDbContext, TEntity>(DbContext));
         }
         catch (Exception ex)
         {

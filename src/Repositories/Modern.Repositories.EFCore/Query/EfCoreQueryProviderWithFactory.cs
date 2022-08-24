@@ -10,20 +10,21 @@ namespace Modern.Repositories.EFCore.Query;
 /// <summary>
 /// The <see cref="IQueryProvider"/> implementation.<br/>
 /// Defines custom query provider with EF Core implementation over standard <see cref="IDbQueryProvider"/> for the database queries
+/// using <see cref="IDbContextFactory{TContext}"/>
 /// </summary>
-internal sealed class EfCoreQueryProvider<TDbContext, TEntity> : IAsyncQueryProvider, IDbQueryProvider
+internal sealed class EfCoreQueryProviderWithFactory<TDbContext, TEntity> : IAsyncQueryProvider, IDbQueryProvider
     where TDbContext : DbContext
     where TEntity : class
 {
-    private readonly TDbContext _dbContext;
+    private readonly IDbContextFactory<TDbContext> _dbContextFactory;
 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    /// <param name="dbContext">The <see cref="DbContext"/></param>
-    public EfCoreQueryProvider(TDbContext dbContext)
+    /// <param name="dbContextFactory">The <see cref="IDbContextFactory{TDbContext}"/> implementation</param>
+    public EfCoreQueryProviderWithFactory(IDbContextFactory<TDbContext> dbContextFactory)
     {
-        _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+        _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory));
     }
 
     /// <summary>
@@ -75,7 +76,8 @@ internal sealed class EfCoreQueryProvider<TDbContext, TEntity> : IAsyncQueryProv
 
         try
         {
-            var queryable = _dbContext.Set<TEntity>().AsNoTracking();
+            using var db = _dbContextFactory.CreateDbContext();
+            var queryable = db.Set<TEntity>().AsNoTracking();
             var convertedExpression = ChangeQueryableInExpression(expression, queryable);
 
             return queryable.Provider.Execute(convertedExpression) ?? throw new InvalidOperationException("Converted expression returned null");
@@ -95,7 +97,8 @@ internal sealed class EfCoreQueryProvider<TDbContext, TEntity> : IAsyncQueryProv
 
         try
         {
-            var queryable = _dbContext.Set<TEntity>().AsNoTracking();
+            using var db = _dbContextFactory.CreateDbContext();
+            var queryable = db.Set<TEntity>().AsNoTracking();
             var convertedExpression = ChangeQueryableInExpression(expression, queryable);
 
             return queryable.Provider.Execute<TResult>(convertedExpression);
@@ -126,7 +129,8 @@ internal sealed class EfCoreQueryProvider<TDbContext, TEntity> : IAsyncQueryProv
     /// </summary>
     public IEnumerator<T> GetEnumerator<T>(Expression expression)
     {
-        var queryable = _dbContext.Set<TEntity>().AsNoTracking();
+        using var db = _dbContextFactory.CreateDbContext();
+        var queryable = db.Set<TEntity>().AsNoTracking();
         var convertedExpression = ChangeQueryableInExpression(expression, queryable);
 
         foreach (var obj in queryable.Provider.Execute<IEnumerable<T>>(convertedExpression))
@@ -140,7 +144,8 @@ internal sealed class EfCoreQueryProvider<TDbContext, TEntity> : IAsyncQueryProv
     /// </summary>
     public IEnumerator GetEnumerator(Expression expression)
     {
-        var queryable = _dbContext.Set<TEntity>().AsNoTracking();
+        using var db = _dbContextFactory.CreateDbContext();
+        var queryable = db.Set<TEntity>().AsNoTracking();
         var convertedExpression = ChangeQueryableInExpression(expression, queryable);
 
         foreach (var obj in queryable.Provider.Execute<IEnumerable>(convertedExpression).Cast<object>())

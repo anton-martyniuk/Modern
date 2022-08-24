@@ -587,8 +587,6 @@ public class ModernEfCoreRepositoryWithFactory<TDbContext, TEntity, TId> : IMode
         }
     }
 
-    // TODO: AsQueryable works only in NON async mode!
-
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.AsQueryable"/>
     /// </summary>
@@ -596,7 +594,7 @@ public class ModernEfCoreRepositoryWithFactory<TDbContext, TEntity, TId> : IMode
     {
         try
         {
-            return new EfCoreQueryable<TEntity>(new EfCoreQueryProvider<TDbContext, TEntity>(DbContextFactory));
+            return new EfCoreQueryable<TEntity>(new EfCoreQueryProviderWithFactory<TDbContext, TEntity>(DbContextFactory));
         }
         catch (Exception ex)
         {
