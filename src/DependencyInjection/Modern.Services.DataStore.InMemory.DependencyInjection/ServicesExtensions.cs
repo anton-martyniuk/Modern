@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using Modern.Extensions.Microsoft.DependencyInjection.Models;
+using Modern.Services.DataStore;
+using Modern.Services.DataStore.Abstractions;
 using Modern.Services.DataStore.InMemory;
 using Modern.Services.DataStore.InMemory.Abstractions;
 using Modern.Services.DataStore.InMemory.Abstractions.Cache;
@@ -26,13 +28,17 @@ public static class ServicesExtensions
 
         foreach (var c in options.Services)
         {
-            var serviceInterfaceType = typeof(IModernInMemoryService<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
-            var serviceImplementationType = typeof(ModernInMemoryService<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
+            var interfaceType = typeof(IModernService<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
+            var implementationType = typeof(ModernService<,,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType, c.RepositoryType);
+
+            var inMemoryServiceInterfaceType = typeof(IModernInMemoryService<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
+            var inMemoryServiceImplementationType = typeof(ModernInMemoryService<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
 
             var cacheInterfaceType = typeof(IModernServiceCache<,>).MakeGenericType(c.EntityDtoType, c.EntityIdType);
             var cacheImplementationType = typeof(ModernInMemoryServiceCache<,>).MakeGenericType(c.EntityDtoType, c.EntityIdType);
 
-            builder.Services.TryAdd(new ServiceDescriptor(serviceInterfaceType, serviceImplementationType, c.Lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(interfaceType, implementationType, c.Lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(inMemoryServiceInterfaceType, inMemoryServiceImplementationType, c.Lifetime));
             builder.Services.TryAdd(new ServiceDescriptor(cacheInterfaceType, cacheImplementationType, ServiceLifetime.Singleton));
         }
 
