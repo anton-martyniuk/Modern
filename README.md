@@ -1,7 +1,7 @@
 # Modern
 
 ## What is Modern?
-Modern is a set of modern .NET tools for fast and efficient development of common backend tasks.
+Modern is a set of modern .NET tools :hammer: :wrench: for fast and efficient development of common backend tasks.
 It allows to create a product ready applications with just a configuration and set of model classes.
 Modern tool are flexible, easily changeable and extendable.\
 Modern includes the following components:
@@ -46,31 +46,31 @@ Any of these components can be used separately.
 As a result a production ready API will be created:
 ```
 GET
-/airplanes/get/{id}
+/Airplanes/get/{id}
 
 GET
-/airplanes/get
+/Airplanes/get
 
 POST
-/airplanes/create
+/Airplanes/create
 
 POST
-/airplanes/create-many
+/Airplanes/create-many
 
 PUT
-/airplanes/update/{id}
+/Airplanes/update/{id}
 
 PUT
-/airplanes/update-many
+/Airplanes/update-many
 
 PATCH
-/airplanes/patch/{id}
+/Airplanes/patch/{id}
 
 DELETE
-/airplanes/delete/{id}
+/Airplanes/delete/{id}
 
 DELETE
-/airplanes/delete-many
+/Airplanes/delete-many
 ```
 
 ## List of Modern components
@@ -79,18 +79,20 @@ DELETE
 * [Repositories for NoSQL databases](#repositories-for-no-sql-databases)
 * [Services](#services)
 * [Services with caching](#services-with-caching)
-* [In Memory Services](#in-memory-services)
+* [Services In Memory](#services-in-memory)
 * [CQRS](#cqrs)
 * [CQRS with caching](#cqrs-with-caching)
-* [CQRS In Memory](#in-memory-cqrs)
+* [CQRS In Memory](#cqrs-in-memory)
 * [GraphQL](#graphql)
-* [GraphQL In Memory](#in-memory-graphql)
+* [GraphQL In Memory](#graphql-in-memory)
 * [Controllers](#controllers)
-* [Controllers In Memory](#in-memory-controllers)
+* [Controllers In Memory](#controllers-in-memory)
 * [OData Controllers](#odata-controllers)
-* [OData Controllers In Memory](#in-memory-odata-controllers)
+* [OData Controllers In Memory](#odata-controllers-in-memory)
 
 ## Roadmap
+
+:arrow_right: :date:
 
 The following features will be implemented in the next releases:
 * Github Wiki docs
@@ -115,7 +117,7 @@ builder.Services
 ```
 Specify the type of EF Core DbContext, Dbo entity model and primary key.
 `useDbFactory` parameter indicates whether repository with DbContextFactory should be used. The default value is `false`.\
-> Use this parameter if you plan to inherit from this generic repository and extend or change its functionality.\
+> :information_source: Use this parameter if you plan to inherit from this generic repository and extend or change its functionality.\
 When using `DbContextFactory` every repository creates and closes a database connection in each method.\
 When NOT using `DbContextFactory` repository shares the same database connection during its lifetime.
 
@@ -225,7 +227,7 @@ Service requires one of modern repositories to be registered.\
 When using **InMemoryCache** modify the CacheSettings of type `MemoryCacheEntryOptions` to specify the cache expiration time.\
 When using **RedisCache** modify the `RedisConfiguration` of `StackExchange.Redis` package and `RedisCacheSettings` expiration time.
 
-## In Memory Services
+## Services In Memory
 Modern generic in memory services use Modern generic repositories and in memory cache to perform CRUD operations.
 In Memory Services holds all the data in cache and performs filtering in the memory. While CachedService only use cache for the items it retrieves frequently.
 To use **In Memory Service** install the `Modern.Services.DataStore.InMemory.DependencyInjection` Nuget package and register it within Modern builder in DI:
@@ -296,3 +298,88 @@ Specify the type of Dto, dbo entity models, primary key and modern repository.\
 CQRS requires one of modern repositories to be registered.\
 When using **InMemoryCache** modify the CacheSettings of type `MemoryCacheEntryOptions` to specify the cache expiration time.\
 When using **RedisCache** modify the `RedisConfiguration` of `StackExchange.Redis` package and `RedisCacheSettings` expiration time.
+
+## Controllers
+Modern generic controllers use Modern generic services to perform CRUD operations.
+To use **Controller** install the `Modern.Controllers.DataStore.DependencyInjection` Nuget package and register it within Modern builder in DI:
+```csharp
+builder.Services
+    .AddModern()
+    .AddControllers(options =>
+    {
+        options.AddController<CreateAirplaneRequest, UpdateAirplaneRequest, AirplaneDto, AirplaneDbo, long>();
+    });
+```
+Specify the type of create and update requests, dto entity model and primary key.\
+Controller requires one of modern services to be registered: regular one or with caching.
+
+## Controllers In Memory
+Modern generic controllers use Modern generic services to perform CRUD operations.
+To use **In Memory Controller** install the `Modern.Controllers.DataStore.InMemory.DependencyInjection` Nuget package and register it within Modern builder in DI:
+```csharp
+builder.Services
+    .AddModern()
+    .AddInMemoryControllers(options =>
+    {
+        options.AddController<CreateAirplaneRequest, UpdateAirplaneRequest, AirplaneDto, AirplaneDbo, long>();
+    });
+```
+Specify the type of create and update requests, dto entity model and primary key.\
+Controller requires a modern in memory service to be registered.
+
+## OData Controllers
+Modern generic OData controllers use Modern generic repositories to perform OData queries.
+To use **OData Controller** install the `Modern.Controllers.DataStore.OData.DependencyInjection` Nuget package and register it within Modern builder in DI:
+```csharp
+builder.Services
+    .AddModern()
+    .AddODataControllers(options =>
+    {
+        options.AddController<AirplaneDbo, long>();
+    });
+```
+Specify the type of dto entity model and primary key.\
+OData Controller requires one of modern repositories to be registered.
+
+Also register OData in the DI:
+```csharp
+builder.Services.AddControllers(options =>
+{
+})
+//..
+.AddOData(opt =>
+{
+    // Adjust settings as appropriate
+    opt.AddRouteComponents("api/odata", GetEdmModel());
+    opt.Select().Filter().Count().SkipToken().OrderBy().Expand().SetMaxTop(1000);
+    opt.TimeZone = TimeZoneInfo.Utc;
+});
+
+IEdmModel GetEdmModel()
+{
+    // Adjust settings as appropriate
+    var builder = new ODataConventionModelBuilder();
+    builder.EnableLowerCamelCase();
+
+    // Register your OData models here. Name of the EntitySet should correspond to the name of OData controller
+    builder.EntitySet<AirplaneDbo>("airplanes");
+    builder.EntityType<AirplaneDbo>();
+
+    return builder.GetEdmModel();
+}
+```
+
+## OData Controllers In Memory
+Modern generic OData controllers use Modern generic repositories to perform OData queries.
+To use **In Memory OData Controller** install the `Modern.Controllers.DataStore.InMemory.OData.DependencyInjection` Nuget package and register it within Modern builder in DI:
+```csharp
+builder.Services
+    .AddModern()
+    .AddInMemoryODataControllers(options =>
+    {
+        options.AddController<AirplaneDbo, long>();
+    });
+```
+Specify the type of dto entity model and primary key.\
+OData Controller requires one of modern repositories to be registered.\
+Remember to configure OData in DI as mentioned in see [OData Controllers](#odata-controllers)

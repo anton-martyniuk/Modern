@@ -16,9 +16,9 @@ public static class ServicesExtensions
     /// <param name="builder">Modern services builder</param>
     /// <param name="configure">Controllers configure delegate</param>
     /// <returns>IServiceCollection</returns>
-    public static ModernServicesBuilder AddInMemoryODataControllers(this ModernServicesBuilder builder, Action<ModernControllersOptions> configure)
+    public static ModernServicesBuilder AddInMemoryODataControllers(this ModernServicesBuilder builder, Action<ModernODataControllersOptions> configure)
     {
-        var options = new ModernControllersOptions();
+        var options = new ModernODataControllersOptions();
         configure(options);
 
         builder.Services.AddMvc().AddControllersAsServices();

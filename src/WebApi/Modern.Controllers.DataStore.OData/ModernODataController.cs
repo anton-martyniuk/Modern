@@ -10,6 +10,7 @@ namespace Modern.Controllers.DataStore.OData;
 /// </summary>
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
+[Route("api/odata/[controller]")]
 public class ModernODataController<TEntityDbo, TId> : ODataController
     where TEntityDbo : class
     where TId : IEquatable<TId>

@@ -4,9 +4,9 @@
 namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
-/// Represents a modern controllers options for registering in DI
+/// Represents a modern odata controllers options for registering in DI
 /// </summary>
-public class ModernControllersOptions
+public class ModernODataControllersOptions
 {
     /// <summary>
     /// Collection of modern controllers specifications
@@ -21,17 +21,14 @@ public class ModernControllersOptions
     /// <summary>
     /// Adds controller
     /// </summary>
-    /// <typeparam name="TEntityDto">The type of entity returned from the controller</typeparam>
     /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
-    public void AddController<TEntityDto, TEntityDbo, TId>()
-        where TEntityDto : class
+    public void AddController<TEntityDbo, TId>()
         where TEntityDbo : class
         where TId : IEquatable<TId>
     {
         var configuration = new ModernControllerSpecification
         {
-            EntityDtoType = typeof(TEntityDto),
             EntityDboType = typeof(TEntityDbo),
             EntityIdType = typeof(TId)
         };
@@ -42,13 +39,13 @@ public class ModernControllersOptions
     /// <summary>
     /// Adds controller
     /// </summary>
-    /// <typeparam name="TServiceImplementation">The type of concrete controller implementation</typeparam>
-    public void AddController<TServiceImplementation>()
-        where TServiceImplementation : class
+    /// <typeparam name="TControllerImplementation">The type of concrete controller implementation</typeparam>
+    public void AddController<TControllerImplementation>()
+        where TControllerImplementation : class
     {
         var configuration = new ModernControllerConcreteSpecification
         {
-            ImplementationType = typeof(TServiceImplementation)
+            ImplementationType = typeof(TControllerImplementation)
         };
 
         ConcreteControllers.Add(configuration);

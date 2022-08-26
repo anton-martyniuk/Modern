@@ -18,6 +18,7 @@ namespace Modern.Controllers.CQRS.DataStore;
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
+[Route("api/[controller]")]
 public class ModernCqrsController<TCreateRequest, TUpdateRequest, TEntityDto, TEntityDbo, TId> : ControllerBase
     where TCreateRequest : class
     where TUpdateRequest : class
