@@ -6,10 +6,27 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+		<Version>1.0.0-alpha1</Version>
+		<Authors>Anton Martyniuk</Authors>
+		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
+		<Title>Modern Extensions for Microsoft Dependency Injection</Title>
+		<Description>Modern Extensions for Microsoft Dependency Injection that add ModernServicesBuilder into DI. This builder is a building block for all Modern components</Description>
+		<PackageTags>modern;extensions;dependencyinjection</PackageTags>
+		<RepositoryUrl>https://github.com/anton-martyniuk/modern</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
 	</ItemGroup>
+
+	<Target Name="PostPackNugetDeploy" AfterTargets="Pack" Condition="'$(Configuration)'=='Release'">
+		<Exec Command="dotnet nuget push -s nuget.org &quot;$(ProjectDir)bin\$(Configuration)\$(PackageId).$(PackageVersion).nupkg&quot;" />
+	</Target>
 
 </Project>

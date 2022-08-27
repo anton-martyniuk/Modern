@@ -6,6 +6,20 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+		<Version>1.0.0-alpha1</Version>
+		<Authors>Anton Martyniuk</Authors>
+		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
+		<Title>Modern In Memory Services Extensions for Microsoft Dependency Injection</Title>
+		<Description>A generic in memory service implementation for CRUD and Query operations in a data store</Description>
+		<PackageTags>modern;service;generic;memory;crud;query</PackageTags>
+		<RepositoryUrl>https://github.com/anton-martyniuk/modern</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -18,5 +32,16 @@
 		<ProjectReference Include="..\Definitions\Modern.Services.DependencyInjection.Definitions\Modern.Services.DependencyInjection.Definitions.csproj" />
 		<ProjectReference Include="..\Modern.Extensions.Microsoft.DependencyInjection\Modern.Extensions.Microsoft.DependencyInjection.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<Target Name="PostPackNugetDeploy" AfterTargets="Pack" Condition="'$(Configuration)'=='Release'">
+		<Exec Command="dotnet nuget push -s nuget.org &quot;$(ProjectDir)bin\$(Configuration)\$(PackageId).$(PackageVersion).nupkg&quot;" />
+	</Target>
 
 </Project>

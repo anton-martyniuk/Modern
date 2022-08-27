@@ -6,6 +6,19 @@
 		<Nullable>enable</Nullable>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+		<Version>1.0.0-alpha1</Version>
+		<Authors>Anton Martyniuk</Authors>
+		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
+		<Title>Modern Controllers</Title>
+		<Description>A generic controller for CRUD and Query operations in a data store</Description>
+		<PackageTags>modern;controller;generic;crud;query;aspnetcore</PackageTags>
+		<RepositoryUrl>https://github.com/anton-martyniuk/modern</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -18,7 +31,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Services\Modern.Services.DataStore.Abstractions\Modern.Services.DataStore.Abstractions.csproj" />
+		<ProjectReference Include="..\..\Services\Modern.Services.DataStore.Abstractions\Modern.Services.DataStore.Abstractions.csproj" />
 	</ItemGroup>
+
+	<Target Name="PostPackNugetDeploy" AfterTargets="Pack" Condition="'$(Configuration)'=='Release'">
+		<Exec Command="dotnet nuget push -s nuget.org &quot;$(ProjectDir)bin\$(Configuration)\$(PackageId).$(PackageVersion).nupkg&quot;" />
+	</Target>
 
 </Project>

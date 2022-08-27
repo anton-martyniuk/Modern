@@ -6,6 +6,19 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+		<Version>1.0.0-alpha1</Version>
+		<Authors>Anton Martyniuk</Authors>
+		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
+		<Title>Modern CQRS Commands and Queries</Title>
+		<Description>A generic CQRS Commands and Queries implementation for CRUD and Query operations in a data store</Description>
+		<PackageTags>modern;cqrs;generic;crud;query;commands;queries</PackageTags>
+		<RepositoryUrl>https://github.com/anton-martyniuk/modern</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -16,8 +29,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Mapster" Version="7.3.0" />
-	  <PackageReference Include="MediatR" Version="10.0.1" />
-	  <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+		<PackageReference Include="Mapster" Version="7.3.0" />
+		<PackageReference Include="MediatR" Version="10.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
 	</ItemGroup>
+
+	<Target Name="PostPackNugetDeploy" AfterTargets="Pack" Condition="'$(Configuration)'=='Release'">
+		<Exec Command="dotnet nuget push -s nuget.org &quot;$(ProjectDir)bin\$(Configuration)\$(PackageId).$(PackageVersion).nupkg&quot;" />
+	</Target>
 </Project>

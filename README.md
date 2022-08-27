@@ -83,6 +83,7 @@ As a result a production ready API will be created:
 * [GraphQL](#graphql)
 * [GraphQL In Memory](#graphql-in-memory)
 * [Controllers](#controllers)
+* [Controllers CQRS](#controllers-cqrs)
 * [Controllers In Memory](#controllers-in-memory)
 * [OData Controllers](#odata-controllers)
 * [OData Controllers In Memory](#odata-controllers-in-memory)
@@ -99,7 +100,7 @@ The following features will be implemented in the next releases:
 * Upgrade to .NET 7 (after official release in November)
 
 ## Repositories for SQL databases :pencil:
-Modern generic repositories are built on top of 2 most popular ORM frameworks: **EF Core** and **Dapper**.
+Modern generic repositories for SQL databases are built on top of 2 most popular ORM frameworks: **EF Core** and **Dapper**.
 To use **EF Core** repository install the `Modern.Repositories.EFCore.DependencyInjection` Nuget package and register it within Modern builder in DI:
 ```csharp
 builder.Services
@@ -116,7 +117,7 @@ When using `DbContextFactory` every repository creates and closes a database con
 When NOT using `DbContextFactory` repository shares the same database connection during its lifetime.
 
 > :warning: It is not recommended to use `useDbFactory = false` when repository is registered as SingleInstance,
-> otherwise a single database connection will persists during the whole application lifetime
+> otherwise a single database connection will persist during the whole application lifetime
 
 To use **Dapper** repository install the `Modern.Repositories.Dapper.DependencyInjection` Nuget package and register it within Modern builder in DI:
 ```csharp
@@ -151,7 +152,7 @@ public class AirplaneDapperMapping : DapperEntityMapping<AirplaneDbo>
 ```
 
 ## Repositories for No SQL databases :pencil:
-Modern generic repositories are built on top one of the most popular NoSQL databases: **MongoDB**.
+Modern generic repositories for No SQL databases are built on top one of the most popular NoSQL databases: **MongoDB**.
 To use **MongoDB** repository install the `Modern.Repositories.MongoDB.DependencyInjection` Nuget package and register it within Modern builder in DI:
 ```csharp
 builder.Services
@@ -177,7 +178,7 @@ builder.Services
         options.AddService<AirplaneDto, AirplaneDbo, long, IModernRepository<AirplaneDbo, long>>();
     });
 ```
-Specify the type of Dto, dbo entity models, primary key and modern repository.\
+Specify the type of Dto and dbo entity models, primary key and modern repository.\
 Service requires one of modern repositories to be registered.
 
 ## Services with caching :pencil:
@@ -216,10 +217,10 @@ builder.Services
     });
 ```
 
-When registering service specify the type of Dto, dbo entity models, primary key and modern repository.\
+When registering service specify the type of Dto and dbo entity models, primary key and modern repository.\
 Service requires one of modern repositories to be registered.\
 When using **InMemoryCache** modify the CacheSettings of type `MemoryCacheEntryOptions` to specify the cache expiration time.\
-When using **RedisCache** modify the `RedisConfiguration` of `StackExchange.Redis` package and `RedisCacheSettings` expiration time.
+When using **RedisCache** modify the `RedisConfiguration` of `StackExchange.Redis` package and expiration time in `RedisCacheSettings`.
 
 ## Services In Memory :pencil:
 Modern generic in memory services use Modern generic repositories and in memory cache to perform CRUD operations.
@@ -233,9 +234,9 @@ builder.Services
         options.AddService<AirplaneDbo, AirplaneDbo, long, IModernRepository<AirplaneDbo, long>>();
     });
 ```
-Specify the type of Dto, dbo entity models, primary key and modern repository.\
+Specify the type of Dto and dbo entity models, primary key and modern repository.\
 Service requires one of modern repositories to be registered.\
-The cache is registered under the hood and there is no Redis support as Redis doesn't support LINQ expressions on all the items.
+The cache is registered under the hood and there is no Redis support as Redis doesn't support LINQ expressions on its items.
 The cache can be changed to the custom one if needed.
 
 ## CQRS :pencil:
@@ -249,7 +250,7 @@ builder.Services
         options.AddQueriesCommandsAndHandlersFor<AirplaneDto, AirplaneDbo, long, IModernRepository<AirplaneDbo, long>>();
     });
 ```
-Specify the type of Dto, dbo entity models, primary key and modern repository.\
+Specify the type of Dto and dbo entity models, primary key and modern repository.\
 CQRS requires one of modern repositories to be registered.
 
 ## CQRS with caching :pencil:
@@ -288,7 +289,7 @@ builder.Services
     });
 ```
 
-Specify the type of Dto, dbo entity models, primary key and modern repository.\
+Specify the type of Dto and dbo entity models, primary key and modern repository.\
 CQRS requires one of modern repositories to be registered.\
 When using **InMemoryCache** modify the CacheSettings of type `MemoryCacheEntryOptions` to specify the cache expiration time.\
 When using **RedisCache** modify the `RedisConfiguration` of `StackExchange.Redis` package and `RedisCacheSettings` expiration time.
@@ -306,6 +307,20 @@ builder.Services
 ```
 Specify the type of create and update requests, dto entity model and primary key.\
 Controller requires one of modern services to be registered: regular one or with caching.
+
+## Controllers CQRS :pencil:
+Modern generic CQRS controllers use Modern CQRS Commands and Queries to perform CRUD operations.
+To use **CQRS Controller** install the `Modern.Controllers.CQRS.DataStore.DependencyInjection` Nuget package and register it within Modern builder in DI:
+```csharp
+builder.Services
+    .AddModern()
+    .AddCqrsControllers(options =>
+    {
+        options.AddController<CreateAirplaneRequest, UpdateAirplaneRequest, AirplaneDto, AirplaneDbo, long>();
+    });
+```
+Specify the type of create and update requests, dto entity model and primary key.\
+Controller requires CQRS Commands and Queries to be registered: regular one or with caching.
 
 ## Controllers In Memory :pencil:
 Modern generic controllers use Modern generic services to perform CRUD operations.
