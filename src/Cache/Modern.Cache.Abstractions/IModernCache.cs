@@ -3,7 +3,7 @@
 namespace Modern.Cache.Abstractions;
 
 /// <summary>
-/// The distributed cache definition
+/// The modern cache definition
 /// </summary>
 /// <typeparam name="TEntity">The type of entity in the cache</typeparam>
 /// <typeparam name="TId">The Entity identifier. Id must be unique</typeparam>
