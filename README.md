@@ -38,7 +38,7 @@ builder.Services
     })
     .AddControllers(options =>
     {
-        options.AddController<CreateAirplaneRequest, UpdateAirplaneRequest, AirplaneDto, AirplaneDbo, long>();
+        options.AddController<CreateRequest, UpdateRequest, AirplaneDto, AirplaneDbo, long>();
     });
 ```
 As a result a production ready API will be created:
@@ -72,6 +72,7 @@ As a result a production ready API will be created:
 
 ## List of Modern components :bookmark_tabs:
 
+* [Repositories](#repositories)
 * [Repositories for SQL databases](#repositories-for-sql-databases)
 * [Repositories for NoSQL databases](#repositories-for-no-sql-databases)
 * [Services](#services)
@@ -98,6 +99,53 @@ The following features will be implemented in the next releases:
 * MinimalsApis using FastEndpoints
 * Reflection improvements
 * Upgrade to .NET 7 (after official release in November)
+
+## Repositories
+Modern generic repository is divided into 2 interfaces: `IModernQueryRepository<TEntity, TId>` and `IModernCrudRepository<TEntity, TId>`.
+`IModernQueryRepository` has the following methods:
+```csharp
+Task<TEntity> GetByIdAsync(TId id, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
+
+Task<TEntity?> TryGetByIdAsync(TId id, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
+
+Task<IEnumerable<TEntity>> GetAllAsync(EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
+
+Task<long> CountAsync(CancellationToken cancellationToken = default);
+
+Task<long> CountAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null,
+    CancellationToken cancellationToken = default);
+
+Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
+
+Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
+
+Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
+
+Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
+
+Task<PagedResult<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, int pageNumber, int pageSize, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
+
+IQueryable<TEntity> AsQueryable();
+```
+
+`IModernCrudRepository` has the following methods:
+```csharp
+Task<TEntity> CreateAsync(TEntity entity, CancellationToken cancellationToken = default);
+
+Task<List<TEntity>> CreateAsync(List<TEntity> entities, CancellationToken cancellationToken = default);
+
+Task<TEntity> UpdateAsync(TId id, TEntity entity, CancellationToken cancellationToken = default);
+
+Task<List<TEntity>> UpdateAsync(List<TEntity> entities, CancellationToken cancellationToken = default);
+
+Task<TEntity> UpdateAsync(TId id, Action<TEntity> update, CancellationToken cancellationToken = default);
+
+Task<bool> DeleteAsync(TId id, CancellationToken cancellationToken = default);
+
+Task<bool> DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default);
+
+Task<TEntity> DeleteAndReturnAsync(TId id, CancellationToken cancellationToken = default);
+```
 
 ## Repositories for SQL databases :pencil:
 Modern generic repositories for SQL databases are built on top of 2 most popular ORM frameworks: **EF Core** and **Dapper**.
@@ -168,6 +216,52 @@ Provide the connection string in `ConfigureMongoDbClient` method.
 You can also use the second parameter `updateSettings` and configure the custom parameters in a `MongoClientSettings` class of MongoDB Driver.
 
 ## Services :pencil:
+Modern generic service is divided into 2 interfaces: `IModernQueryService<TEntityDto, TEntityDbo, TId>` and `IModernCrudService<TEntityDto, TEntityDbo, TId>`.
+`IModernQueryService` has the following methods:
+```csharp
+Task<TEntityDto> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
+
+Task<TEntityDto?> TryGetByIdAsync(TId id, CancellationToken cancellationToken = default);
+
+Task<List<TEntityDto>> GetAllAsync(CancellationToken cancellationToken = default);
+
+Task<long> CountAsync(CancellationToken cancellationToken = default);
+
+Task<long> CountAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default);
+
+Task<bool> ExistsAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default);
+
+Task<TEntityDto?> FirstOrDefaultAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default);
+
+Task<TEntityDto?> SingleOrDefaultAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default);
+
+Task<List<TEntityDto>> WhereAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default);
+
+Task<PagedResult<TEntityDto>> WhereAsync(Expression<Func<TEntityDbo, bool>> predicate, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+
+IQueryable<TEntityDbo> AsQueryable();
+```
+
+`IModernCrudService` has the following methods:
+```csharp
+Task<TEntityDto> CreateAsync(TEntityDto entity, CancellationToken cancellationToken = default);
+
+Task<List<TEntityDto>> CreateAsync(List<TEntityDto> entities, CancellationToken cancellationToken = default);
+
+Task<TEntityDto> UpdateAsync(TId id, TEntityDto entity, CancellationToken cancellationToken = default);
+
+Task<List<TEntityDto>> UpdateAsync(List<TEntityDto> entities, CancellationToken cancellationToken = default);
+
+Task<TEntityDto> UpdateAsync(TId id, Action<TEntityDto> update, CancellationToken cancellationToken = default);
+
+Task<bool> DeleteAsync(TId id, CancellationToken cancellationToken = default);
+
+Task<bool> DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default);
+
+Task<TEntityDto> DeleteAndReturnAsync(TId id, CancellationToken cancellationToken = default);
+```
+
+
 Modern generic services use Modern generic repositories to perform CRUD operations.
 To use **Service** install the `Modern.Services.DataStore.DependencyInjection` Nuget package and register it within Modern builder in DI:
 ```csharp
@@ -240,7 +334,50 @@ The cache is registered under the hood and there is no Redis support as Redis do
 The cache can be changed to the custom one if needed.
 
 ## CQRS :pencil:
-Modern CQRS tools consist of Queries and Commands which use Modern generic repositories to perform CRUD operations.
+Modern generic CQRS consist of Commands and Queries.
+CQRS has the following Queries:
+```csharp
+GetAllQuery<TEntityDto, TId>() : IRequest<List<TEntityDto>>
+
+GetByIdQuery<TEntityDto, TId>(TId Id) : IRequest<TEntityDto>
+
+TryGetByIdQuery<TEntityDto, TId>(TId Id) : IRequest<TEntityDto?>
+
+GetCountAllQuery<TEntityDto, TId> : IRequest<long>
+
+GetCountQuery<TEntityDbo, TId>(Expression<Func<TEntityDbo, bool>> Predicate) : IRequest<long>
+
+GetExistsQuery<TEntityDbo, TId>(Expression<Func<TEntityDbo, bool>> Predicate) : IRequest<bool>
+
+GetFirstOrDefaultQuery<TEntityDto, TEntityDbo, TId>(Expression<Func<TEntityDbo, bool>> Predicate) : IRequest<TEntityDto?>
+
+GetSingleOrDefaultQuery<TEntityDto, TEntityDbo, TId>(Expression<Func<TEntityDbo, bool>> Predicate) : IRequest<TEntityDto?>
+
+GetWhereQuery<TEntityDto, TEntityDbo, TId>(Expression<Func<TEntityDbo, bool>> Predicate) : IRequest<List<TEntityDto>>
+
+GetWherePagedQuery<TEntityDto, TEntityDbo, TId> : IRequest<PagedResult<TEntityDto>>
+```
+
+CQRS has the following Commands:
+```csharp
+CreateEntityCommand<TEntityDto>(TEntityDto Entity) : IRequest<TEntityDto>
+
+CreateEntitiesCommand<TEntityDto>(List<TEntityDto> Entities) : IRequest<List<TEntityDto>>
+
+UpdateEntityCommand<TEntityDto, TId>(TId Id, TEntityDto Entity) : IRequest<TEntityDto>
+
+UpdateEntityByActionCommand<TEntityDto, TId>(TId Id, Action<TEntityDto> UpdateAction) : IRequest<TEntityDto>
+
+UpdateEntitiesCommand<TEntityDto>(List<TEntityDto> Entities) : IRequest<List<TEntityDto>>
+
+DeleteEntityCommand<TId>(TId Id) : IRequest<bool>
+
+DeleteEntitiesCommand<TId>(List<TId> Ids) : IRequest<bool>
+
+DeleteAndReturnEntityCommand<TEntityDto, TId>(TId Id) : IRequest<TEntityDto>
+```
+
+Modern generic CQRS consist of Commands and Queries which use Modern generic repositories to perform CRUD operations.
 To use **CQRS** install the `Modern.CQRS.DataStore.DependencyInjection` Nuget package and register it within Modern builder in DI:
 ```csharp
 builder.Services
@@ -254,7 +391,7 @@ Specify the type of Dto and dbo entity models, primary key and modern repository
 CQRS requires one of modern repositories to be registered.
 
 ## CQRS with caching :pencil:
-Modern generic services with caching support use Modern generic repositories and cache to perform CRUD operations.
+Modern generic CQRS Commands and Queries with caching support use Modern generic repositories and cache to perform CRUD operations.
 To use **Service with caching** install the `Modern.Services.DataStore.Cached.DependencyInjection` and `Modern.Cache.InMemory.DependencyInjection` Nuget packages and register them within Modern builder in DI:
 ```csharp
 builder.Services
@@ -295,6 +432,40 @@ When using **InMemoryCache** modify the CacheSettings of type `MemoryCacheEntryO
 When using **RedisCache** modify the `RedisConfiguration` of `StackExchange.Redis` package and `RedisCacheSettings` expiration time.
 
 ## Controllers :pencil:
+Modern generic controller has the following HTTP endpoints:
+```csharp
+[Route("api/[controller]")]
+public class ModernController<TCreateRequest, TUpdateRequest, TEntityDto, TEntityDbo, TId> : ControllerBase
+{
+    [HttpGet("get/{id}")]
+    Task<IActionResult> GetById([Required] TId id)
+    
+    [HttpGet("get")]
+    Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    
+    [HttpPost("create")]
+    Task<IActionResult> Create([FromBody, Required] TCreateRequest request)
+    
+    [HttpPost("create-many")]
+    Task<IActionResult> CreateMany([FromBody, Required] List<TCreateRequest> requests)
+    
+    [HttpPut("update/{id}")]
+    Task<IActionResult> Update([Required] TId id, [FromBody, Required] TUpdateRequest request)
+    
+    [HttpPut("update-many")]
+    Task<IActionResult> UpdateMany([FromBody, Required] List<TUpdateRequest> requests)
+    
+    [HttpPatch("patch/{id}")]
+    Task<IActionResult> Patch([Required] TId id, [FromBody] JsonPatchDocument<TEntityDto> patch)
+    
+    [HttpDelete("delete/{id}")]
+    Task<IActionResult> Delete([Required] TId id)
+    
+    [HttpDelete("delete-many")]
+    Task<IActionResult> DeleteMany([Required] List<TId> ids)
+}
+```
+
 Modern generic controllers use Modern generic services to perform CRUD operations.
 To use **Controller** install the `Modern.Controllers.DataStore.DependencyInjection` Nuget package and register it within Modern builder in DI:
 ```csharp
@@ -302,7 +473,7 @@ builder.Services
     .AddModern()
     .AddControllers(options =>
     {
-        options.AddController<CreateAirplaneRequest, UpdateAirplaneRequest, AirplaneDto, AirplaneDbo, long>();
+        options.AddController<CreateRequest, UpdateRequest, AirplaneDto, AirplaneDbo, long>();
     });
 ```
 Specify the type of create and update requests, dto entity model and primary key.\
@@ -316,7 +487,7 @@ builder.Services
     .AddModern()
     .AddCqrsControllers(options =>
     {
-        options.AddController<CreateAirplaneRequest, UpdateAirplaneRequest, AirplaneDto, AirplaneDbo, long>();
+        options.AddController<CreateRequest, UpdateRequest, AirplaneDto, AirplaneDbo, long>();
     });
 ```
 Specify the type of create and update requests, dto entity model and primary key.\
@@ -330,7 +501,7 @@ builder.Services
     .AddModern()
     .AddInMemoryControllers(options =>
     {
-        options.AddController<CreateAirplaneRequest, UpdateAirplaneRequest, AirplaneDto, AirplaneDbo, long>();
+        options.AddController<CreateRequest, UpdateRequest, AirplaneDto, AirplaneDbo, long>();
     });
 ```
 Specify the type of create and update requests, dto entity model and primary key.\
