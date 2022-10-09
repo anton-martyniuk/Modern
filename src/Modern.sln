@@ -121,7 +121,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Repositories.Dapper.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "IntegrationTests", "{3E840BA5-F9D7-403F-A6AF-9A0F4011D2E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Repositories.EFCore.Tests.Integration", "..\tests\IntegrationTests\Modern.Repositories.EFCore.Tests.Integration\Modern.Repositories.EFCore.Tests.Integration.csproj", "{0A51FDF7-5C3B-43C9-8981-84AB0ACB7582}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Repositories.EFCore.Tests.Integration", "..\tests\IntegrationTests\Modern.Repositories.EFCore.Tests.Integration\Modern.Repositories.EFCore.Tests.Integration.csproj", "{0A51FDF7-5C3B-43C9-8981-84AB0ACB7582}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Repositories.MongoDB.Tests.Integration", "..\tests\IntegrationTests\Modern.Repositories.MongoDB.Tests.Integration\Modern.Repositories.MongoDB.Tests.Integration.csproj", "{EC9D0DB4-BB26-4916-936F-CF9FFF47C22C}"
 EndProject
@@ -142,6 +142,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Services.DataStore.InMemory.Tests.Unit", "..\tests\UnitTests\Modern.Services.DataStore.InMemory.Tests.Unit\Modern.Services.DataStore.InMemory.Tests.Unit.csproj", "{99C7828B-5D54-46B2-91BD-B362BDF30D69}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Services.DataStore.Tests.Unit", "..\tests\UnitTests\Modern.Services.DataStore.Tests.Unit\Modern.Services.DataStore.Tests.Unit.csproj", "{AAF6D85C-FF55-4D60-8CE0-CC7B0F653A20}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Repositories.LiteDB", "Repositories\Modern.Repositories.LiteDB\Modern.Repositories.LiteDB.csproj", "{5380EF0F-CBAC-4859-BA47-1510E55C124A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modern.Repositories.LiteDB.DependencyInjection", "DependencyInjection\Modern.Repositories.LiteDB.DependencyInjection\Modern.Repositories.LiteDB.DependencyInjection.csproj", "{61DDFA28-FC57-4374-92CD-AD5B396FA955}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -381,6 +385,14 @@ Global
 		{AAF6D85C-FF55-4D60-8CE0-CC7B0F653A20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAF6D85C-FF55-4D60-8CE0-CC7B0F653A20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAF6D85C-FF55-4D60-8CE0-CC7B0F653A20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5380EF0F-CBAC-4859-BA47-1510E55C124A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5380EF0F-CBAC-4859-BA47-1510E55C124A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5380EF0F-CBAC-4859-BA47-1510E55C124A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5380EF0F-CBAC-4859-BA47-1510E55C124A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61DDFA28-FC57-4374-92CD-AD5B396FA955}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61DDFA28-FC57-4374-92CD-AD5B396FA955}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61DDFA28-FC57-4374-92CD-AD5B396FA955}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61DDFA28-FC57-4374-92CD-AD5B396FA955}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -446,6 +458,8 @@ Global
 		{40D3A873-E4EF-4467-A608-BE62FDF40706} = {8A142BC6-54A0-4FF7-AF50-15D95629DD61}
 		{99C7828B-5D54-46B2-91BD-B362BDF30D69} = {8A142BC6-54A0-4FF7-AF50-15D95629DD61}
 		{AAF6D85C-FF55-4D60-8CE0-CC7B0F653A20} = {8A142BC6-54A0-4FF7-AF50-15D95629DD61}
+		{5380EF0F-CBAC-4859-BA47-1510E55C124A} = {79927B92-F532-469C-9E86-76E84C16584E}
+		{61DDFA28-FC57-4374-92CD-AD5B396FA955} = {642097AE-8D89-4BD6-BB97-3490C5E0234D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94D244EE-259E-401A-A55F-7D833CA4DC5E}

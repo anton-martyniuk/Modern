@@ -6,11 +6,9 @@ namespace Modern.Services.DataStore.Abstractions;
 /// The generic service definition for CRUD operations
 /// </summary>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
-/// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of the entity's identifier (mainly primary key)</typeparam>
-public interface IModernCrudService<TEntityDto, out TEntityDbo, TId>
+public interface IModernCrudService<TEntityDto, TId>
     where TEntityDto : class
-    where TEntityDbo : class
     where TId : IEquatable<TId>
 {
     /// <summary>

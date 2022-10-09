@@ -148,7 +148,10 @@ Task<TEntity> DeleteAndReturnAsync(TId id, CancellationToken cancellationToken =
 ```
 
 ## Repositories for SQL databases :pencil:
-Modern generic repositories for SQL databases are built on top of 2 most popular ORM frameworks: **EF Core** and **Dapper**.
+Modern generic repositories for SQL databases are built on top of 2 the following ORM frameworks:
+* **EF Core**
+* **Dapper**
+
 To use **EF Core** repository install the `Modern.Repositories.EFCore.DependencyInjection` Nuget package and register it within Modern builder in DI:
 ```csharp
 builder.Services
@@ -200,7 +203,10 @@ public class AirplaneDapperMapping : DapperEntityMapping<AirplaneDbo>
 ```
 
 ## Repositories for No SQL databases :pencil:
-Modern generic repositories for No SQL databases are built on top one of the most popular NoSQL databases: **MongoDB**.
+Modern generic repositories for No SQL databases are built on of the following NoSQL databases:
+* **MongoDB**
+* **LiteDb** (embedded single-file NoSQL database)
+
 To use **MongoDB** repository install the `Modern.Repositories.MongoDB.DependencyInjection` Nuget package and register it within Modern builder in DI:
 ```csharp
 builder.Services
@@ -214,6 +220,17 @@ builder.Services
 Specify the type of Dbo entity model and "_id" key.\
 Provide the connection string in `ConfigureMongoDbClient` method.
 You can also use the second parameter `updateSettings` and configure the custom parameters in a `MongoClientSettings` class of MongoDB Driver.
+
+To use **LiteDB** repository install the `Modern.Repositories.LiteDB.DependencyInjection` Nuget package and register it within Modern builder in DI:
+```csharp
+builder.Services
+    .AddModern()
+    .AddRepositoriesLiteDb(options =>
+    {
+        options.AddRepository<AirplaneDbo, string>("connection_string", "collection_name");
+    });
+```
+Specify the type of Dbo entity model and "_id" key.
 
 ## Services :pencil:
 Modern generic service is divided into 2 interfaces: `IModernQueryService<TEntityDto, TEntityDbo, TId>` and `IModernCrudService<TEntityDto, TEntityDbo, TId>`.

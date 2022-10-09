@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection.Extensions;
-using Modern.Controllers.DataStore.InMemory.OData;
+﻿using Modern.Controllers.DataStore.InMemory.OData.DependencyInjection.Features;
 using Modern.Extensions.Microsoft.DependencyInjection.Models;
 
 // ReSharper disable once CheckNamespace
@@ -21,18 +20,9 @@ public static class ServicesExtensions
         var options = new ModernODataControllersOptions();
         configure(options);
 
-        builder.Services.AddMvc().AddControllersAsServices();
-
-        foreach (var c in options.Controllers)
-        {
-            var implementationType = typeof(ModernInMemoryODataController<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
-            builder.Services.TryAdd(new ServiceDescriptor(implementationType, implementationType, ServiceLifetime.Scoped));
-        }
-
-        foreach (var c in options.ConcreteControllers)
-        {
-            builder.Services.TryAdd(new ServiceDescriptor(c.ImplementationType, c.ImplementationType, ServiceLifetime.Scoped));
-        }
+        builder.Services
+            .AddMvc(o => o.Conventions.Add(new GenericControllerRouteConvention()))
+            .ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new GenericTypeControllerFeatureProvider(options)));
 
         return builder;
     }

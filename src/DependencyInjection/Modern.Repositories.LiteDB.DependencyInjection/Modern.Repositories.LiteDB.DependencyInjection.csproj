@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
@@ -10,9 +10,9 @@
 		<Version>1.0.0-alpha1</Version>
 		<Authors>Anton Martyniuk</Authors>
 		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
-		<Title>Modern Controllers Extensions for Microsoft Dependency Injection</Title>
-		<Description>A generic controller for CRUD and Query operations in a data store. Supports cached and non cached services</Description>
-		<PackageTags>modern;controller;generic;crud;query;aspnetcore</PackageTags>
+		<Title>Modern MongoDB Repositories Extensions for Microsoft Dependency Injection</Title>
+		<Description>A generic repository implementation using MongoDB for CRUD and Query operations</Description>
+		<PackageTags>modern;repository;generic;crud;query;mongodb</PackageTags>
 		<RepositoryUrl>https://github.com/anton-martyniuk/modern</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -27,8 +27,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\WebApi\Modern.Controllers.DataStore\Modern.Controllers.DataStore.csproj" />
-		<ProjectReference Include="..\Definitions\Modern.Controllers.DependencyInjection.Definitions\Modern.Controllers.DependencyInjection.Definitions.csproj" />
+		<ProjectReference Include="..\..\Repositories\Modern.Repositories.LiteDB\Modern.Repositories.LiteDB.csproj" />
 		<ProjectReference Include="..\Modern.Extensions.Microsoft.DependencyInjection\Modern.Extensions.Microsoft.DependencyInjection.csproj" />
 	</ItemGroup>
 
