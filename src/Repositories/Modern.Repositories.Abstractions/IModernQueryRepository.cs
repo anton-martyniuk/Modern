@@ -131,7 +131,9 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// Returns <see cref="IQueryable{TEntity}"/> implementation
     /// </summary>
     /// <remarks>
-    /// IMPORTANT: The members of the returned <see cref="IQueryable{TEntity}"/> instance can throw implementation specific exceptions
+    /// IMPORTANT: The members of the returned <see cref="IQueryable{TEntity}"/> instance can throw implementation specific exceptions.<br/>
+    /// AsQueryable supports synchronous and asynchronous operations depending on implementation.<br/>
+    /// Some implementations may not support this operation at all
     /// </remarks>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
     /// <returns>The object typed as <see cref="IQueryable{TEntity}"/></returns>

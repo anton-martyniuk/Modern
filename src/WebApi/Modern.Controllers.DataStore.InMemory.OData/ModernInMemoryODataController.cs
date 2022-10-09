@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
-using Modern.Services.DataStore.InMemory.Abstractions;
+using Modern.Services.DataStore.InMemory.Abstractions.Cache;
 
 namespace Modern.Controllers.DataStore.InMemory.OData;
 
@@ -9,23 +9,21 @@ namespace Modern.Controllers.DataStore.InMemory.OData;
 /// The OData controller for cached service
 /// </summary>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
-/// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
 [Route("api/odata/[controller]")]
-public class ModernInMemoryODataController<TEntityDto, TEntityDbo, TId> : ODataController
+public class ModernInMemoryODataController<TEntityDto, TId> : ODataController
     where TEntityDto : class
-    where TEntityDbo : class
     where TId : IEquatable<TId>
 {
-    private readonly IModernInMemoryService<TEntityDto, TEntityDbo, TId> _service;
+    private readonly IModernServiceCache<TEntityDto, TId> _cache;
 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    /// <param name="service">Cached service</param>
-    protected ModernInMemoryODataController(IModernInMemoryService<TEntityDto, TEntityDbo, TId> service)
+    /// <param name="cache">Cache</param>
+    protected ModernInMemoryODataController(IModernServiceCache<TEntityDto, TId> cache)
     {
-        _service = service;
+        _cache = cache;
     }
 
     /// <summary>
@@ -44,6 +42,6 @@ public class ModernInMemoryODataController<TEntityDto, TEntityDbo, TId> : ODataC
     //[ProducesResponseType(typeof(IEnumerable<TEntity>), (int)HttpStatusCode.OK)] TODO: // create attribute
     public virtual IActionResult Get()
     {
-        return Ok(_service.AsEnumerable());
+        return Ok(_cache.AsEnumerable());
     }
 }

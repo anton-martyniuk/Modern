@@ -16,14 +16,12 @@ namespace Modern.Controllers.CQRS.DataStore;
 /// <typeparam name="TCreateRequest">The type of request that creates an entity</typeparam>
 /// <typeparam name="TUpdateRequest">The type of request that updates an entity</typeparam>
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
-/// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
 [Route("api/[controller]")]
-public class ModernCqrsController<TCreateRequest, TUpdateRequest, TEntityDto, TEntityDbo, TId> : ControllerBase
+public class ModernCqrsController<TCreateRequest, TUpdateRequest, TEntityDto, TId> : ControllerBase
     where TCreateRequest : class
     where TUpdateRequest : class
     where TEntityDto : class
-    where TEntityDbo : class
     where TId : IEquatable<TId>
 {
     private readonly IMediator _mediator;
