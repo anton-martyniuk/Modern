@@ -68,8 +68,8 @@ public class ModernInMemoryCache<TEntity, TId> : IModernCache<TEntity, TId>
         Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
 
         var keys = ids.Select(x => GetKey(x)).ToArray();
-        var entities = keys.Select(x => _cache.Get<TEntity>(x)).Where(x => x is not null);
-        return ValueTask.FromResult(entities.ToList());
+        var entities = keys.Select(x => _cache.Get<TEntity>(x)).Where(x => x is not null).ToList();
+        return ValueTask.FromResult(entities)!;
     }
 
     /// <summary>

@@ -38,7 +38,7 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
     /// </summary>
     /// <param name="dbContext">The <see cref="DbContext"/></param>
     /// <param name="configuration">Repository configuration</param>
-    public ModernEfCoreRepository(TDbContext dbContext, IOptions<EfCoreRepositoryConfiguration?> configuration)
+    public ModernEfCoreRepository(TDbContext dbContext, IOptions<EfCoreRepositoryConfiguration> configuration)
     {
         DbContext = dbContext;
         _configuration = configuration.Value;

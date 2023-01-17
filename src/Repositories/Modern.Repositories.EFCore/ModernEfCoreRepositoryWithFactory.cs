@@ -38,7 +38,7 @@ public class ModernEfCoreRepositoryWithFactory<TDbContext, TEntity, TId> : IMode
     /// </summary>
     /// <param name="dbContextFactory">The <see cref="IDbContextFactory{TDbContext}"/> implementation</param>
     /// <param name="configuration">Repository configuration</param>
-    public ModernEfCoreRepositoryWithFactory(IDbContextFactory<TDbContext> dbContextFactory, IOptions<EfCoreRepositoryConfiguration?> configuration)
+    public ModernEfCoreRepositoryWithFactory(IDbContextFactory<TDbContext> dbContextFactory, IOptions<EfCoreRepositoryConfiguration> configuration)
     {
         DbContextFactory = dbContextFactory;
         _configuration = configuration.Value;

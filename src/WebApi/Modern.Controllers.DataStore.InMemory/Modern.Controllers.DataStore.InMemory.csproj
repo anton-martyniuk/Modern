@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -27,7 +27,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Mapster" Version="7.3.0" />
-		<PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="6.0.4" />
+		<PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="7.0.2" />
 	</ItemGroup>
 
 	<ItemGroup>
