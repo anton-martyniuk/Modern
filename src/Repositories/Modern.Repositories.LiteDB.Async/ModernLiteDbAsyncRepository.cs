@@ -1,19 +1,20 @@
 ﻿using System.Linq.Expressions;
 using Ardalis.GuardClauses;
 using LiteDB;
+using LiteDB.Async;
 using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Infrastracture;
 
-namespace Modern.Repositories.LiteDB;
+namespace Modern.Repositories.LiteDB.Async;
 
 /// <summary>
-/// Represents an <see cref="IModernCrudRepository{TEntity,TId}"/> and <see cref="IModernQueryRepository{TEntity, TId}"/> implementation using NO SQL LiteDB
+/// Represents an <see cref="IModernCrudRepository{TEntity,TId}"/> and <see cref="IModernQueryRepository{TEntity, TId}"/> implementation using NO SQL LiteDB (Async version)
 /// </summary>
 /// <typeparam name="TEntity">The type of entity</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
-public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, TId>
+public class ModernLiteDbAsyncRepository<TEntity, TId> : IModernRepository<TEntity, TId>
     where TEntity : class
     where TId : IEquatable<TId>
 {
@@ -26,7 +27,7 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
     /// </summary>
     /// <param name="connectionString">Connection string to LiteDB</param>
     /// <param name="collectionName">Name of the collection</param>
-    public ModernLiteDbRepository(string connectionString, string collectionName)
+    public ModernLiteDbAsyncRepository(string connectionString, string collectionName)
     {
         _connectionString = connectionString;
         _collectionName = collectionName;
@@ -57,11 +58,10 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
-            collection.Insert(entity);
+            await collection.InsertAsync(entity);
 
-            await Task.CompletedTask;
             return entity;
         }
         catch (Exception ex)
@@ -81,11 +81,10 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
-            collection.Insert(entities);
+            await collection.InsertAsync(entities);
 
-            await Task.CompletedTask;
             return entities;
         }
         catch (Exception ex)
@@ -105,16 +104,15 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            var result = collection.Update(new BsonValue(id), entity);
+            var result = await collection.UpdateAsync(new BsonValue(id), entity);
             if (!result)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
             }
 
-            await Task.CompletedTask;
             return entity;
         }
         catch (Exception ex)
@@ -134,16 +132,15 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            var result = collection.Update(entities);
+            var result = await collection.UpdateAsync(entities);
             if (result != entities.Count)
             {
                 throw new EntityNotFoundException($"Not all {_entityName} entities were found!");
             }
 
-            await Task.CompletedTask;
             return entities;
         }
         catch (Exception ex)
@@ -162,10 +159,10 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            var entity = collection.FindById(new BsonValue(id));
+            var entity = await collection.FindByIdAsync(new BsonValue(id));
             if (entity is null)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
@@ -174,13 +171,12 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             // Perform update action
             update(entity);
 
-            var result = collection.Update(entity);
+            var result = await collection.UpdateAsync(entity);
             if (!result)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
             }
 
-            await Task.CompletedTask;
             return entity;
         }
         catch (Exception ex)
@@ -199,11 +195,10 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            await Task.CompletedTask;
-            return collection.Delete(new BsonValue(id));
+            return await collection.DeleteAsync(new BsonValue(id));
         }
         catch (Exception ex)
         {
@@ -222,11 +217,17 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            await Task.CompletedTask;
-            return ids.Aggregate(true, (current, id) => current && collection.Delete(new BsonValue(id)));
+            var result = true;
+            
+            foreach (var id in ids)
+            {
+                result &= await collection.DeleteAsync(new BsonValue(id));
+            }
+            
+            return result;
         }
         catch (Exception ex)
         {
@@ -242,22 +243,21 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            var entity = collection.FindById(new BsonValue(id));
+            var entity = await collection.FindByIdAsync(new BsonValue(id));
             if (entity is null)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
             }
 
-            var result = collection.Delete(new BsonValue(id));
+            var result = await collection.DeleteAsync(new BsonValue(id));
             if (!result)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
             }
 
-            await Task.CompletedTask;
             return entity;
         }
         catch (Exception ex)
@@ -276,16 +276,15 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            var entity = collection.FindById(new BsonValue(id));
+            var entity = await collection.FindByIdAsync(new BsonValue(id));
             if (entity is null)
             {
                 throw new EntityNotFoundException($"{_entityName} entity with id '{id}' not found");
             }
 
-            await Task.CompletedTask;
             return entity;
         }
         catch (Exception ex)
@@ -304,11 +303,10 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            await Task.CompletedTask;
-            return collection.FindById(new BsonValue(id));
+            return await collection.FindByIdAsync(new BsonValue(id));
         }
         catch (Exception ex)
         {
@@ -325,11 +323,10 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            await Task.CompletedTask;
-            return collection.FindAll().ToList();
+            return await collection.FindAllAsync();
         }
         catch (Exception ex)
         {
@@ -346,11 +343,10 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            await Task.CompletedTask;
-            return collection.LongCount();
+            return await collection.LongCountAsync();
         }
         catch (Exception ex)
         {
@@ -369,11 +365,10 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            await Task.CompletedTask;
-            return collection.Count(predicate);
+            return await collection.CountAsync(predicate);
         }
         catch (Exception ex)
         {
@@ -391,11 +386,10 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            await Task.CompletedTask;
-            return collection.Exists(predicate);
+            return await collection.ExistsAsync(predicate);
         }
         catch (Exception ex)
         {
@@ -413,11 +407,10 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            await Task.CompletedTask;
-            return collection.FindOne(predicate);
+            return await collection.FindOneAsync(predicate);
         }
         catch (Exception ex)
         {
@@ -435,11 +428,10 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            await Task.CompletedTask;
-            return collection.FindOne(predicate);
+            return await collection.FindOneAsync(predicate);
         }
         catch (Exception ex)
         {
@@ -457,11 +449,10 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            await Task.CompletedTask;
-            return collection.Query().Where(predicate).ToList();
+            return await collection.Query().Where(predicate).ToListAsync();
         }
         catch (Exception ex)
         {
@@ -480,19 +471,17 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
             ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_connectionString);
+            using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            var count = collection.Count(predicate);
+            var count = await collection.CountAsync(predicate);
 
-            var items = collection.Query()
+            var items = await collection.Query()
                 .Where(predicate)
                 .Skip((pageNumber - 1) * pageSize)
                 .Limit(pageSize)
-                .ToList();
-
-            await Task.CompletedTask;
-
+                .ToListAsync();
+            
             return new PagedResult<TEntity>
             {
                 PageNumber = pageNumber,

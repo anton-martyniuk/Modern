@@ -91,14 +91,13 @@ As a result a production ready API will be created:
 
 ## Roadmap :arrow_right: :date:
 The following features will be implemented in the next releases:
-* Github Wiki docs
+* Examples
 * Assembly scan in DI packages
 * Unit and integration tests
 * CQRS InMemory
 * GraphQL tools
 * MinimalsApis using FastEndpoints
 * Reflection improvements
-* Upgrade to .NET 7 (after official release in November)
 
 ## Repositories
 Modern generic repository is divided into 2 interfaces: `IModernQueryRepository<TEntity, TId>` and `IModernCrudRepository<TEntity, TId>`.
