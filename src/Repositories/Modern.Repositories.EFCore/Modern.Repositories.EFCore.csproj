@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.0-alpha1</Version>
+		<Version>1.0.0-beta1</Version>
 		<Authors>Anton Martyniuk</Authors>
 		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
 		<Title>Modern EF Core Repositories</Title>
@@ -23,8 +23,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Ardalis.GuardClauses" Version="4.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.4" />
-		<PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="6.13.18" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.2" />
+		<PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="7.18.2" />
 	</ItemGroup>
 
 	<ItemGroup>
