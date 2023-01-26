@@ -231,6 +231,22 @@ builder.Services
 ```
 Specify the type of Dbo entity model and "_id" key.
 
+> :information_source: Right out of the box LiteDB official library supports only synchronous methods. To use asynchronous methods a third party library can be used. Modern libraries support asynchronous methods in LiteDB using [litedb-async library](https://github.com/mlockett42/litedb-async)
+
+> :warning: **DISCLAIMER:** LiteDb async repository uses litedb-async library which is not an official LiteDb project.
+Modern libraries are NOT responsible for any problems with litedb-async library, so use this package at your own risk.
+
+To use **LiteDB Async** repository install the `Modern.Repositories.LiteDB.Async.DependencyInjection` Nuget package and register it within Modern builder in DI:
+```csharp
+builder.Services
+    .AddModern()
+    .AddRepositoriesLiteDbAsync(options =>
+    {
+        options.AddRepository<AirplaneDbo, long>("connection_string", "collection_name");
+    });
+```
+Specify the type of Dbo entity model and "_id" key.
+
 ## Services :pencil:
 Modern generic service is divided into 2 interfaces: `IModernQueryService<TEntityDto, TEntityDbo, TId>` and `IModernCrudService<TEntityDto, TEntityDbo, TId>`.
 `IModernQueryService` has the following methods:
