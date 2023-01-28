@@ -326,7 +326,8 @@ public class ModernLiteDbAsyncRepository<TEntity, TId> : IModernRepository<TEnti
             using var db = new LiteDatabaseAsync(_connectionString);
             var collection = db.GetCollection<TEntity>(_collectionName);
 
-            return await collection.FindAllAsync();
+            var entities = await collection.FindAllAsync();
+            return entities.ToList();
         }
         catch (Exception ex)
         {

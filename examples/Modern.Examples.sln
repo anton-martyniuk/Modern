@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.LiteDb.Examples", "Modern.LiteDb.Examples\Modern.LiteDb.Examples.csproj", "{209DFE9E-EC40-4218-A973-38F2F55336E3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repositories", "Repositories", "{A4DFE31B-58A0-457B-B30B-0232570BB48E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.LiteDb.Async.Examples", "Modern.LiteDb.Async.Examples\Modern.LiteDb.Async.Examples.csproj", "{789F176D-8BB3-4A47-9465-0DA1AE88272C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{209DFE9E-EC40-4218-A973-38F2F55336E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{209DFE9E-EC40-4218-A973-38F2F55336E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{209DFE9E-EC40-4218-A973-38F2F55336E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{209DFE9E-EC40-4218-A973-38F2F55336E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{789F176D-8BB3-4A47-9465-0DA1AE88272C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{789F176D-8BB3-4A47-9465-0DA1AE88272C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{789F176D-8BB3-4A47-9465-0DA1AE88272C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{789F176D-8BB3-4A47-9465-0DA1AE88272C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{209DFE9E-EC40-4218-A973-38F2F55336E3} = {A4DFE31B-58A0-457B-B30B-0232570BB48E}
+		{789F176D-8BB3-4A47-9465-0DA1AE88272C} = {A4DFE31B-58A0-457B-B30B-0232570BB48E}
+	EndGlobalSection
+EndGlobal
