@@ -6,6 +6,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repositories", "Repositorie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.LiteDb.Async.Examples", "Modern.LiteDb.Async.Examples\Modern.LiteDb.Async.Examples.csproj", "{789F176D-8BB3-4A47-9465-0DA1AE88272C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.MongoDb.Examples", "Modern.MongoDb.Examples\Modern.MongoDb.Examples.csproj", "{AA7020D8-6394-4CAE-B416-7C2CB3DDF642}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,9 +22,14 @@ Global
 		{789F176D-8BB3-4A47-9465-0DA1AE88272C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{789F176D-8BB3-4A47-9465-0DA1AE88272C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{789F176D-8BB3-4A47-9465-0DA1AE88272C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA7020D8-6394-4CAE-B416-7C2CB3DDF642}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA7020D8-6394-4CAE-B416-7C2CB3DDF642}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA7020D8-6394-4CAE-B416-7C2CB3DDF642}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA7020D8-6394-4CAE-B416-7C2CB3DDF642}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{209DFE9E-EC40-4218-A973-38F2F55336E3} = {A4DFE31B-58A0-457B-B30B-0232570BB48E}
 		{789F176D-8BB3-4A47-9465-0DA1AE88272C} = {A4DFE31B-58A0-457B-B30B-0232570BB48E}
+		{AA7020D8-6394-4CAE-B416-7C2CB3DDF642} = {A4DFE31B-58A0-457B-B30B-0232570BB48E}
 	EndGlobalSection
 EndGlobal
