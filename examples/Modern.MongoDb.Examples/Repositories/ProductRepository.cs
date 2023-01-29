@@ -18,11 +18,11 @@ public class ProductRepository : ModernMongoDbRepository<ProductDbo, string>, IP
         return await WhereAsync(dbo => dbo.Attributes.Any(attr => attr.Key.Equals(attributeName) && attr.Value.Equals(attributeValue)));
 
         // Native approach
-        var keyValuePair = new KeyValuePair<string, string>(attributeName, attributeValue);
-        
-        return await MongoCollection
-            .Find(Builders<ProductDbo>.Filter.AnyEq(x => x.Attributes, keyValuePair))
-            .ToListAsync();
+        // var keyValuePair = new KeyValuePair<string, string>(attributeName, attributeValue);
+        //
+        // return await MongoCollection
+        //     .Find(Builders<ProductDbo>.Filter.AnyEq(x => x.Attributes, keyValuePair))
+        //     .ToListAsync();
     }
 
     public async Task<IEnumerable<ProductDbo>> OrderByPriceAsync(bool ascending)

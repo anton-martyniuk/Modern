@@ -11,7 +11,7 @@ var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .Build();
 
-var connectionString = config.GetSection("MongoDb:ConnectionString").Value;
+var connectionString = config.GetSection("DatabaseConfiguration:ConnectionString").Value;
 
 services
     .AddModern()
