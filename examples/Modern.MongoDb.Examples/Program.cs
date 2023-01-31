@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Modern.Extensions.Microsoft.DependencyInjection;
 using Modern.MongoDb.Examples.Entities;
 using Modern.MongoDb.Examples.Repositories;
+using Modern.Repositories.Abstractions;
 
 var services = new ServiceCollection();
 
@@ -18,10 +19,23 @@ services
     .AddRepositoriesMongoDb(options =>
     {
         options.ConfigureMongoDbClient(connectionString!);
+
+        // Add repository by entity type.
+        // Use it when an own repository is NOT needed
+        options.AddRepository<ProductDbo, string>("commercial", "products");
+        
+        // Add concrete repository inherited from IModernRepository
+        // Use it when an own repository with specific methods is needed
         options.AddConcreteRepository<IProductRepository, ProductRepository>();
     });
 
 var provider = services.BuildServiceProvider();
+
+// Get repository by entity type
+var repositoryByEntityType = provider.GetRequiredService<IModernRepository<ProductDbo, string>>();
+var entities = await repositoryByEntityType.GetAllAsync();
+
+// Get concrete repository
 var repository = provider.GetRequiredService<IProductRepository>();
 
 var newProducts = new List<ProductDbo>

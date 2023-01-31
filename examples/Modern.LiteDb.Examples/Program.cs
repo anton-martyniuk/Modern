@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Modern.Extensions.Microsoft.DependencyInjection;
 using Modern.LiteDb.Examples.Entities;
 using Modern.LiteDb.Examples.Repositories;
+using Modern.Repositories.Abstractions;
 
 var services = new ServiceCollection();
 
@@ -10,10 +11,22 @@ services
     .AddModern()
     .AddRepositoriesLiteDb(options =>
     {
+        // Add repository by entity type.
+        // Use it when an own repository is NOT needed
+        options.AddRepository<CarDbo, long>("example_lite.db", "cars");
+        
+        // Add concrete repository inherited from IModernRepository
+        // Use it when an own repository with specific methods is needed
         options.AddConcreteRepository<ICarRepository, CarRepository>();
     });
 
 var provider = services.BuildServiceProvider();
+
+// Get repository by entity type
+var repositoryByEntityType = provider.GetRequiredService<IModernRepository<CarDbo, long>>();
+var entities = await repositoryByEntityType.GetAllAsync();
+
+// Get concrete repository
 var repository = provider.GetRequiredService<ICarRepository>();
 
 var mazda = new CarDbo

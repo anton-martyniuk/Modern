@@ -14,8 +14,6 @@ public class SqliteQueryProvider : IQueryProvider
     public string GetInsertWithOutputCommand<TEntity>(DapperEntityMapping<TEntity> entityMapping)
         where TEntity : class
     {
-        // TODO: test it
-
         var columns = entityMapping.ColumnMappings.Aggregate(new StringBuilder(), (builder, mapping) => builder.AppendFormat("{0}\"{1}\"",
             builder.Length > 0 ? ", " : "", mapping.Key), builder => builder.ToString());
 
