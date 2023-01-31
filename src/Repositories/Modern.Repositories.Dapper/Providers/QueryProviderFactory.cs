@@ -13,7 +13,7 @@ public class QueryProviderFactory : IQueryProviderFactory
     public IQueryProvider Get(IDbConnection dbConnection)
     {
         var connectionName = dbConnection.GetType().Name;
-        return connectionName switch
+        return connectionName.ToLower() switch
         {
             "sqlconnection" => new SqlServerQueryProvider(),
             "npgsqlconnection" => new PostgresQueryProvider(),

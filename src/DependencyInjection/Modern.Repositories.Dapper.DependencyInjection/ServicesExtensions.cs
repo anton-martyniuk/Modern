@@ -44,6 +44,7 @@ public static class ServicesExtensions
         foreach (var c in options.ConcreteRepositories)
         {
             builder.Services.TryAdd(new ServiceDescriptor(c.InterfaceType, c.ImplementationType, c.Lifetime));
+            builder.Services.TryAddSingleton(c.EntityMappingType);
         }
 
         return builder;
