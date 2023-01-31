@@ -11,8 +11,8 @@
         <Authors>Anton Martyniuk</Authors>
         <Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
         <Title>Modern MongoDB Repositories Extensions for Microsoft Dependency Injection</Title>
-        <Description>A generic repository implementation using LiteDb for CRUD and Query operations</Description>
-        <PackageTags>modern;repository;generic;crud;query;litedb</PackageTags>
+        <Description>A generic repository implementation using LiteDb Async for CRUD and Query operations</Description>
+        <PackageTags>modern;repository;generic;crud;query;litedb;async</PackageTags>
         <RepositoryUrl>https://github.com/anton-martyniuk/modern</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

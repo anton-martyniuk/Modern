@@ -65,12 +65,14 @@ public class ModernDapperRepositoriesOptions
     /// <param name="lifetime">Repository lifetime in DI</param>
     /// <typeparam name="TRepositoryInterface">The type of concrete repository interface</typeparam>
     /// <typeparam name="TRepositoryImplementation">The type of concrete repository implementation</typeparam>
-    public void AddConcreteRepository<TRepositoryInterface, TRepositoryImplementation>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    /// <typeparam name="TEntityMapping">The type of entity mapping</typeparam>
+    public void AddConcreteRepository<TRepositoryInterface, TRepositoryImplementation, TEntityMapping>(ServiceLifetime lifetime = ServiceLifetime.Transient)
         where TRepositoryInterface : class
         where TRepositoryImplementation : class, TRepositoryInterface
     {
         var configuration = new ModernDapperRepositoryConcreteSpecification
         {
+            EntityMappingType = typeof(TEntityMapping),
             InterfaceType = typeof(TRepositoryInterface),
             ImplementationType = typeof(TRepositoryImplementation),
             Lifetime = lifetime

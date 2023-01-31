@@ -8,6 +8,11 @@ namespace Modern.Repositories.Dapper.DependencyInjection.Configuration;
 public class ModernDapperRepositoryConcreteSpecification
 {
     /// <summary>
+    /// The type of entity mapping
+    /// </summary>
+    public Type EntityMappingType { get; set; } = default!;
+    
+    /// <summary>
     /// The type of concrete repository interface
     /// </summary>
     public Type InterfaceType { get; set; } = default!;
