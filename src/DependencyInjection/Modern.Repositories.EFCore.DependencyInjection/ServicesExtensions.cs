@@ -2,6 +2,7 @@
 using Modern.Extensions.Microsoft.DependencyInjection.Models;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.EFCore;
+using Modern.Repositories.EFCore.Configuration;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,13 @@ public static class ServicesExtensions
     {
         var options = new ModernEfCoreRepositoriesOptions();
         configure(options);
+
+        builder.Services.Configure<EfCoreRepositoryConfiguration>(x =>
+        {
+            x.CreateConfiguration = options.RepositoryConfiguration.CreateConfiguration;
+            x.UpdateConfiguration = options.RepositoryConfiguration.UpdateConfiguration;
+            x.DeleteConfiguration = options.RepositoryConfiguration.DeleteConfiguration;
+        });
 
         foreach (var c in options.Repositories)
         {
