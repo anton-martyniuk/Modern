@@ -1,6 +1,11 @@
 # Modern
 
 ## What is Modern?
+
+[See full documentation here](https://github.com/anton-martyniuk/Modern/wiki)
+
+[See examples here](./examples)
+
 Modern is a set of modern .NET tools :hammer: :wrench: for fast and efficient development of common backend tasks.
 It allows to create a product ready applications with just a configuration and set of model classes.
 Modern tool are flexible, easily changeable and extendable.\
@@ -13,8 +18,6 @@ Modern includes the following components:
 * GraphQL queries and subscriptions
 * generic controllers for all types of services
 * OData controllers for all types of services
-
-See docs here !!!
 
 ## How to get started?
 First, select and install the needed Nuget packages !!!\
