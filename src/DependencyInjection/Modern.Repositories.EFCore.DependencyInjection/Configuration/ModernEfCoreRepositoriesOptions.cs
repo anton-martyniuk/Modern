@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Modern.Repositories.EFCore.Configuration;
 using Modern.Repositories.EFCore.DependencyInjection.Configuration;
 
 // ReSharper disable once CheckNamespace
@@ -10,6 +11,11 @@ namespace Microsoft.Extensions.DependencyInjection;
 public class ModernEfCoreRepositoriesOptions
 {
     /// <summary>
+    /// EF Core repository configuration
+    /// </summary>
+    internal EfCoreRepositoryConfiguration RepositoryConfiguration { get; } = new();
+    
+    /// <summary>
     /// Collection of modern repository specifications
     /// </summary>
     internal List<ModernEfCoreRepositorySpecification> Repositories { get; } = new();
@@ -18,6 +24,15 @@ public class ModernEfCoreRepositoriesOptions
     /// Collection of modern repository specifications
     /// </summary>
     internal List<ModernEfCoreRepositoryConcreteSpecification> ConcreteRepositories { get; } = new();
+    
+    /// <summary>
+    /// Configures EF Core repository configuration
+    /// </summary>
+    /// <param name="repositoryConfiguration">The EF Core repository configuration update action</param>
+    public void ConfigureRepositoryConfiguration(Action<EfCoreRepositoryConfiguration>? repositoryConfiguration = null)
+    {
+        repositoryConfiguration?.Invoke(RepositoryConfiguration);
+    }
 
     /// <summary>
     /// Adds repository
