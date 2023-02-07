@@ -55,7 +55,7 @@ var repository = provider.GetRequiredService<ICityRepository>();
 var count = await repository.CountAsync();
 if (count == 0)
 {
-    var newCities = new List<CityDbo>
+    var newEntities = new List<CityDbo>
     {
         new()
         {
@@ -95,30 +95,30 @@ if (count == 0)
     };
 
     // Create entities
-    await repository.CreateAsync(newCities);
+    await repository.CreateAsync(newEntities);
 }
 
 // Get entities
-Console.WriteLine("All cities:");
+Console.WriteLine("All entities:");
 var allCities = await repository.GetAllAsync();
 Print(allCities);
 
-var firstCity = allCities.First();
-firstCity.Population += 10_000;
+var firstEntity = allCities.First();
+firstEntity.Population += 10_000;
 
 // Update entity
-await repository.UpdateAsync(firstCity.Id, firstCity);
+await repository.UpdateAsync(firstEntity.Id, firstEntity);
 
 // Get filtered entities
 Console.WriteLine("\nCities in Ukraine:");
-var ukraineCities = await repository.GetCountryCitiesAsync("Ukraine");
-Print(ukraineCities);
+var ukrainianCities = await repository.GetCountryCitiesAsync("Ukraine");
+Print(ukrainianCities);
 
 // Delete entity
-await repository.DeleteAsync(firstCity.Id);
+await repository.DeleteAsync(firstEntity.Id);
 
 // Get entities
-Console.WriteLine("\nAll cities:");
+Console.WriteLine("\nAll entities:");
 allCities = await repository.GetAllAsync();
 Print(allCities);
 
