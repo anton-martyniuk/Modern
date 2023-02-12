@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Modern.EfCore.Examples.Migrations
+namespace Modern.Services.DataStore.InMemory.Examples.Migrations
 {
     /// <inheritdoc />
     public partial class InitialMigration : Migration
@@ -29,8 +29,7 @@ namespace Modern.EfCore.Examples.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_cities_name",
                 table: "cities",
-                column: "name",
-                unique: true);
+                column: "name");
         }
 
         /// <inheritdoc />

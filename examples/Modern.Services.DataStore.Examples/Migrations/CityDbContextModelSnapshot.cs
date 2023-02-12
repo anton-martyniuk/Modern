@@ -6,7 +6,7 @@ using Modern.Services.DataStore.Examples.DbContexts;
 
 #nullable disable
 
-namespace Modern.EfCore.Examples.Migrations
+namespace Modern.Services.DataStore.Examples.Migrations
 {
     [DbContext(typeof(CityDbContext))]
     partial class CityDbContextModelSnapshot : ModelSnapshot
@@ -16,7 +16,7 @@ namespace Modern.EfCore.Examples.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.2");
 
-            modelBuilder.Entity("Modern.EfCore.Examples.Entities.CityDbo", b =>
+            modelBuilder.Entity("Modern.Services.DataStore.Cached.Examples.Entities.CityDbo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -45,8 +45,7 @@ namespace Modern.EfCore.Examples.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.HasIndex("Name");
 
                     b.ToTable("cities", (string)null);
                 });

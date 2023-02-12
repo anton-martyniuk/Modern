@@ -6,33 +6,16 @@ using Modern.Services.DataStore.InMemory.Examples.Repositories;
 
 namespace Modern.Services.DataStore.InMemory.Examples.Services;
 
-public class CityService : ModernService<CityDto, CityDbo, int, ICityRepository>, ICityService
+public class CityInMemoryService : ModernInMemoryService<CityDto, CityDbo, int, ICityRepository>, ICityInMemoryService
 {
-    public CityService(ICityRepository repository, ILogger<CityService> logger)
-        : base(repository, logger)
+    public CityInMemoryService(ICityRepository repository, IModernServiceCache<CityDto, int> cache, ILogger<CityInMemoryService> logger)
+        : base(repository, cache, logger)
     {
     }
 
     public async Task<IEnumerable<CityDto>> GetCountryCitiesAsync(string country)
     {
         var entitiesDbo = await Repository.GetCountryCitiesAsync(country);
-        return entitiesDbo.Select(MapToDto).ToList();
-    }
-}
-
-public class CityInMemoryService : ModernInMemoryService<CityDto, CityDbo, int>, ICityInMemoryService
-{
-    private readonly ICityService _service;
-
-    public CityInMemoryService(ICityService service, IModernServiceCache<CityDto, int> cache, ILogger<CityInMemoryService> logger)
-        : base(service, cache, logger)
-    {
-        _service = service;
-    }
-
-    public async Task<IEnumerable<CityDto>> GetCountryCitiesAsync(string country)
-    {
-        var entitiesDto = await _service.GetCountryCitiesAsync(country);
-        return entitiesDto;
+        return entitiesDbo.ToList().ConvertAll(MapToDto);
     }
 }

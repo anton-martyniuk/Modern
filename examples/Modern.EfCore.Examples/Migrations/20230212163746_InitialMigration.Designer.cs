@@ -10,7 +10,7 @@ using Modern.EfCore.Examples.DbContexts;
 namespace Modern.EfCore.Examples.Migrations
 {
     [DbContext(typeof(CityDbContext))]
-    [Migration("20230206200931_InitialMigration")]
+    [Migration("20230212163746_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -19,7 +19,7 @@ namespace Modern.EfCore.Examples.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.2");
 
-            modelBuilder.Entity("Modern.EfCore.Examples.Entities.CityDbo", b =>
+            modelBuilder.Entity("Modern.Services.DataStore.Cached.Examples.Entities.CityDbo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -48,8 +48,7 @@ namespace Modern.EfCore.Examples.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.HasIndex("Name");
 
                     b.ToTable("cities", (string)null);
                 });

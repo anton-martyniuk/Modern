@@ -40,8 +40,9 @@ var provider = services.BuildServiceProvider();
 // Use EF Core migrations to create a database
 using (var scope = provider.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<CityDbContext>();
-    db.Database.Migrate();
+    var dbContext = scope.ServiceProvider.GetRequiredService<CityDbContext>();
+    await dbContext.Database.EnsureDeletedAsync();
+    await dbContext.Database.EnsureCreatedAsync();
 }
 
 // Get repository by entity type

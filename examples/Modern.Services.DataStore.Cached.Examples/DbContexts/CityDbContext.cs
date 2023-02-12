@@ -15,7 +15,7 @@ public class CityDbContext : DbContext
     {
         var flyingCompany = modelBuilder.Entity<CityDbo>().ToTable("cities");
         flyingCompany.HasKey(x => x.Id);
-        flyingCompany.HasIndex(x => x.Name).IsUnique();
+        flyingCompany.HasIndex(x => x.Name);
 
         flyingCompany.Property(x => x.Id).HasColumnName("id").IsRequired();
         flyingCompany.Property(x => x.Name).HasColumnName("name").HasMaxLength(100).IsRequired();

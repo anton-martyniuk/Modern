@@ -60,18 +60,17 @@ services
         
         // Add concrete service inherited from IModernService
         // Use it when an own service with specific methods is needed
-        options.AddConcreteService<ICityService, CityService>();
+        options.AddConcreteService<ICityService, CityCachedService>();
     });
-
-services.Decorate<ICityService, CityCachedService>();
 
 var provider = services.BuildServiceProvider();
 
 // Use EF Core migrations to create a database
 using (var scope = provider.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<CityDbContext>();
-    db.Database.Migrate();
+    var dbContext = scope.ServiceProvider.GetRequiredService<CityDbContext>();
+    await dbContext.Database.EnsureDeletedAsync();
+    await dbContext.Database.EnsureCreatedAsync();
 }
 
 // Get service by entity type

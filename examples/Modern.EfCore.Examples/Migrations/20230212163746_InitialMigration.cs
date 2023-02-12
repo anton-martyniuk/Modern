@@ -29,8 +29,7 @@ namespace Modern.EfCore.Examples.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_cities_name",
                 table: "cities",
-                column: "name",
-                unique: true);
+                column: "name");
         }
 
         /// <inheritdoc />

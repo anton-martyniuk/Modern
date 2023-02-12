@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Modern.Extensions.Microsoft.DependencyInjection;
 using Modern.Repositories.Abstractions;
-using Modern.Services.DataStore.Abstractions;
 using Modern.Services.DataStore.InMemory.Abstractions;
 using Modern.Services.DataStore.InMemory.Examples.DbContexts;
 using Modern.Services.DataStore.InMemory.Examples.Entities;
@@ -51,7 +50,6 @@ services
         
         // Add concrete service inherited from IModernService
         // Use it when an own service with specific methods is needed
-        options.AddConcreteService<ICityService, CityService>();
         options.AddConcreteService<ICityInMemoryService, CityInMemoryService>();
     });
 
@@ -60,8 +58,9 @@ var provider = services.BuildServiceProvider();
 // Use EF Core migrations to create a database
 using (var scope = provider.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<CityDbContext>();
-    db.Database.Migrate();
+    var dbContext = scope.ServiceProvider.GetRequiredService<CityDbContext>();
+    await dbContext.Database.EnsureDeletedAsync();
+    await dbContext.Database.EnsureCreatedAsync();
 }
 
 // Get service by entity type
