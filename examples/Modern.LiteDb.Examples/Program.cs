@@ -7,6 +7,7 @@ using Modern.Repositories.Abstractions;
 
 var services = new ServiceCollection();
 
+// Add modern stuff
 services
     .AddModern()
     .AddRepositoriesLiteDb(options =>

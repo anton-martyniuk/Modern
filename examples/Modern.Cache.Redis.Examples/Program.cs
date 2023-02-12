@@ -17,6 +17,7 @@ var connectionString = config.GetSection("Redis:ConnectionString").Value;
 // Needed for Redis
 services.AddLogging();
 
+// Add modern stuff
 services
     .AddModern()
     .AddRedisCache(options =>

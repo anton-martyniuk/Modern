@@ -7,6 +7,7 @@ using Modern.Extensions.Microsoft.DependencyInjection;
 
 var services = new ServiceCollection();
 
+// Add modern stuff
 services
     .AddModern()
     .AddInMemoryCache(options =>

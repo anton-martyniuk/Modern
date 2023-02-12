@@ -27,6 +27,7 @@ services.AddLogging();
 // Register db dependencies
 services.AddDbContextFactory<CityDbContext>(x => x.EnableSensitiveDataLogging().UseSqlite(connectionString));
 
+// Add modern stuff
 services
     .AddModern()
     .AddRepositoriesEfCore(options =>
@@ -50,7 +51,7 @@ services
         
         // Add concrete service inherited from IModernService
         // Use it when an own service with specific methods is needed
-        options.AddConcreteService<ICityInMemoryService, CityInMemoryService>();
+        options.AddConcreteService<ICityInMemoryService, CityInMemoryService, CityDto, int>();
     });
 
 var provider = services.BuildServiceProvider();

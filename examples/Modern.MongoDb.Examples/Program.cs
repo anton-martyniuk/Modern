@@ -14,6 +14,7 @@ var config = new ConfigurationBuilder()
 
 var connectionString = config.GetSection("DatabaseConfiguration:ConnectionString").Value;
 
+// Add modern stuff
 services
     .AddModern()
     .AddRepositoriesMongoDb(options =>

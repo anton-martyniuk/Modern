@@ -27,6 +27,7 @@ services.AddLogging();
 // Register db dependencies
 services.AddDbContextFactory<CityDbContext>(x => x.EnableSensitiveDataLogging().UseSqlite(connectionString));
 
+// Add modern stuff
 services
     .AddModern()
     .AddRepositoriesEfCore(options =>

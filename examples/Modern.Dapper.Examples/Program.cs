@@ -28,6 +28,7 @@ using (var scope = serviceProvider.CreateScope())
 
 var services = new ServiceCollection();
 
+// Add modern stuff
 services
     .AddModern()
     .AddRepositoriesDapper(options =>
