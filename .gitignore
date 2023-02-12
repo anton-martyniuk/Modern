@@ -2,6 +2,6 @@ bin
 obj
 .idea
 .vs
-.db
+*.db*
 appsettings.development.json
 appsettings.production.json
