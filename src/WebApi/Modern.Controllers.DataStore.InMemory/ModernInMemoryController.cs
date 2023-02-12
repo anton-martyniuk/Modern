@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
-using MapsterMapper;
+using Mapster;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Modern.Exceptions;
@@ -25,13 +25,12 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     where TId : IEquatable<TId>
 {
     private readonly IModernInMemoryService<TEntityDto, TEntityDbo, TId> _service;
-    private readonly IMapper _mapper = new Mapper();
 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="service">Cached service</param>
-    protected ModernInMemoryController(IModernInMemoryService<TEntityDto, TEntityDbo, TId> service)
+    public ModernInMemoryController(IModernInMemoryService<TEntityDto, TEntityDbo, TId> service)
     {
         _service = service;
     }
@@ -74,9 +73,9 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public virtual async Task<IActionResult> GetAll()
+    public virtual async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
-        var entities = await _service.GetAllAsync().ConfigureAwait(false);
+        var entities = await _service.GetAllAsync(cancellationToken).ConfigureAwait(false);
         return Ok(entities);
     }
 
@@ -94,7 +93,7 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public virtual async Task<IActionResult> Create([FromBody, Required] TCreateRequest request)
     {
-        var entity = _mapper.Map<TEntityDto>(request);
+        var entity = request.Adapt<TEntityDto>();
         var createdEntity = await _service.CreateAsync(entity).ConfigureAwait(false);
         return Created(nameof(Create), createdEntity);
     }
@@ -113,7 +112,7 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public virtual async Task<IActionResult> CreateMany([FromBody, Required] List<TCreateRequest> requests)
     {
-        var entities = _mapper.Map<List<TEntityDto>>(requests);
+        var entities = requests.Adapt<List<TEntityDto>>();
         var createdEntities = await _service.CreateAsync(entities).ConfigureAwait(false);
         return Created(nameof(Create), createdEntities);
     }
@@ -136,7 +135,7 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     {
         try
         {
-            var entity = _mapper.Map<TEntityDto>(request);
+            var entity = request.Adapt<TEntityDto>();
             await _service.UpdateAsync(id, entity).ConfigureAwait(false);
         }
         catch (EntityNotFoundException e)
@@ -164,7 +163,7 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     {
         try
         {
-            var entities = _mapper.Map<List<TEntityDto>>(requests);
+            var entities = requests.Adapt<List<TEntityDto>>();
             await _service.UpdateAsync(entities).ConfigureAwait(false);
         }
         catch (EntityNotFoundException e)
@@ -207,7 +206,7 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     /// Deletes the entity in the data store with the given <paramref name="id"/>.<br/>
     /// </summary>
     /// <param name="id">The entity id</param>
-    /// <response code="200">Entity was found and deleted from the data store</response>
+    /// <response code="204">Entity was found and deleted from the data store</response>
     /// <response code="404">Entity was not found in the data store</response>
     /// <response code="500">Error occurred while deleting entity</response>
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -230,7 +229,7 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     /// Deletes the list of entities in the data store with the given list of <paramref name="ids"/>.<br/>
     /// </summary>
     /// <param name="ids">The list of entity ids</param>
-    /// <response code="200">Entity was found and deleted from the data store</response>
+    /// <response code="204">Entity was found and deleted from the data store</response>
     /// <response code="404">Entity was not found in the data store</response>
     /// <response code="500">Error occurred while deleting entity</response>
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
