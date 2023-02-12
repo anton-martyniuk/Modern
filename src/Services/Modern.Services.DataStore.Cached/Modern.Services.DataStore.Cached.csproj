@@ -7,7 +7,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.0-beta1</Version>
+		<Version>1.0.0-beta2</Version>
 		<Authors>Anton Martyniuk</Authors>
 		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
 		<Title>Modern Cached Services</Title>
@@ -22,11 +22,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Mapster" Version="7.3.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Cache\Modern.Cache.Abstractions\Modern.Cache.Abstractions.csproj" />
+		<ProjectReference Include="..\..\Repositories\Modern.Repositories.Abstractions\Modern.Repositories.Abstractions.csproj" />
 		<ProjectReference Include="..\Modern.Services.DataStore.Abstractions\Modern.Services.DataStore.Abstractions.csproj" />
 	</ItemGroup>
 
