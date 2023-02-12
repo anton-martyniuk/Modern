@@ -38,7 +38,11 @@ public static class ServicesExtensions
 
         foreach (var c in options.ConcreteServices)
         {
+            var cacheInterfaceType = typeof(IModernServiceCache<,>).MakeGenericType(c.EntityDtoType, c.EntityIdType);
+            var cacheImplementationType = typeof(ModernInMemoryServiceCache<,>).MakeGenericType(c.EntityDtoType, c.EntityIdType);
+            
             builder.Services.TryAdd(new ServiceDescriptor(c.InterfaceType, c.ImplementationType, c.Lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(cacheInterfaceType, cacheImplementationType, ServiceLifetime.Singleton));
         }
 
         return builder;

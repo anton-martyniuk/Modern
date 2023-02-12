@@ -7,7 +7,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.0-beta2</Version>
+		<Version>1.0.0-beta4</Version>
 		<Authors>Anton Martyniuk</Authors>
 		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
 		<Title>Modern In Memory Services Extensions for Microsoft Dependency Injection</Title>
@@ -29,7 +29,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Services\Modern.Services.DataStore.InMemory\Modern.Services.DataStore.InMemory.csproj" />
 		<ProjectReference Include="..\..\Services\Modern.Services.DataStore\Modern.Services.DataStore.csproj" />
-		<ProjectReference Include="..\Definitions\Modern.Services.DependencyInjection.Definitions\Modern.Services.DependencyInjection.Definitions.csproj" />
 		<ProjectReference Include="..\Modern.Extensions.Microsoft.DependencyInjection\Modern.Extensions.Microsoft.DependencyInjection.csproj" />
 	</ItemGroup>
 

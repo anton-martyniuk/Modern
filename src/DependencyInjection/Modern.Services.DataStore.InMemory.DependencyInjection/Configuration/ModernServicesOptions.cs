@@ -1,5 +1,6 @@
 ﻿using Modern.Repositories.Abstractions;
-using Modern.Services.DependencyInjection.Definitions.Configuration;
+using ModernServiceConcreteSpecification = Modern.Services.DataStore.InMemory.DependencyInjection.Configuration.ModernServiceConcreteSpecification;
+using ModernServiceSpecification = Modern.Services.DataStore.InMemory.DependencyInjection.Configuration.ModernServiceSpecification;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -51,14 +52,21 @@ public class ModernServicesOptions
     /// <param name="lifetime">Repository lifetime in DI</param>
     /// <typeparam name="TServiceInterface">The type of concrete service interface</typeparam>
     /// <typeparam name="TServiceImplementation">The type of concrete service implementation</typeparam>
-    public void AddConcreteService<TServiceInterface, TServiceImplementation>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
+    /// <typeparam name="TId">The type of entity identifier</typeparam>
+    /// 
+    public void AddConcreteService<TServiceInterface, TServiceImplementation, TEntityDto, TId>(ServiceLifetime lifetime = ServiceLifetime.Transient)
         where TServiceInterface : class
         where TServiceImplementation : class, TServiceInterface
+        where TEntityDto : class
+        where TId : IEquatable<TId>
     {
         var configuration = new ModernServiceConcreteSpecification
         {
             InterfaceType = typeof(TServiceInterface), 
-            ImplementationType = typeof(TServiceImplementation), 
+            ImplementationType = typeof(TServiceImplementation),
+            EntityDtoType = typeof(TEntityDto),
+            EntityIdType = typeof(TId),
             Lifetime = lifetime
         };
 
