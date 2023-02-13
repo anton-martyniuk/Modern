@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 using Ardalis.GuardClauses;
-using MapsterMapper;
+using Mapster;
 using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
@@ -26,7 +26,6 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
 {
     private readonly string _entityName = typeof(TEntityDto).Name;
     private readonly string _serviceName = $"{typeof(TEntityDto).Name}Service";
-    private readonly IMapper _mapper = new Mapper();
 
     /// <summary>
     /// The repository instance
@@ -57,14 +56,14 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// </summary>
     /// <param name="entityDto">Entity Dto</param>
     /// <returns>Entity Dbo</returns>
-    protected virtual TEntityDbo MapToDbo(TEntityDto entityDto) => _mapper.Map<TEntityDbo>(entityDto);
+    protected virtual TEntityDbo MapToDbo(TEntityDto entityDto) => entityDto.Adapt<TEntityDbo>();
 
     /// <summary>
     /// Returns <typeparamref name="TEntityDbo"/> mapped from <typeparamref name="TEntityDto"/>
     /// </summary>
     /// <param name="entityDbo">Entity Dbo</param>
     /// <returns>Entity Dto</returns>
-    protected virtual TEntityDto MapToDto(TEntityDbo entityDbo) => _mapper.Map<TEntityDto>(entityDbo);
+    protected virtual TEntityDto MapToDto(TEntityDbo entityDbo) => entityDbo.Adapt<TEntityDto>();
 
     /// <summary>
     /// Returns standardized service exception
@@ -96,7 +95,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             if (Logger.IsEnabled(LogLevel.Trace))
             {
-                Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(GetByIdAsync), id);
+                Logger.LogTrace("{ServiceName}.{Method} id: {Id}", _serviceName, nameof(GetByIdAsync), id);
             }
 
             var entityDbo = await Repository.GetByIdAsync(id, null, cancellationToken).ConfigureAwait(false);
@@ -104,7 +103,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Could not get {name} entity by id '{id}': {reason}", _entityName, id, ex.Message);
+            Logger.LogError(ex, "Could not get {Name} entity by id '{Id}': {Reason}", _entityName, id, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -121,7 +120,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             if (Logger.IsEnabled(LogLevel.Trace))
             {
-                Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(TryGetByIdAsync), id);
+                Logger.LogTrace("{ServiceName}.{Method} id: {Id}", _serviceName, nameof(TryGetByIdAsync), id);
             }
 
             var entityDbo = await Repository.TryGetByIdAsync(id, null, cancellationToken).ConfigureAwait(false);
@@ -129,7 +128,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Could not get {name} entity by id '{id}': {reason}", _entityName, id, ex.Message);
+            Logger.LogError(ex, "Could not get {Name} entity by id '{Id}': {Reason}", _entityName, id, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -150,7 +149,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Could not get all {name} entities: {reason}", _entityName, ex.Message);
+            Logger.LogError(ex, "Could not get all {Name} entities: {Reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -166,14 +165,14 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             if (Logger.IsEnabled(LogLevel.Trace))
             {
-                Logger.LogTrace("{serviceName}.{method} of all entities", _serviceName, nameof(CountAsync));
+                Logger.LogTrace("{ServiceName}.{Method} of all entities", _serviceName, nameof(CountAsync));
             }
 
             return await Repository.CountAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Could not get count of all {name} entities: {reason}", _entityName, ex.Message);
+            Logger.LogError(ex, "Could not get count of all {Name} entities: {Reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -194,7 +193,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Could not get {name} entities count by the given predicate: {reason}", _entityName, ex.Message);
+            Logger.LogError(ex, "Could not get {Name} entities count by the given predicate: {Reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -215,7 +214,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Could not check {name} entity existence by the given predicate: {reason}", _entityName, ex.Message);
+            Logger.LogError(ex, "Could not check {Name} entity existence by the given predicate: {Reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -237,7 +236,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Could not get first {name} entity by the given predicate: {reason}", _entityName, ex.Message);
+            Logger.LogError(ex, "Could not get first {Name} entity by the given predicate: {Reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -259,7 +258,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Could not get single {name} entity by the given predicate: {reason}", _entityName, ex.Message);
+            Logger.LogError(ex, "Could not get single {Name} entity by the given predicate: {Reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -281,7 +280,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Could not get {name} entities by the given predicate: {reason}", _entityName, ex.Message);
+            Logger.LogError(ex, "Could not get {Name} entities by the given predicate: {Reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -300,7 +299,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
 
             if (Logger.IsEnabled(LogLevel.Trace))
             {
-                Logger.LogTrace("{serviceName}.{method}. Page number: {pageNumber}, page size: {pageSize}", _serviceName, nameof(WhereAsync), pageNumber, pageSize);
+                Logger.LogTrace("{ServiceName}.{Method}. Page number: {PageNumber}, page size: {PageSize}", _serviceName, nameof(WhereAsync), pageNumber, pageSize);
             }
 
             var pagedResult = await Repository.WhereAsync(predicate, pageNumber, pageSize, null, cancellationToken).ConfigureAwait(false);
@@ -314,7 +313,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Could not get {name} entities by the given predicate: {reason}", _entityName, ex.Message);
+            Logger.LogError(ex, "Could not get {Name} entities by the given predicate: {Reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -332,7 +331,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Could not get {name} entities as Queryable: {reason}", _entityName, ex.Message);
+            Logger.LogError(ex, "Could not get {Name} entities as Queryable: {Reason}", _entityName, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -347,18 +346,18 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
             cancellationToken.ThrowIfCancellationRequested();
 
-            Logger.LogTrace("{serviceName}.{method} entity: {@entity}", _serviceName, nameof(CreateAsync), entity);
+            Logger.LogTrace("{ServiceName}.{Method} entity: {@Entity}", _serviceName, nameof(CreateAsync), entity);
 
-            Logger.LogDebug("Creating {name} entity in db...", _entityName);
+            Logger.LogDebug("Creating {Name} entity in db...", _entityName);
             var entityDbo = MapToDbo(entity);
             entityDbo = await Repository.CreateAsync(entityDbo, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Created {name} entity. {@entityDbo}", _entityName, entityDbo);
+            Logger.LogDebug("Created {Name} entity. {@EntityDbo}", _entityName, entityDbo);
 
             return MapToDto(entityDbo);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Unable to create a new {name} entity: {reason}. {@entity}", _entityName, ex.Message, entity);
+            Logger.LogError(ex, "Unable to create a new {Name} entity: {Reason}. {@Entity}", _entityName, ex.Message, entity);
             throw CreateProperException(ex);
         }
     }
@@ -370,22 +369,22 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     {
         try
         {
-            ArgumentNullException.ThrowIfNull(entities, nameof(entities)); // TODO: test if second parameter is needed
+            ArgumentNullException.ThrowIfNull(entities, nameof(entities));
             Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
             cancellationToken.ThrowIfCancellationRequested();
 
-            Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(CreateAsync), entities);
+            Logger.LogTrace("{ServiceName}.{Method} entities: {@Entities}", _serviceName, nameof(CreateAsync), entities);
 
-            Logger.LogDebug("Creating {name} entities in db...", _entityName);
+            Logger.LogDebug("Creating {Name} entities in db...", _entityName);
             var entitiesDbo = entities.ConvertAll(MapToDbo);
             entitiesDbo = await Repository.CreateAsync(entitiesDbo, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Created {name} entities. {@entityDbo}", _entityName, entitiesDbo);
+            Logger.LogDebug("Created {Name} entities. {@EntityDbo}", _entityName, entitiesDbo);
 
             return entitiesDbo.ConvertAll(MapToDto);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Unable to create new {name} entities: {reason}. {@entities}", _entityName, ex.Message, entities);
+            Logger.LogError(ex, "Unable to create new {Name} entities: {Reason}. {@Entities}", _entityName, ex.Message, entities);
             throw CreateProperException(ex);
         }
     }
@@ -401,19 +400,19 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
             cancellationToken.ThrowIfCancellationRequested();
 
-            Logger.LogTrace("{serviceName}.{method} id: {id}, entity: {@entity}", _serviceName, nameof(UpdateAsync), id, entity);
+            Logger.LogTrace("{ServiceName}.{Method} id: {Id}, entity: {@Entity}", _serviceName, nameof(UpdateAsync), id, entity);
 
             var entityDbo = MapToDbo(entity);
 
-            Logger.LogDebug("Updating {name} entity with id '{id}' in db...", _entityName, id);
+            Logger.LogDebug("Updating {Name} entity with id '{Id}' in db...", _entityName, id);
             entityDbo = await Repository.UpdateAsync(id, entityDbo, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Updated {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDbo);
+            Logger.LogDebug("Updated {Name} entity with id {Id}. {@EntityDbo}", _entityName, id, entityDbo);
 
             return MapToDto(entityDbo);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Unable to update a {name} entity by id '{id}': {reason}. {@entity}", _entityName, id, ex.Message, entity);
+            Logger.LogError(ex, "Unable to update a {Name} entity by id '{Id}': {Reason}. {@Entity}", _entityName, id, ex.Message, entity);
             throw CreateProperException(ex);
         }
     }
@@ -429,19 +428,19 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
             cancellationToken.ThrowIfCancellationRequested();
 
-            Logger.LogTrace("{serviceName}.{method} entities: {@entities}", _serviceName, nameof(UpdateAsync), entities);
+            Logger.LogTrace("{ServiceName}.{Method} entities: {@Entities}", _serviceName, nameof(UpdateAsync), entities);
 
             var entitiesDbo = entities.ConvertAll(MapToDbo);
 
             Logger.LogDebug("Updating entity in db...");
             entitiesDbo = await Repository.UpdateAsync(entitiesDbo, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Updated {name} entities. {@entitiesDbo}", _entityName, entitiesDbo);
+            Logger.LogDebug("Updated {Name} entities. {@EntitiesDbo}", _entityName, entitiesDbo);
 
             return entitiesDbo.ConvertAll(MapToDto);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Unable to update {name} entities: {reason}. {@entities}", _entityName, ex.Message, entities);
+            Logger.LogError(ex, "Unable to update {Name} entities: {Reason}. {@Entities}", _entityName, ex.Message, entities);
             throw CreateProperException(ex);
         }
     }
@@ -457,7 +456,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             ArgumentNullException.ThrowIfNull(update, nameof(update));
             cancellationToken.ThrowIfCancellationRequested();
 
-            Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(UpdateAsync), id);
+            Logger.LogTrace("{ServiceName}.{Method} id: {Id}", _serviceName, nameof(UpdateAsync), id);
 
             var entityDbo = await Repository.GetByIdAsync(id, null, cancellationToken).ConfigureAwait(false);
             var entityDto = MapToDto(entityDbo);
@@ -465,16 +464,16 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             // Perform update action
             update(entityDto);
 
-            Logger.LogDebug("Updating {name} entity with id '{id}' in db...", _entityName, id);
+            Logger.LogDebug("Updating {Name} entity with id '{Id}' in db...", _entityName, id);
             entityDbo = MapToDbo(entityDto);
             entityDbo = await Repository.UpdateAsync(id, entityDbo, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Updated {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDbo);
+            Logger.LogDebug("Updated {Name} entity with id {Id}. {@EntityDbo}", _entityName, id, entityDbo);
 
             return MapToDto(entityDbo);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Unable to update a {name} entity by id '{id}': {reason}", _entityName, id, ex.Message);
+            Logger.LogError(ex, "Unable to update a {Name} entity by id '{Id}': {Reason}", _entityName, id, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -489,22 +488,22 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
-            Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(DeleteAsync), id);
-            Logger.LogDebug("Deleting {name} entity with id '{id}' in db...", _entityName, id);
+            Logger.LogTrace("{ServiceName}.{Method} id: {Id}", _serviceName, nameof(DeleteAsync), id);
+            Logger.LogDebug("Deleting {Name} entity with id '{Id}' in db...", _entityName, id);
 
             var result = await Repository.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
             if (!result)
             {
-                Logger.LogDebug("{name} entity with id {id} was not found for deletion", _entityName, id);
+                Logger.LogDebug("{Name} entity with id {Id} was not found for deletion", _entityName, id);
                 return result;
             }
 
-            Logger.LogDebug("Deleted {name} entity with id {id}", _entityName, id);
+            Logger.LogDebug("Deleted {Name} entity with id {Id}", _entityName, id);
             return result;
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Unable to delete a {name} entity by id '{id}': {reason}", _entityName, id, ex.Message);
+            Logger.LogError(ex, "Unable to delete a {Name} entity by id '{Id}': {Reason}", _entityName, id, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -520,22 +519,22 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
             cancellationToken.ThrowIfCancellationRequested();
 
-            Logger.LogTrace("{serviceName}.{method} ids: {@ids}", _serviceName, nameof(DeleteAsync), ids);
-            Logger.LogDebug("Updating {name} entities in db...", _entityName);
+            Logger.LogTrace("{ServiceName}.{Method} ids: {@Ids}", _serviceName, nameof(DeleteAsync), ids);
+            Logger.LogDebug("Updating {Name} entities in db...", _entityName);
 
             var result = await Repository.DeleteAsync(ids, cancellationToken).ConfigureAwait(false);
             if (!result)
             {
-                Logger.LogDebug("Not all {name} entities with ids: {@ids} were found for deletion", _entityName, ids);
+                Logger.LogDebug("Not all {Name} entities with ids: {@Ids} were found for deletion", _entityName, ids);
                 return result;
             }
 
-            Logger.LogDebug("Deleted {name} entities with ids: {@ids}. Result: {result}", _entityName, ids, result);
+            Logger.LogDebug("Deleted {Name} entities with ids: {@Ids}. Result: {Result}", _entityName, ids, result);
             return result;
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Unable to delete {name} entities by ids '{@ids}': {reason}", _entityName, ids, ex.Message);
+            Logger.LogError(ex, "Unable to delete {Name} entities by ids '{@Ids}': {Reason}", _entityName, ids, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -550,17 +549,17 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             cancellationToken.ThrowIfCancellationRequested();
 
-            Logger.LogTrace("{serviceName}.{method} id: {id}", _serviceName, nameof(DeleteAndReturnAsync), id);
+            Logger.LogTrace("{ServiceName}.{Method} id: {Id}", _serviceName, nameof(DeleteAndReturnAsync), id);
 
-            Logger.LogDebug("Deleting {name} entity with id '{id}' in db...", _entityName, id);
+            Logger.LogDebug("Deleting {Name} entity with id '{Id}' in db...", _entityName, id);
             var entityDbo = await Repository.DeleteAndReturnAsync(id, cancellationToken).ConfigureAwait(false);
-            Logger.LogDebug("Deleted {name} entity with id {id}. {@entityDbo}", _entityName, id, entityDbo);
+            Logger.LogDebug("Deleted {Name} entity with id {Id}. {@EntityDbo}", _entityName, id, entityDbo);
 
             return MapToDto(entityDbo);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Unable to delete a {name} entity by id '{id}': {reason}", _entityName, id, ex.Message);
+            Logger.LogError(ex, "Unable to delete a {Name} entity by id '{Id}': {Reason}", _entityName, id, ex.Message);
             throw CreateProperException(ex);
         }
     }
@@ -569,7 +568,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     {
         if (Logger.IsEnabled(LogLevel.Trace))
         {
-            Logger.LogTrace("{serviceName}.{method}", _serviceName, methodName);
+            Logger.LogTrace("{ServiceName}.{Method}", _serviceName, methodName);
         }
     }
 }
