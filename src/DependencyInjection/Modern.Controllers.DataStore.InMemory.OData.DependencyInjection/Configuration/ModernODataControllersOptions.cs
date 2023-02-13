@@ -21,15 +21,15 @@ public class ModernODataControllersOptions
     /// <summary>
     /// Adds controller
     /// </summary>
-    /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
+    /// <typeparam name="TEntityDto">The type of entity contained in the data store</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
-    public void AddController<TEntityDbo, TId>()
-        where TEntityDbo : class
+    public void AddController<TEntityDto, TId>()
+        where TEntityDto : class
         where TId : IEquatable<TId>
     {
         var configuration = new ModernControllerSpecification
         {
-            EntityDboType = typeof(TEntityDbo),
+            EntityDtoType = typeof(TEntityDto),
             EntityIdType = typeof(TId)
         };
 

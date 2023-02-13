@@ -3,5 +3,6 @@ obj
 .idea
 .vs
 *.db*
+*.bak
 appsettings.development.json
 appsettings.production.json
