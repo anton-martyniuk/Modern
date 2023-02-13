@@ -1,8 +1,12 @@
+using System.Text.Json.Serialization;
 using Bogus;
+using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
-using Modern.Controllers.DataStore.Examples.DbContexts;
-using Modern.Controllers.DataStore.Examples.Entities;
-using Modern.Controllers.DataStore.Examples.Models;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
+using Modern.Controllers.DataStore.OData.Examples.DbContexts;
+using Modern.Controllers.DataStore.OData.Examples.Entities;
+using Modern.Controllers.DataStore.OData.Examples.Models;
 using Modern.Extensions.Microsoft.DependencyInjection;
 using Modern.Repositories.Abstractions;
 using Modern.Services.DataStore.Abstractions;
@@ -21,6 +25,24 @@ builder.Services.AddLogging();
 // Register db dependencies
 builder.Services.AddDbContextFactory<CityDbContext>(x => x.EnableSensitiveDataLogging().UseSqlite(connectionString));
 
+// Add controllers and register OData
+builder.Services.AddControllers(options =>
+    {
+        options.EnableEndpointRouting = true;
+    })
+    .AddJsonOptions(x =>
+    {
+        x.JsonSerializerOptions.PropertyNamingPolicy = null;
+        x.JsonSerializerOptions.WriteIndented = true;
+        x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    })
+    .AddOData(opt =>
+    {
+        opt.AddRouteComponents("api/odata", GetEdmModel());
+        opt.Select().Filter().Count().SkipToken().OrderBy().Expand().SetMaxTop(1000);
+        opt.TimeZone = TimeZoneInfo.Utc;
+    });
+
 // Add modern stuff
 builder.Services
     .AddModern()
@@ -35,6 +57,10 @@ builder.Services
     .AddControllers(options =>
     {
         options.AddController<CreateCityRequest, UpdateCityRequest, CityDto, CityDbo, int>();
+    })
+    .AddODataControllers(options =>
+    {
+        options.AddController<CityDbo, int>();
     });
 
 
@@ -46,7 +72,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
@@ -70,6 +96,18 @@ if (count == 0)
 
 // Run the api
 app.Run();
+
+static IEdmModel GetEdmModel()
+{
+    var builder = new ODataConventionModelBuilder();
+    builder.EnableLowerCamelCase();
+
+    builder.EntitySet<CityDbo>("cities");
+    builder.EntityType<CityDbo>();
+
+    return builder.GetEdmModel();
+}
+
 
 List<CityDto> GetCities(int count)
 {

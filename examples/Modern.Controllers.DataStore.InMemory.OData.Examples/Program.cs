@@ -1,11 +1,15 @@
+using System.Text.Json.Serialization;
 using Bogus;
+using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
-using Modern.Controllers.DataStore.InMemory.Examples.Customized.Controllers;
-using Modern.Controllers.DataStore.InMemory.Examples.Customized.DbContexts;
-using Modern.Controllers.DataStore.InMemory.Examples.Customized.Models;
-using Modern.Controllers.DataStore.InMemory.Examples.Customized.Repositories;
-using Modern.Controllers.DataStore.InMemory.Examples.Customized.Services;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
+using Modern.Controllers.DataStore.InMemory.OData.Examples.DbContexts;
+using Modern.Controllers.DataStore.InMemory.OData.Examples.Entities;
+using Modern.Controllers.DataStore.InMemory.OData.Examples.Models;
 using Modern.Extensions.Microsoft.DependencyInjection;
+using Modern.Repositories.Abstractions;
+using Modern.Services.DataStore.InMemory.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,20 +25,42 @@ builder.Services.AddLogging();
 // Register db dependencies
 builder.Services.AddDbContextFactory<CityDbContext>(x => x.EnableSensitiveDataLogging().UseSqlite(connectionString));
 
+// Add controllers and register OData
+builder.Services.AddControllers(options =>
+    {
+        options.EnableEndpointRouting = true;
+    })
+    .AddJsonOptions(x =>
+    {
+        x.JsonSerializerOptions.PropertyNamingPolicy = null;
+        x.JsonSerializerOptions.WriteIndented = true;
+        x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    })
+    .AddOData(opt =>
+    {
+        opt.AddRouteComponents("api/odata", GetEdmModel());
+        opt.Select().Filter().Count().SkipToken().OrderBy().Expand().SetMaxTop(1000);
+        opt.TimeZone = TimeZoneInfo.Utc;
+    });
+
 // Add modern stuff
 builder.Services
     .AddModern()
     .AddRepositoriesEfCore(options =>
     {
-        options.AddConcreteRepository<ICityRepository, CityRepository>();
+        options.AddRepository<CityDbContext, CityDbo, int>(true);
     })
     .AddInMemoryServices(options =>
     {
-        options.AddConcreteService<ICityInMemoryService, CityInMemoryService, CityDto, int>();
+        options.AddService<CityDto, CityDbo, int, IModernRepository<CityDbo, int>>();
     })
     .AddInMemoryControllers(options =>
     {
-        options.AddController<CitiesController>();
+        options.AddController<CreateCityRequest, UpdateCityRequest, CityDto, CityDbo, int>();
+    })
+    .AddInMemoryODataControllers(options =>
+    {
+        options.AddController<CityDto, int>();
     });
 
 
@@ -58,8 +84,7 @@ using (var scope = app.Services.CreateScope())
     await dbContext.Database.EnsureCreatedAsync();
 }
 
-// Get concrete service
-var service = app.Services.GetRequiredService<ICityInMemoryService>();
+var service = app.Services.GetRequiredService<IModernInMemoryService<CityDto, CityDbo, int>>();
 
 var count = await service.CountAsync();
 if (count == 0)
@@ -71,6 +96,18 @@ if (count == 0)
 
 // Run the api
 app.Run();
+
+
+static IEdmModel GetEdmModel()
+{
+    var builder = new ODataConventionModelBuilder();
+    builder.EnableLowerCamelCase();
+
+    builder.EntitySet<CityDto>("cities");
+    builder.EntityType<CityDto>();
+
+    return builder.GetEdmModel();
+}
 
 List<CityDto> GetCities(int count)
 {

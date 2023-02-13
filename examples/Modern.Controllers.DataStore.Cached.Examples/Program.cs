@@ -77,6 +77,7 @@ if (count == 0)
     await service.CreateAsync(newCities);
 }
 
+// Run the api
 app.Run();
 
 List<CityDto> GetCities(int count)
