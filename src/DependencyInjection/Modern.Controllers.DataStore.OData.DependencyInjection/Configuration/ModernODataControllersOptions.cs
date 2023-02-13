@@ -39,13 +39,13 @@ public class ModernODataControllersOptions
     /// <summary>
     /// Adds controller
     /// </summary>
-    /// <typeparam name="TServiceImplementation">The type of concrete controller implementation</typeparam>
-    public void AddController<TServiceImplementation>()
-        where TServiceImplementation : class
+    /// <typeparam name="TControllerImplementation">The type of concrete controller implementation</typeparam>
+    public void AddController<TControllerImplementation>()
+        where TControllerImplementation : class
     {
         var configuration = new ModernControllerConcreteSpecification
         {
-            ImplementationType = typeof(TServiceImplementation)
+            ImplementationType = typeof(TControllerImplementation)
         };
 
         ConcreteControllers.Add(configuration);

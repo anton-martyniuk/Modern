@@ -15,13 +15,13 @@ internal class GenericControllerRouteConvention : IControllerModelConvention
     public void Apply(ControllerModel controller)
     {
         var genericArgs = controller.ControllerType.GenericTypeArguments;
-        if (!controller.ControllerType.IsGenericType || genericArgs.Length != 3)
+        if (!controller.ControllerType.IsGenericType || genericArgs.Length != 2)
         {
             return;
         }
 
         // Select the [TEntityDto] type (1st in the list)
-        // ModernInMemoryODataController<**TEntityDto**, TEntityDbo, TId>
+        // ModernInMemoryODataController<**TEntityDto**, TId>
         var genericType = genericArgs[0];
 
         controller.Selectors.Clear();

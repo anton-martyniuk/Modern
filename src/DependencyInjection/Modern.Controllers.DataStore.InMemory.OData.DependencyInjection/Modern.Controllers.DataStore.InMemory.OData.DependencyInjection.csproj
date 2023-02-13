@@ -7,7 +7,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.0-beta2</Version>
+		<Version>1.0.0-beta3</Version>
 		<Authors>Anton Martyniuk</Authors>
 		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
 		<Title>Modern OData Controllers Extensions for Microsoft Dependency Injection</Title>
