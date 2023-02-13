@@ -22,7 +22,7 @@ public class ModernODataController<TEntityDbo, TId> : ODataController
     /// </summary>
     /// <param name="repository">The generic query repository</param>
     //protected ModernODataController(IModernService<TEntityDto, TEntityDbo, TId> service)
-    protected ModernODataController(IModernRepository<TEntityDbo, TId> repository)
+    public ModernODataController(IModernRepository<TEntityDbo, TId> repository)
     {
         _repository = repository;
     }

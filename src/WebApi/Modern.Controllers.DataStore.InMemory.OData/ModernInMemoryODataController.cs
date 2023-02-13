@@ -21,7 +21,7 @@ public class ModernInMemoryODataController<TEntityDto, TId> : ODataController
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="cache">Cache</param>
-    protected ModernInMemoryODataController(IModernServiceCache<TEntityDto, TId> cache)
+    public ModernInMemoryODataController(IModernServiceCache<TEntityDto, TId> cache)
     {
         _cache = cache;
     }

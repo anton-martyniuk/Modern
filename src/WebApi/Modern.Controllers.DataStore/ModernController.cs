@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
-using MapsterMapper;
+using Mapster;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Modern.Exceptions;
@@ -25,7 +25,6 @@ public class ModernController<TCreateRequest, TUpdateRequest, TEntityDto, TEntit
     where TId : IEquatable<TId>
 {
     private readonly IModernService<TEntityDto, TEntityDbo, TId> _service;
-    private readonly IMapper _mapper = new Mapper();
 
     /// <summary>
     /// Initializes a new instance of the class
@@ -94,7 +93,7 @@ public class ModernController<TCreateRequest, TUpdateRequest, TEntityDto, TEntit
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public virtual async Task<IActionResult> Create([FromBody, Required] TCreateRequest request)
     {
-        var entity = _mapper.Map<TEntityDto>(request);
+        var entity = request.Adapt<TEntityDto>();
         var createdEntity = await _service.CreateAsync(entity).ConfigureAwait(false);
         return Created(nameof(Create), createdEntity);
     }
@@ -113,7 +112,7 @@ public class ModernController<TCreateRequest, TUpdateRequest, TEntityDto, TEntit
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public virtual async Task<IActionResult> CreateMany([FromBody, Required] List<TCreateRequest> requests)
     {
-        var entities = _mapper.Map<List<TEntityDto>>(requests);
+        var entities = requests.Adapt<List<TEntityDto>>();
         var createdEntities = await _service.CreateAsync(entities).ConfigureAwait(false);
         return Created(nameof(Create), createdEntities);
     }
@@ -136,7 +135,7 @@ public class ModernController<TCreateRequest, TUpdateRequest, TEntityDto, TEntit
     {
         try
         {
-            var entity = _mapper.Map<TEntityDto>(request);
+            var entity = request.Adapt<TEntityDto>();
             await _service.UpdateAsync(id, entity).ConfigureAwait(false);
         }
         catch (EntityNotFoundException e)
@@ -164,7 +163,7 @@ public class ModernController<TCreateRequest, TUpdateRequest, TEntityDto, TEntit
     {
         try
         {
-            var entities = _mapper.Map<List<TEntityDto>>(requests);
+            var entities = requests.Adapt<List<TEntityDto>>();
             await _service.UpdateAsync(entities).ConfigureAwait(false);
         }
         catch (EntityNotFoundException e)
