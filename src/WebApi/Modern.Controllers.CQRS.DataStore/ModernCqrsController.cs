@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
-using MapsterMapper;
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +25,6 @@ public class ModernCqrsController<TCreateRequest, TUpdateRequest, TEntityDto, TI
     where TId : IEquatable<TId>
 {
     private readonly IMediator _mediator;
-    private readonly IMapper _mapper = new Mapper();
 
     /// <summary>
     /// Initializes a new instance of the class
@@ -96,7 +95,7 @@ public class ModernCqrsController<TCreateRequest, TUpdateRequest, TEntityDto, TI
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public virtual async Task<IActionResult> Create([FromBody, Required] TCreateRequest request)
     {
-        var entity = _mapper.Map<TEntityDto>(request);
+        var entity = request.Adapt<TEntityDto>();
         var command = new CreateEntityCommand<TEntityDto>(entity);
 
         var createdEntity = await _mediator.Send(command).ConfigureAwait(false);
@@ -117,7 +116,7 @@ public class ModernCqrsController<TCreateRequest, TUpdateRequest, TEntityDto, TI
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public virtual async Task<IActionResult> CreateMany([FromBody, Required] List<TCreateRequest> requests)
     {
-        var entities = _mapper.Map<List<TEntityDto>>(requests);
+        var entities = requests.Adapt<List<TEntityDto>>();
         var command = new CreateEntitiesCommand<TEntityDto>(entities);
 
         var createdEntities = await _mediator.Send(command).ConfigureAwait(false);
@@ -142,7 +141,7 @@ public class ModernCqrsController<TCreateRequest, TUpdateRequest, TEntityDto, TI
     {
         try
         {
-            var entity = _mapper.Map<TEntityDto>(request);
+            var entity = request.Adapt<TEntityDto>();
             var command = new UpdateEntityCommand<TEntityDto, TId>(id, entity);
 
             await _mediator.Send(command).ConfigureAwait(false);
@@ -172,7 +171,7 @@ public class ModernCqrsController<TCreateRequest, TUpdateRequest, TEntityDto, TI
     {
         try
         {
-            var entities = _mapper.Map<List<TEntityDto>>(requests);
+            var entities = requests.Adapt<List<TEntityDto>>();
             var command = new UpdateEntitiesCommand<TEntityDto>(entities);
 
             await _mediator.Send(command).ConfigureAwait(false);

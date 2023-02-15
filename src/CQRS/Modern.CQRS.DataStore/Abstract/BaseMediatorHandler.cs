@@ -1,4 +1,4 @@
-﻿using MapsterMapper;
+﻿using Mapster;
 using Modern.Exceptions;
 
 namespace Modern.CQRS.DataStore.Abstract;
@@ -16,23 +16,18 @@ public abstract class BaseMediatorHandler<TEntityDto, TEntityDbo>
     protected readonly string EntityName = typeof(TEntityDto).Name;
 
     /// <summary>
-    /// Mapper
-    /// </summary>
-    protected IMapper Mapper = new Mapper();
-
-    /// <summary>
     /// Returns <typeparamref name="TEntityDto"/> mapped from <typeparamref name="TEntityDbo"/>
     /// </summary>
     /// <param name="entityDto">Entity Dto</param>
     /// <returns>Entity Dbo</returns>
-    protected virtual TEntityDbo MapToDbo(TEntityDto entityDto) => Mapper.Map<TEntityDbo>(entityDto);
+    protected virtual TEntityDbo MapToDbo(TEntityDto entityDto) => entityDto.Adapt<TEntityDbo>();
 
     /// <summary>
     /// Returns <typeparamref name="TEntityDbo"/> mapped from <typeparamref name="TEntityDto"/>
     /// </summary>
     /// <param name="entityDbo">Entity Dbo</param>
     /// <returns>Entity Dto</returns>
-    protected virtual TEntityDto MapToDto(TEntityDbo entityDbo) => Mapper.Map<TEntityDto>(entityDbo);
+    protected virtual TEntityDto MapToDto(TEntityDbo entityDbo) => entityDbo.Adapt<TEntityDto>();
 
     /// <summary>
     /// Returns standardized handler exception

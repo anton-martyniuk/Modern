@@ -40,8 +40,8 @@ public static class ServicesExtensions
             builder.Services.AddDoubleArityRequestAndHandler(typeof(GetByIdQuery<,>), typeof(GetByIdQueryHandler<,,,>), c.EntityDtoType, c);
             builder.Services.AddDoubleArityRequestAndHandler(typeof(TryGetByIdQuery<,>), typeof(TryGetByIdQueryHandler<,,,>), nullableType, c);
             builder.Services.AddDoubleArityRequestAndHandler(typeof(GetAllQuery<,>), typeof(GetAllQueryHandler<,,,>), listType, c);
-            builder.Services.AddDoubleArityRequestAndHandler(typeof(GetCountAllQuery<,>), typeof(GetCountAllQueryHandler<,,,>), typeof(int), c);
-            builder.Services.AddDoubleArityRequestAndHandler(typeof(GetCountQuery<,>), typeof(GetCountQueryHandler<,,,>), typeof(int), c);
+            builder.Services.AddDoubleArityRequestAndHandler(typeof(GetCountAllQuery<,>), typeof(GetCountAllQueryHandler<,,,>), typeof(long), c);
+            builder.Services.AddDoubleArityRequestAndHandler(typeof(GetCountQuery<,>), typeof(GetCountQueryHandler<,,,>), typeof(long), c);
             builder.Services.AddDoubleArityRequestAndHandler(typeof(GetExistsQuery<,>), typeof(GetExistsQueryHandler<,,,>), typeof(bool), c);
             builder.Services.AddTripleArityRequestAndHandler(typeof(GetFirstOrDefaultQuery<,,>), typeof(GetFirstOrDefaultQueryHandler<,,,>), nullableType, c);
             builder.Services.AddTripleArityRequestAndHandler(typeof(GetSingleOrDefaultQuery<,,>), typeof(GetSingleOrDefaultQueryHandler<,,,>), nullableType, c);
@@ -61,36 +61,36 @@ public static class ServicesExtensions
         return builder;
     }
 
-    private static void AddSingleArityRequestAndHandler(this IServiceCollection services, Type reguestType, Type requestHandlerType, Type returnType, ModernCqrsSpecification c)
+    private static void AddSingleArityRequestAndHandler(this IServiceCollection services, Type requestType, Type requestHandlerType, Type returnType, ModernCqrsSpecification c)
     {
-        var requestInterfaceType = reguestType.MakeGenericType(c.EntityDtoType);
+        var requestInterfaceType = requestType.MakeGenericType(c.EntityDtoType);
         var requestHandlerInterfaceType = typeof(IRequestHandler<,>).MakeGenericType(requestInterfaceType, returnType);
         var requestHandlerImplementationType = requestHandlerType.MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType, c.RepositoryType);
 
         services.TryAdd(new ServiceDescriptor(requestHandlerInterfaceType, requestHandlerImplementationType, c.Lifetime));
     }
 
-    private static void AddDoubleArityRequestAndHandler(this IServiceCollection services, Type reguestType, Type requestHandlerType, Type returnType, ModernCqrsSpecification c)
+    private static void AddDoubleArityRequestAndHandler(this IServiceCollection services, Type requestType, Type requestHandlerType, Type returnType, ModernCqrsSpecification c)
     {
-        var requestInterfaceType = reguestType.MakeGenericType(c.EntityDtoType, c.EntityIdType);
+        var requestInterfaceType = requestType.MakeGenericType(c.EntityDtoType, c.EntityIdType);
         var requestHandlerInterfaceType = typeof(IRequestHandler<,>).MakeGenericType(requestInterfaceType, returnType);
         var requestHandlerImplementationType = requestHandlerType.MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType, c.RepositoryType);
 
         services.TryAdd(new ServiceDescriptor(requestHandlerInterfaceType, requestHandlerImplementationType, c.Lifetime));
     }
 
-    private static void AddTripleArityRequestAndHandler(this IServiceCollection services, Type reguestType, Type requestHandlerType, Type returnType, ModernCqrsSpecification c)
+    private static void AddTripleArityRequestAndHandler(this IServiceCollection services, Type requestType, Type requestHandlerType, Type returnType, ModernCqrsSpecification c)
     {
-        var requestInterfaceType = reguestType.MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
+        var requestInterfaceType = requestType.MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);
         var requestHandlerInterfaceType = typeof(IRequestHandler<,>).MakeGenericType(requestInterfaceType, returnType);
         var requestHandlerImplementationType = requestHandlerType.MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType, c.RepositoryType);
 
         services.TryAdd(new ServiceDescriptor(requestHandlerInterfaceType, requestHandlerImplementationType, c.Lifetime));
     }
 
-    private static void AddByIdRequestAndHandler(this IServiceCollection services, Type reguestType, Type requestHandlerType, Type returnType, ModernCqrsSpecification c)
+    private static void AddByIdRequestAndHandler(this IServiceCollection services, Type requestType, Type requestHandlerType, Type returnType, ModernCqrsSpecification c)
     {
-        var requestInterfaceType = reguestType.MakeGenericType(c.EntityIdType);
+        var requestInterfaceType = requestType.MakeGenericType(c.EntityIdType);
         var requestHandlerInterfaceType = typeof(IRequestHandler<,>).MakeGenericType(requestInterfaceType, returnType);
         var requestHandlerImplementationType = requestHandlerType.MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType, c.RepositoryType);
 
