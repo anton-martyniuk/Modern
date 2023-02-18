@@ -25,7 +25,7 @@ public class CitiesController : ModernInMemoryController<CreateCityRequest, Upda
     [HttpGet("get-by-country/{country}")]
     public virtual async Task<IActionResult> GetCountryCities([Required] string country)
     {
-        var entity = await _service.GetCountryCitiesAsync(country).ConfigureAwait(false);
-        return Ok(entity);
+        var entities = await _service.GetCountryCitiesAsync(country).ConfigureAwait(false);
+        return Ok(entities);
     }
 }
