@@ -28,7 +28,7 @@ public class ModernEfCoreRepositorySpecification
     public ServiceLifetime Lifetime { get; set; }
 
     /// <summary>
-    /// Indicates whether repository with DbContextFactory should be used
+    /// Specifies the repository type
     /// </summary>
-    public bool UseDbFactory { get; set; }
+    internal EfCoreRepositoryType RepositoryType { get; set; }
 }

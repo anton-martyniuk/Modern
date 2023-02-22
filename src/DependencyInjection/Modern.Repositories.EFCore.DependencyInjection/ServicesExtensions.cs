@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Modern.Extensions.Microsoft.DependencyInjection.Models;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.EFCore;
 using Modern.Repositories.EFCore.Configuration;
+using Modern.Repositories.EFCore.DependencyInjection.Configuration;
+using Modern.Repositories.EFCore.UnitOfWork;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -33,11 +36,14 @@ public static class ServicesExtensions
         foreach (var c in options.Repositories)
         {
             var interfaceType = typeof(IModernRepository<,>).MakeGenericType(c.EntityType, c.EntityIdType);
-            var implementationType = c.UseDbFactory 
-                ? typeof(ModernEfCoreRepositoryWithFactory<,,>).MakeGenericType(c.DbContextType, c.EntityType, c.EntityIdType)
-                : typeof(ModernEfCoreRepository<,,>).MakeGenericType(c.DbContextType, c.EntityType, c.EntityIdType);
+            var implementationType = GetRepositoryImplementationType(c);
 
             builder.Services.TryAdd(new ServiceDescriptor(interfaceType, implementationType, c.Lifetime));
+
+            if (c.RepositoryType is EfCoreRepositoryType.UnitOfWork)
+            {
+                RegisterUnitOfWork(builder, c);
+            }
         }
 
         foreach (var c in options.ConcreteRepositories)
@@ -47,4 +53,21 @@ public static class ServicesExtensions
 
         return builder;
     }
+
+    private static void RegisterUnitOfWork(ModernServicesBuilder builder, ModernEfCoreRepositorySpecification c)
+    {
+        var interfaceType = typeof(IModernUnitOfWork<,>).MakeGenericType(c.EntityType, c.EntityIdType);
+        var implementationType = typeof(ModernUnitOfWork<,,>).MakeGenericType(c.DbContextType, c.EntityType, c.EntityIdType);
+        
+        builder.Services.TryAdd(new ServiceDescriptor(interfaceType, implementationType, c.Lifetime));
+    }
+
+    private static Type GetRepositoryImplementationType(ModernEfCoreRepositorySpecification c)
+        => c.RepositoryType switch
+        {
+            EfCoreRepositoryType.DbContext => typeof(ModernEfCoreRepository<,,>).MakeGenericType(c.DbContextType, c.EntityType, c.EntityIdType),
+            EfCoreRepositoryType.DbContextFactory => typeof(ModernEfCoreRepositoryWithFactory<,,>).MakeGenericType(c.DbContextType, c.EntityType, c.EntityIdType),
+            EfCoreRepositoryType.UnitOfWork => typeof(ModernEfCoreRepositoryForUnitOfWork<,,>).MakeGenericType(c.DbContextType, c.EntityType, c.EntityIdType),
+            _ => throw new UnreachableException($"{c.RepositoryType:G} is not supported")
+        };
 }

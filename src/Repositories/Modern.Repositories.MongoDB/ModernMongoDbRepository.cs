@@ -309,7 +309,7 @@ public class ModernMongoDbRepository<TEntity, TId> : IModernRepository<TEntity, 
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.GetAllAsync"/>
     /// </summary>
-    public virtual async Task<IEnumerable<TEntity>> GetAllAsync(EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
+    public virtual async Task<List<TEntity>> GetAllAsync(EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -416,7 +416,7 @@ public class ModernMongoDbRepository<TEntity, TId> : IModernRepository<TEntity, 
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.WhereAsync(Expression{Func{TEntity, bool}},EntityIncludeQuery{TEntity},CancellationToken)"/>
     /// </summary>
-    public virtual async Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
+    public virtual async Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {

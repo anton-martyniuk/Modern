@@ -48,7 +48,7 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
     /// <returns>The list of all entities</returns>
-    Task<IEnumerable<TEntity>> GetAllAsync(EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
+    Task<List<TEntity>> GetAllAsync(EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns the total count of entities in the data store
@@ -112,7 +112,7 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
     /// <returns>A list of entities that match the condition</returns>
-    Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
+    Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns certain amount of paged entities from the data store that match the given <paramref name="predicate"/>

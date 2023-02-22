@@ -93,7 +93,7 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
 
             var isolationLevel = _configuration?.CreateConfiguration?.TransactionIsolationLevel ?? IsolationLevel.Unspecified;
             await using var transaction = await DbContext.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
-
+            
             await DbContext.Set<TEntity>().AddAsync(entity, cancellationToken).ConfigureAwait(false);
             await DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
@@ -352,7 +352,7 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity, TId}.GetAllAsync"/>
     /// </summary>
-    public virtual async Task<IEnumerable<TEntity>> GetAllAsync(EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
+    public virtual async Task<List<TEntity>> GetAllAsync(EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -499,7 +499,7 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
     /// <summary>
     /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.WhereAsync(Expression{Func{TEntity, bool}},EntityIncludeQuery{TEntity},CancellationToken)"/>
     /// </summary>
-    public virtual async Task<IEnumerable<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
+    public virtual async Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -676,7 +676,7 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
     private async Task<bool> PerformDeleteAsync(TDbContext context, TId id, CancellationToken cancellationToken)
     {
         var idName = GetEntityIdColumnOrThrow(context);
-        var result = await context.Set<TEntity>().Where(x => id.Equals(EF.Property<TId>(x, idName))).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
+        var result = await context.Set<TEntity>().Where(x => id.Equals(EF.Property<TId>(x, idName))).ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
         return result == 1;
     }
 
@@ -698,7 +698,7 @@ public class ModernEfCoreRepository<TDbContext, TEntity, TId> : IModernRepositor
         var entityIdChunks = ids.Chunk(200).ToList();
         foreach (var entityIdChunk in entityIdChunks)
         {
-            var result = await context.Set<TEntity>().Where(x => entityIdChunk.Contains(EF.Property<TId>(x, idName))).DeleteFromQueryAsync(cancellationToken).ConfigureAwait(false);
+            var result = await context.Set<TEntity>().Where(x => entityIdChunk.Contains(EF.Property<TId>(x, idName))).ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
             isAllDeleted &= result == ids.Count;
         }
 

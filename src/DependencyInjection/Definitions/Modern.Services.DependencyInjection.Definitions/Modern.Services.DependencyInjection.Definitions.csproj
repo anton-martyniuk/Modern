@@ -7,7 +7,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.0-beta1</Version>
+		<Version>1.0.0-beta2</Version>
 		<Authors>Anton Martyniuk</Authors>
 		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
 		<Title>Modern Services Dependency Injection definitions</Title>
@@ -23,10 +23,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\..\..\Repositories\Modern.Repositories.Abstractions\Modern.Repositories.Abstractions.csproj" />
 	</ItemGroup>
 
 	<Target Name="PostPackNugetDeploy" AfterTargets="Pack" Condition="'$(Configuration)'=='Release'">

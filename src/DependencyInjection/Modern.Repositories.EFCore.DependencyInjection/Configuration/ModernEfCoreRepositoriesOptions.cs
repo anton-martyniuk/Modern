@@ -35,18 +35,14 @@ public class ModernEfCoreRepositoriesOptions
     }
 
     /// <summary>
-    /// Adds repository
+    /// Adds repository with injecting DbContext in the constructor.<br/>
+    /// When using DbContext repository shares the same database connection during its lifetime
     /// </summary>
-    /// <param name="useDbFactory">
-    /// Indicates whether repository with DbContextFactory should be used.<br/>
-    /// When using DbContextFactory every repository creates and closes a database connection in each method.<br/>
-    /// When NOT using DbContextFactory repository shares the same database connection during its lifetime
-    /// </param>
     /// <param name="lifetime">Repository lifetime in DI</param>
     /// <typeparam name="TDbContext">The type of EF Core DbContext</typeparam>
     /// <typeparam name="TEntity">The type of entity</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
-    public void AddRepository<TDbContext, TEntity, TId>(bool useDbFactory = false, ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddRepository<TDbContext, TEntity, TId>(ServiceLifetime lifetime = ServiceLifetime.Transient)
         where TDbContext : DbContext
         where TEntity : class
         where TId : IEquatable<TId>
@@ -57,7 +53,57 @@ public class ModernEfCoreRepositoriesOptions
             EntityType = typeof(TEntity),
             EntityIdType = typeof(TId),
             Lifetime = lifetime,
-            UseDbFactory = useDbFactory
+            RepositoryType = EfCoreRepositoryType.DbContext
+        };
+
+        Repositories.Add(configuration);
+    }
+    
+    /// <summary>
+    /// Adds repository with injecting DbContextFactory in the constructor.<br/>
+    /// When using DbContextFactory every repository creates and closes a database connection in each method.
+    /// </summary>
+    /// <param name="lifetime">Repository lifetime in DI</param>
+    /// <typeparam name="TDbContext">The type of EF Core DbContext</typeparam>
+    /// <typeparam name="TEntity">The type of entity</typeparam>
+    /// <typeparam name="TId">The type of entity identifier</typeparam>
+    public void AddRepositoryWithDbFactory<TDbContext, TEntity, TId>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+        where TDbContext : DbContext
+        where TEntity : class
+        where TId : IEquatable<TId>
+    {
+        var configuration = new ModernEfCoreRepositorySpecification
+        {
+            DbContextType = typeof(TDbContext),
+            EntityType = typeof(TEntity),
+            EntityIdType = typeof(TId),
+            Lifetime = lifetime,
+            RepositoryType = EfCoreRepositoryType.DbContextFactory
+        };
+
+        Repositories.Add(configuration);
+    }
+    
+    /// <summary>
+    /// Adds repository with injecting DbContextFactory in the constructor.<br/>
+    /// When using DbContextFactory every repository creates and closes a database connection in each method.
+    /// </summary>
+    /// <param name="lifetime">Repository lifetime in DI</param>
+    /// <typeparam name="TDbContext">The type of EF Core DbContext</typeparam>
+    /// <typeparam name="TEntity">The type of entity</typeparam>
+    /// <typeparam name="TId">The type of entity identifier</typeparam>
+    public void AddRepositoryWithUnitOfWork<TDbContext, TEntity, TId>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+        where TDbContext : DbContext
+        where TEntity : class
+        where TId : IEquatable<TId>
+    {
+        var configuration = new ModernEfCoreRepositorySpecification
+        {
+            DbContextType = typeof(TDbContext),
+            EntityType = typeof(TEntity),
+            EntityIdType = typeof(TId),
+            Lifetime = lifetime,
+            RepositoryType = EfCoreRepositoryType.UnitOfWork
         };
 
         Repositories.Add(configuration);
