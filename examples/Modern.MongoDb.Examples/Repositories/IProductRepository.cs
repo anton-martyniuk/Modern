@@ -5,7 +5,7 @@ namespace Modern.MongoDb.Examples.Repositories;
 
 public interface IProductRepository : IModernRepository<ProductDbo, string>
 {
-    Task<IEnumerable<ProductDbo>> FilterByAttributeAsync(string attributeName, string attributeValue);
+    Task<List<ProductDbo>> FilterByAttributeAsync(string attributeName, string attributeValue);
     
-    Task<IEnumerable<ProductDbo>> OrderByPriceAsync(bool ascending);
+    Task<List<ProductDbo>> OrderByPriceAsync(bool ascending);
 }

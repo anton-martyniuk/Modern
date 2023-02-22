@@ -6,5 +6,5 @@ namespace Modern.Controllers.DataStore.Examples.Customized.Services;
 
 public interface ICityService : IModernService<CityDto, CityDbo, int>
 {
-    Task<IEnumerable<CityDto>> GetCountryCitiesAsync(string country);
+    Task<List<CityDto>> GetCountryCitiesAsync(string country);
 }

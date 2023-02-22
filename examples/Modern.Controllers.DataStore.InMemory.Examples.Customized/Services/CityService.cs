@@ -13,9 +13,9 @@ public class CityInMemoryService : ModernInMemoryService<CityDto, CityDbo, int, 
     {
     }
 
-    public async Task<IEnumerable<CityDto>> GetCountryCitiesAsync(string country)
+    public async Task<List<CityDto>> GetCountryCitiesAsync(string country)
     {
         var entitiesDbo = await Repository.GetCountryCitiesAsync(country);
-        return entitiesDbo.Select(MapToDto).ToList();
+        return entitiesDbo.ConvertAll(MapToDto);
     }
 }

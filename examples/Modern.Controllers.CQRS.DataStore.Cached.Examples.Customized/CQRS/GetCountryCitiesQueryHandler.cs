@@ -21,6 +21,6 @@ public class GetCountryCitiesQueryHandler : BaseMediatorHandler<CityDto, CityDbo
     public async Task<List<CityDto>> Handle(GetCountryCitiesQuery request, CancellationToken cancellationToken)
     {
         var cities = await _cityRepository.GetCountryCitiesAsync(request.Country);
-        return cities.ToList().ConvertAll(MapToDto);
+        return cities.ConvertAll(MapToDto);
     }
 }

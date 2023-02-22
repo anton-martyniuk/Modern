@@ -15,9 +15,9 @@
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.2" />
         <PackageReference Include="Modern.Controllers.DataStore.DependencyInjection" Version="1.0.0-beta2" />
-        <PackageReference Include="Modern.Controllers.DataStore.OData.DependencyInjection" Version="1.0.0-beta2" />
-        <PackageReference Include="Modern.Repositories.EFCore.DependencyInjection" Version="1.0.0-beta2" />
-        <PackageReference Include="Modern.Services.DataStore.DependencyInjection" Version="1.0.0-beta2" />
+        <PackageReference Include="Modern.Controllers.DataStore.OData.DependencyInjection" Version="1.0.0-beta3" />
+        <PackageReference Include="Modern.Repositories.EFCore.DependencyInjection" Version="1.0.0-beta3" />
+        <PackageReference Include="Modern.Services.DataStore.DependencyInjection" Version="1.0.0-beta3" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     </ItemGroup>
 

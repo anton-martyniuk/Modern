@@ -13,9 +13,9 @@ public class CityCachedService : ModernCachedService<CityDto, CityDbo, int, ICit
     {
     }
 
-    public async Task<IEnumerable<CityDto>> GetCountryCitiesAsync(string country)
+    public async Task<List<CityDto>> GetCountryCitiesAsync(string country)
     {
         var entitiesDbo = await Repository.GetCountryCitiesAsync(country);
-        return entitiesDbo.Select(MapToDto).ToList();
+        return entitiesDbo.ConvertAll(MapToDto);
     }
 }

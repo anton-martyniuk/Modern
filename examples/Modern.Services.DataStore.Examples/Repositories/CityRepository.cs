@@ -14,7 +14,7 @@ public class CityRepository : ModernEfCoreRepositoryWithFactory<CityDbContext, C
     {
     }
 
-    public async Task<IEnumerable<CityDbo>> GetCountryCitiesAsync(string country)
+    public async Task<List<CityDbo>> GetCountryCitiesAsync(string country)
     {
         await using var dbConnection = await DbContextFactory.CreateDbContextAsync();
 

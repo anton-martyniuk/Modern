@@ -14,7 +14,7 @@ public class CityRepository : ModernDapperRepository<CityDboMapping, CityDbo, in
     {
     }
 
-    public async Task<IEnumerable<CityDbo>> GetCountryCitiesAsync(string country)
+    public async Task<List<CityDbo>> GetCountryCitiesAsync(string country)
     {
         await using var dbConnection = DbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
@@ -23,6 +23,6 @@ public class CityRepository : ModernDapperRepository<CityDboMapping, CityDbo, in
         const string query = $"SELECT {columnsQuery} FROM cities WHERE country like '%@Country%'";
         
         var entities = await dbConnection.QueryAsync<CityDbo>(new CommandDefinition(query, new { Country = country }));
-        return entities;
+        return entities.ToList();
     }
 }

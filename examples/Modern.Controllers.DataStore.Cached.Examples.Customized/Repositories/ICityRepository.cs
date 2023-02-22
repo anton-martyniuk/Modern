@@ -5,5 +5,5 @@ namespace Modern.Controllers.DataStore.Cached.Examples.Customized.Repositories;
 
 public interface ICityRepository : IModernRepository<CityDbo, int>
 {
-    Task<IEnumerable<CityDbo>> GetCountryCitiesAsync(string country);
+    Task<List<CityDbo>> GetCountryCitiesAsync(string country);
 }

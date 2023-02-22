@@ -29,7 +29,7 @@ builder.Services
     .AddModern()
     .AddRepositoriesEfCore(options =>
     {
-        options.AddRepository<CityDbContext, CityDbo, int>(true);
+        options.AddRepositoryWithDbFactory<CityDbContext, CityDbo, int>();
     })
     .AddCqrs(options =>
     {

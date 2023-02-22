@@ -12,7 +12,7 @@ public class ProductRepository : ModernMongoDbRepository<ProductDbo, string>, IP
     {
     }
 
-    public async Task<IEnumerable<ProductDbo>> FilterByAttributeAsync(string attributeName, string attributeValue)
+    public async Task<List<ProductDbo>> FilterByAttributeAsync(string attributeName, string attributeValue)
     {
         // Use IModernRepository method
         return await WhereAsync(dbo => dbo.Attributes.Any(attr => attr.Key.Equals(attributeName) && attr.Value.Equals(attributeValue)));
@@ -25,7 +25,7 @@ public class ProductRepository : ModernMongoDbRepository<ProductDbo, string>, IP
         //     .ToListAsync();
     }
 
-    public async Task<IEnumerable<ProductDbo>> OrderByPriceAsync(bool ascending)
+    public async Task<List<ProductDbo>> OrderByPriceAsync(bool ascending)
     {
         if (ascending)
         {

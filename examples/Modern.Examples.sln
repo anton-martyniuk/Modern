@@ -54,6 +54,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.CQRS.Dat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.CQRS.DataStore.Examples.Customized", "Modern.Controllers.CQRS.DataStore.Examples.Customized\Modern.Controllers.CQRS.DataStore.Examples.Customized.csproj", "{7AF6A953-CFC9-4262-B585-3564C2CA2FE2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.EfCore.UnitOfWork.Examples", "Modern.EfCore.UnitOfWork.Examples\Modern.EfCore.UnitOfWork.Examples.csproj", "{74603B03-81E2-46CF-9716-33BD39566288}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -148,6 +150,10 @@ Global
 		{7AF6A953-CFC9-4262-B585-3564C2CA2FE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AF6A953-CFC9-4262-B585-3564C2CA2FE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AF6A953-CFC9-4262-B585-3564C2CA2FE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74603B03-81E2-46CF-9716-33BD39566288}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74603B03-81E2-46CF-9716-33BD39566288}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74603B03-81E2-46CF-9716-33BD39566288}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74603B03-81E2-46CF-9716-33BD39566288}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{209DFE9E-EC40-4218-A973-38F2F55336E3} = {A4DFE31B-58A0-457B-B30B-0232570BB48E}
@@ -172,5 +178,6 @@ Global
 		{926F9743-35AF-4F49-9178-A93A19432CB6} = {79497AB6-34B0-4E1D-8981-71CCA57B7127}
 		{DC6C1561-AF4C-466E-9DC5-8092C094D1ED} = {79497AB6-34B0-4E1D-8981-71CCA57B7127}
 		{7AF6A953-CFC9-4262-B585-3564C2CA2FE2} = {79497AB6-34B0-4E1D-8981-71CCA57B7127}
+		{74603B03-81E2-46CF-9716-33BD39566288} = {A4DFE31B-58A0-457B-B30B-0232570BB48E}
 	EndGlobalSection
 EndGlobal

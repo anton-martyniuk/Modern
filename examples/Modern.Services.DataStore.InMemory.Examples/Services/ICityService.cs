@@ -6,5 +6,5 @@ namespace Modern.Services.DataStore.InMemory.Examples.Services;
 
 public interface ICityInMemoryService : IModernInMemoryService<CityDto, CityDbo, int>
 {
-    Task<IEnumerable<CityDto>> GetCountryCitiesAsync(string country);
+    Task<List<CityDto>> GetCountryCitiesAsync(string country);
 }

@@ -13,14 +13,14 @@ public class CityDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var flyingCompany = modelBuilder.Entity<CityDbo>().ToTable("cities");
-        flyingCompany.HasKey(x => x.Id);
-        flyingCompany.HasIndex(x => x.Name).IsUnique();
+        var entity = modelBuilder.Entity<CityDbo>().ToTable("cities");
+        entity.HasKey(x => x.Id);
+        entity.HasIndex(x => x.Name);
 
-        flyingCompany.Property(x => x.Id).HasColumnName("id").IsRequired();
-        flyingCompany.Property(x => x.Name).HasColumnName("name").HasMaxLength(100).IsRequired();
-        flyingCompany.Property(x => x.Country).HasColumnName("country").HasMaxLength(100).IsRequired();
-        flyingCompany.Property(x => x.Area).HasColumnName("area").IsRequired();
-        flyingCompany.Property(x => x.Population).HasColumnName("population").IsRequired();
+        entity.Property(x => x.Id).HasColumnName("id").IsRequired();
+        entity.Property(x => x.Name).HasColumnName("name").HasMaxLength(100).IsRequired();
+        entity.Property(x => x.Country).HasColumnName("country").HasMaxLength(100).IsRequired();
+        entity.Property(x => x.Area).HasColumnName("area").IsRequired();
+        entity.Property(x => x.Population).HasColumnName("population").IsRequired();
     }
 }
