@@ -2,6 +2,7 @@
 using Modern.Extensions.Microsoft.DependencyInjection.Models;
 using Modern.Services.DataStore.Abstractions;
 using Modern.Services.DataStore.Cached;
+using Modern.Services.DataStore.Cached.Configuration;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -21,7 +22,16 @@ public static class ServicesExtensions
     {
         var options = new ModernServicesOptions();
         configure(options);
-        
+
+        if (options.ServiceConfiguration is not null)
+        {
+            builder.Services.Configure<ModernCachedServiceConfiguration>(x =>
+            {
+                x.AddToCacheWhenEntityCreated = options.ServiceConfiguration.AddToCacheWhenEntityCreated;
+                x.AddOrUpdateInCacheWhenEntityIsUpdated = options.ServiceConfiguration.AddOrUpdateInCacheWhenEntityIsUpdated;
+            });   
+        }
+
         foreach (var c in options.Services)
         {
             var interfaceType = typeof(IModernService<,,>).MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType);

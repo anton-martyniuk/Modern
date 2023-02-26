@@ -4,6 +4,7 @@ using Modern.Services.DataStore.InMemory;
 using Modern.Services.DataStore.InMemory.Abstractions;
 using Modern.Services.DataStore.InMemory.Abstractions.Cache;
 using Modern.Services.DataStore.InMemory.Cache;
+using Modern.Services.DataStore.InMemory.Configuration;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,15 @@ public static class ServicesExtensions
     {
         var options = new ModernServicesOptions();
         configure(options);
+        
+        if (options.ServiceConfiguration is not null)
+        {
+            builder.Services.Configure<ModernInMemoryServiceConfiguration>(x =>
+            {
+                x.AddToCacheWhenEntityCreated = options.ServiceConfiguration.AddToCacheWhenEntityCreated;
+                x.AddOrUpdateInCacheWhenEntityIsUpdated = options.ServiceConfiguration.AddOrUpdateInCacheWhenEntityIsUpdated;
+            });   
+        }
 
         foreach (var c in options.Services)
         {

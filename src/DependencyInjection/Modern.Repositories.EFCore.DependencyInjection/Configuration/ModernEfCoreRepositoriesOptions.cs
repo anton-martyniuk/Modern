@@ -13,7 +13,7 @@ public class ModernEfCoreRepositoriesOptions
     /// <summary>
     /// EF Core repository configuration
     /// </summary>
-    internal EfCoreRepositoryConfiguration RepositoryConfiguration { get; } = new();
+    internal EfCoreRepositoryConfiguration? RepositoryConfiguration { get; private set; }
     
     /// <summary>
     /// Collection of modern repository specifications
@@ -29,8 +29,9 @@ public class ModernEfCoreRepositoriesOptions
     /// Configures EF Core repository configuration
     /// </summary>
     /// <param name="repositoryConfiguration">The EF Core repository configuration update action</param>
-    public void ConfigureRepositoryConfiguration(Action<EfCoreRepositoryConfiguration>? repositoryConfiguration = null)
+    public void ConfigureRepository(Action<EfCoreRepositoryConfiguration>? repositoryConfiguration = null)
     {
+        RepositoryConfiguration = new EfCoreRepositoryConfiguration();
         repositoryConfiguration?.Invoke(RepositoryConfiguration);
     }
 

@@ -2,11 +2,13 @@
 using System.Linq.Expressions;
 using Ardalis.GuardClauses;
 using Mapster;
+using Microsoft.Extensions.Options;
 using Modern.Cache.Abstractions;
 using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Services.DataStore.Abstractions;
+using Modern.Services.DataStore.Cached.Configuration;
 
 namespace Modern.Services.DataStore.Cached;
 
@@ -24,6 +26,8 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     where TId : IEquatable<TId>
     where TRepository : class, IModernQueryRepository<TEntityDbo, TId>, IModernCrudRepository<TEntityDbo, TId>
 {
+    private readonly IOptions<ModernCachedServiceConfiguration> _options;
+    
     private readonly string _entityName = typeof(TEntityDto).Name;
     private readonly string _serviceName = $"{typeof(TEntityDto).Name}Service";
 
@@ -46,16 +50,20 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="repository">The generic repository</param>
-    /// <param name="cache">Cache</param>
+    /// <param name="cache">The service cache of entities</param>
+    /// <param name="options">The cached service configuration options</param>
     /// <param name="logger">The logger</param>
     public ModernCachedService(TRepository repository,
         IModernCache<TEntityDto, TId> cache,
+        IOptions<ModernCachedServiceConfiguration> options,
         ILogger<ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(cache, nameof(cache));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
+        _options = options;
+        
         Repository = repository;
         Cache = cache;
         Logger = logger;
@@ -395,9 +403,14 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
             entityDbo = await Repository.CreateAsync(entityDbo, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Created {Name} entity. {@EntityDbo}", _entityName, entityDbo);
 
+            if (!_options.Value.AddToCacheWhenEntityCreated)
+            {
+                return MapToDto(entityDbo);
+            }
+            
             var entityDto = MapToDto(entityDbo);
             var entityId = GetEntityId(entityDto);
-
+                
             Logger.LogDebug("Creating {Name} entity with id '{Id}' in cache...", _entityName, entityId);
             await Cache.AddOrUpdateAsync(entityId, entityDto).ConfigureAwait(false);
             Logger.LogDebug("Created {Name} entity with id '{Id}'. {@EntityDto}", _entityName, entityId, entityDto);
@@ -428,6 +441,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
             var entitiesDbo = entities.ConvertAll(MapToDbo);
             entitiesDbo = await Repository.CreateAsync(entitiesDbo, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Created {Name} entities. {@EntityDbo}", _entityName, entitiesDbo);
+            
+            if (!_options.Value.AddToCacheWhenEntityCreated)
+            {
+                return entitiesDbo.ConvertAll(MapToDto);
+            }
 
             var entitiesDto = entitiesDbo.ConvertAll(MapToDto);
             var dictionary = entitiesDto.ToDictionary(GetEntityId, entity => entity);
@@ -463,6 +481,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
             Logger.LogDebug("Updating {Name} entity with id '{Id}' in db...", _entityName, id);
             entityDbo = await Repository.UpdateAsync(id, entityDbo, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Updated {Name} entity with id {Id}. {@EntityDbo}", _entityName, id, entityDbo);
+            
+            if (!_options.Value.AddOrUpdateInCacheWhenEntityIsUpdated)
+            {
+                return MapToDto(entityDbo);
+            }
 
             var entityDto = MapToDto(entityDbo);
 
@@ -497,6 +520,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
             Logger.LogDebug("Updating entity in db...");
             entitiesDbo = await Repository.UpdateAsync(entitiesDbo, cancellationToken).ConfigureAwait(false);
             Logger.LogDebug("Updated {Name} entities. {@EntitiesDbo}", _entityName, entitiesDbo);
+            
+            if (!_options.Value.AddOrUpdateInCacheWhenEntityIsUpdated)
+            {
+                return entitiesDbo.ConvertAll(MapToDto);
+            }
 
             var entitiesDto = entitiesDbo.ConvertAll(MapToDto);
             var dictionary = entitiesDto.ToDictionary(GetEntityId, entity => entity);
@@ -539,6 +567,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId, TRepository> :
             Logger.LogDebug("Updated {Name} entity with id {Id}. {@EntityDbo}", _entityName, id, entityDbo);
 
             entityDto = MapToDto(entityDbo);
+            
+            if (!_options.Value.AddOrUpdateInCacheWhenEntityIsUpdated)
+            {
+                return entityDto;
+            }
 
             Logger.LogDebug("Updating {Name} entity with id '{Id}' in cache...", _entityName, id);
             await Cache.AddOrUpdateAsync(id, entityDto).ConfigureAwait(false);

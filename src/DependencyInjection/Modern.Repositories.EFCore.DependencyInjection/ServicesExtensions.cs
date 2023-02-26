@@ -26,12 +26,15 @@ public static class ServicesExtensions
         var options = new ModernEfCoreRepositoriesOptions();
         configure(options);
 
-        builder.Services.Configure<EfCoreRepositoryConfiguration>(x =>
+        if (options.RepositoryConfiguration is not null)
         {
-            x.CreateConfiguration = options.RepositoryConfiguration.CreateConfiguration;
-            x.UpdateConfiguration = options.RepositoryConfiguration.UpdateConfiguration;
-            x.DeleteConfiguration = options.RepositoryConfiguration.DeleteConfiguration;
-        });
+            builder.Services.Configure<EfCoreRepositoryConfiguration>(x =>
+            {
+                x.CreateConfiguration = options.RepositoryConfiguration.CreateConfiguration;
+                x.UpdateConfiguration = options.RepositoryConfiguration.UpdateConfiguration;
+                x.DeleteConfiguration = options.RepositoryConfiguration.DeleteConfiguration;
+            });   
+        }
 
         foreach (var c in options.Repositories)
         {

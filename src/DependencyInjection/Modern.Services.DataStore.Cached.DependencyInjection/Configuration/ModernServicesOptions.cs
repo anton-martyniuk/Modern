@@ -1,4 +1,5 @@
 ﻿using Modern.Repositories.Abstractions;
+using Modern.Services.DataStore.Cached.Configuration;
 using Modern.Services.DependencyInjection.Definitions.Configuration;
 
 // ReSharper disable once CheckNamespace
@@ -10,6 +11,11 @@ namespace Microsoft.Extensions.DependencyInjection;
 public class ModernServicesOptions
 {
     /// <summary>
+    /// The modern cached service configuration
+    /// </summary>
+    internal ModernCachedServiceConfiguration? ServiceConfiguration { get; private set; }
+    
+    /// <summary>
     /// Collection of modern services specifications
     /// </summary>
     internal List<ModernServiceSpecification> Services { get; } = new();
@@ -18,6 +24,16 @@ public class ModernServicesOptions
     /// Collection of modern services specifications
     /// </summary>
     internal List<ModernServiceConcreteSpecification> ConcreteServices { get; } = new();
+    
+    /// <summary>
+    /// Configures modern cached service configuration
+    /// </summary>
+    /// <param name="configuration">The modern cached service configuration update action</param>
+    public void ConfigureService(Action<ModernCachedServiceConfiguration>? configuration = null)
+    {
+        ServiceConfiguration = new ModernCachedServiceConfiguration();
+        configuration?.Invoke(ServiceConfiguration);
+    }
 
     /// <summary>
     /// Adds service

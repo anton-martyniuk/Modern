@@ -1,4 +1,5 @@
 ﻿using Modern.Repositories.Abstractions;
+using Modern.Services.DataStore.InMemory.Configuration;
 using ModernServiceConcreteSpecification = Modern.Services.DataStore.InMemory.DependencyInjection.Configuration.ModernServiceConcreteSpecification;
 using ModernServiceSpecification = Modern.Services.DataStore.InMemory.DependencyInjection.Configuration.ModernServiceSpecification;
 
@@ -11,6 +12,11 @@ namespace Microsoft.Extensions.DependencyInjection;
 public class ModernServicesOptions
 {
     /// <summary>
+    /// The modern in-memory service configuration
+    /// </summary>
+    internal ModernInMemoryServiceConfiguration? ServiceConfiguration { get; private set; }
+    
+    /// <summary>
     /// Collection of modern services specifications
     /// </summary>
     internal List<ModernServiceSpecification> Services { get; } = new();
@@ -19,6 +25,16 @@ public class ModernServicesOptions
     /// Collection of modern services specifications
     /// </summary>
     internal List<ModernServiceConcreteSpecification> ConcreteServices { get; } = new();
+    
+    /// <summary>
+    /// Configures modern in-memory service configuration
+    /// </summary>
+    /// <param name="configuration">The modern in-memory service configuration update action</param>
+    public void ConfigureService(Action<ModernInMemoryServiceConfiguration>? configuration = null)
+    {
+        ServiceConfiguration = new ModernInMemoryServiceConfiguration();
+        configuration?.Invoke(ServiceConfiguration);
+    }
 
     /// <summary>
     /// Adds service
