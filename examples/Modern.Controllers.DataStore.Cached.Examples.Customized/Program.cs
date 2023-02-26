@@ -6,6 +6,7 @@ using Modern.Controllers.DataStore.Cached.Examples.Customized.Models;
 using Modern.Controllers.DataStore.Cached.Examples.Customized.Repositories;
 using Modern.Controllers.DataStore.Cached.Examples.Customized.Services;
 using Modern.Extensions.Microsoft.DependencyInjection;
+using Modern.Services.DataStore.Cached.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,11 @@ builder.Services.AddLogging();
 
 // Register db dependencies
 builder.Services.AddDbContextFactory<CityDbContext>(x => x.EnableSensitiveDataLogging().UseSqlite(connectionString));
+
+// Register configuration
+builder.Services
+    .AddOptions<ModernCachedServiceConfiguration>()
+    .Bind(builder.Configuration.GetSection(nameof(ModernCachedServiceConfiguration)));
 
 // Add modern stuff
 builder.Services
@@ -39,6 +45,13 @@ builder.Services
     })
     .AddCachedServices(options =>
     {
+        // Specify configuration in appsettings.json and use AddOptions or configure service here:
+        options.ConfigureService(configuration =>
+        {
+            configuration.AddToCacheWhenEntityCreated = true;
+            configuration.AddOrUpdateInCacheWhenEntityIsUpdated = false;
+        });
+        
         options.AddConcreteService<ICityService, CityCachedService>();
     })
     .AddControllers(options =>

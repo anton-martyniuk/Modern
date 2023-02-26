@@ -6,6 +6,7 @@ using Modern.Controllers.DataStore.InMemory.Examples.Customized.Models;
 using Modern.Controllers.DataStore.InMemory.Examples.Customized.Repositories;
 using Modern.Controllers.DataStore.InMemory.Examples.Customized.Services;
 using Modern.Extensions.Microsoft.DependencyInjection;
+using Modern.Services.DataStore.InMemory.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,11 @@ builder.Services.AddLogging();
 
 // Register db dependencies
 builder.Services.AddDbContextFactory<CityDbContext>(x => x.EnableSensitiveDataLogging().UseSqlite(connectionString));
+
+// Register configuration
+builder.Services
+    .AddOptions<ModernInMemoryServiceConfiguration>()
+    .Bind(builder.Configuration.GetSection(nameof(ModernInMemoryServiceConfiguration)));
 
 // Add modern stuff
 builder.Services
