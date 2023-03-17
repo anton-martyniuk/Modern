@@ -17,8 +17,8 @@
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-        <PackageReference Include="Modern.Repositories.EFCore.DependencyInjection" Version="1.0.0-beta4" />
-        <PackageReference Include="Modern.Services.DataStore.InMemory.DependencyInjection" Version="1.0.0-beta6" />
+        <PackageReference Include="Modern.Repositories.EFCore.DependencyInjection" Version="1.0.0-beta5" />
+        <PackageReference Include="Modern.Services.DataStore.InMemory.DependencyInjection" Version="1.0.0-beta7" />
     </ItemGroup>
 
     <ItemGroup>

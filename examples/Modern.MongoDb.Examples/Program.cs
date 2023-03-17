@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Modern.Extensions.Microsoft.DependencyInjection;
 using Modern.MongoDb.Examples.Entities;
 using Modern.MongoDb.Examples.Repositories;
+using Modern.MongoDb.Examples.Specifications;
 using Modern.Repositories.Abstractions;
 
 var services = new ServiceCollection();
@@ -98,10 +99,10 @@ Print(whiteProducts);
 // Delete entity
 await repository.DeleteAsync(lastEntity.Id);
 
-// Get ordered entities
-Console.WriteLine("\nAll products (price desc):");
-allEntities = await repository.OrderByPriceAsync(false);
-Print(allEntities);
+// Get entities by a specification
+Console.WriteLine("\nExpensive products:");
+var expensiveProducts = await repository.WhereAsync(new ExpensiveProductsSpecification());
+Print(expensiveProducts);
 
 void Print(IEnumerable<ProductDbo> products)
 {

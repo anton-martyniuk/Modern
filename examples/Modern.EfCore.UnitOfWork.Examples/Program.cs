@@ -7,7 +7,6 @@ using Modern.EfCore.UnitOfWork.Examples.Models;
 using Modern.EfCore.UnitOfWork.Examples.Repositories;
 using Modern.EfCore.UnitOfWork.Examples.Services;
 using Modern.Extensions.Microsoft.DependencyInjection;
-using Modern.Repositories.EFCore.UnitOfWork;
 
 var builder = WebApplication.CreateBuilder(args);
 

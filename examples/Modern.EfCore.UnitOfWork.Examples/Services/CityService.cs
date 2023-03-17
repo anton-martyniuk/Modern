@@ -8,9 +8,9 @@ namespace Modern.EfCore.UnitOfWork.Examples.Services;
 
 public class CityService : ModernService<CityDto, CityDbo, int, ICityRepository>, ICityService
 {
-    private readonly IModernUnitOfWork<CityDbo, int> _unitOfWork;
+    private readonly IModernUnitOfWork _unitOfWork;
 
-    public CityService(IModernUnitOfWork<CityDbo, int> unitOfWork, ICityRepository repository, ILogger<CityService> logger)
+    public CityService(IModernUnitOfWork unitOfWork, ICityRepository repository, ILogger<CityService> logger)
         : base(repository, logger)
     {
         _unitOfWork = unitOfWork;

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Modern.EfCore.Examples.DbContexts;
 using Modern.EfCore.Examples.Entities;
 using Modern.EfCore.Examples.Repositories;
+using Modern.EfCore.Examples.Specifications;
 using Modern.Extensions.Microsoft.DependencyInjection;
 using Modern.Repositories.Abstractions;
 
@@ -80,10 +81,10 @@ Print(filteredEntities);
 // Delete entity
 await repository.DeleteAsync(firstEntity.Id);
 
-// Get entities
-Console.WriteLine("\nAll entities:");
-allEntities = await repository.GetAllAsync();
-Print(allEntities);
+// Get entities by a specification
+Console.WriteLine("\nBig cities:");
+var bigCities = await repository.WhereAsync(new BigCitiesSpecification());
+Print(bigCities);
 
 // ================================================================ END
 

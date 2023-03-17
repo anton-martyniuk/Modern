@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Modern.Extensions.Microsoft.DependencyInjection;
 using Modern.LiteDb.Async.Examples.Entities;
 using Modern.LiteDb.Async.Examples.Repositories;
+using Modern.LiteDb.Async.Examples.Specifications;
 using Modern.Repositories.Abstractions;
 
 var services = new ServiceCollection();
@@ -71,9 +72,9 @@ mazda = await repository.UpdateAsync(mazda.Id, mazda);
 // Delete entity
 await repository.DeleteAsync(mazda2.Id);
 
-Console.WriteLine("\nAll cars:");
-allCars = await repository.GetAllAsync();
-PrintCars(allCars);
+Console.WriteLine("\nWonderful cars:");
+var wonderfulCars = await repository.WhereAsync(new WonderfulCarsSpecification());
+PrintCars(wonderfulCars);
 
 void PrintCars(IEnumerable<CarDbo> cars)
 {
