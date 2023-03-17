@@ -8,7 +8,9 @@ using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Infrastracture;
+using Modern.Repositories.Abstractions.Specifications;
 using Modern.Repositories.EFCore.Query;
+using Modern.Repositories.EFCore.Specifications;
 
 namespace Modern.Repositories.EFCore;
 
@@ -580,6 +582,31 @@ public class ModernEfCoreRepositoryWithFactory<TDbContext, TEntity, TId> : IMode
             };
 
             return pagedResult;
+        }
+        catch (Exception ex)
+        {
+            throw CreateProperException(ex);
+        }
+    }
+    
+    /// <summary>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.WhereAsync(Specification{TEntity},System.Threading.CancellationToken)"/>
+    /// </summary>
+    public async Task<List<TEntity>> WhereAsync(Specification<TEntity> specification, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            ArgumentNullException.ThrowIfNull(specification, nameof(specification));
+            cancellationToken.ThrowIfCancellationRequested();
+
+            await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
+            
+            var efCoreSpecification = new EfCoreSpecification<TEntity>(specification);
+
+            var query = context.Set<TEntity>().AsNoTracking();
+            query = efCoreSpecification.Apply(query);
+            
+            return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

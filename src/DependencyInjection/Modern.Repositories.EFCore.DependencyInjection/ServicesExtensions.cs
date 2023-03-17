@@ -26,15 +26,12 @@ public static class ServicesExtensions
         var options = new ModernEfCoreRepositoriesOptions();
         configure(options);
 
-        if (options.RepositoryConfiguration is not null)
+        builder.Services.Configure<EfCoreRepositoryConfiguration>(x =>
         {
-            builder.Services.Configure<EfCoreRepositoryConfiguration>(x =>
-            {
-                x.CreateConfiguration = options.RepositoryConfiguration.CreateConfiguration;
-                x.UpdateConfiguration = options.RepositoryConfiguration.UpdateConfiguration;
-                x.DeleteConfiguration = options.RepositoryConfiguration.DeleteConfiguration;
-            });   
-        }
+            x.CreateConfiguration = options.RepositoryConfiguration?.CreateConfiguration;
+            x.UpdateConfiguration = options.RepositoryConfiguration?.UpdateConfiguration;
+            x.DeleteConfiguration = options.RepositoryConfiguration?.DeleteConfiguration;
+        });
 
         foreach (var c in options.Repositories)
         {
@@ -59,8 +56,8 @@ public static class ServicesExtensions
 
     private static void RegisterUnitOfWork(ModernServicesBuilder builder, ModernEfCoreRepositorySpecification c)
     {
-        var interfaceType = typeof(IModernUnitOfWork<,>).MakeGenericType(c.EntityType, c.EntityIdType);
-        var implementationType = typeof(ModernUnitOfWork<,,>).MakeGenericType(c.DbContextType, c.EntityType, c.EntityIdType);
+        var interfaceType = typeof(IModernUnitOfWork);
+        var implementationType = typeof(ModernUnitOfWork<>).MakeGenericType(c.DbContextType);
         
         builder.Services.TryAdd(new ServiceDescriptor(interfaceType, implementationType, c.Lifetime));
     }

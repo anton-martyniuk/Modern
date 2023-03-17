@@ -5,6 +5,8 @@ using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Infrastracture;
+using Modern.Repositories.Abstractions.Specifications;
+using Modern.Repositories.LiteDB.Specifications;
 
 namespace Modern.Repositories.LiteDB;
 
@@ -500,6 +502,34 @@ public class ModernLiteDbRepository<TEntity, TId> : IModernRepository<TEntity, T
                 TotalCount = count,
                 Items = items
             };
+        }
+        catch (Exception ex)
+        {
+            throw CreateProperException(ex);
+        }
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.WhereAsync(Specification{TEntity},System.Threading.CancellationToken)"/>
+    /// </summary>
+    public async Task<List<TEntity>> WhereAsync(Specification<TEntity> specification, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            ArgumentNullException.ThrowIfNull(specification, nameof(specification));
+            cancellationToken.ThrowIfCancellationRequested();
+            
+            using var db = new LiteDatabase(_connectionString);
+            var collection = db.GetCollection<TEntity>(_collectionName);
+
+            var liteDbSpecification = new LiteDbSpecification<TEntity>(specification);
+
+            var query = collection.Query();
+            query = liteDbSpecification.Apply(query);
+            
+            await Task.CompletedTask;
+            
+            return query.ToList();
         }
         catch (Exception ex)
         {

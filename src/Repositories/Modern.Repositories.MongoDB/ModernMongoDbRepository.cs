@@ -4,6 +4,8 @@ using Modern.Exceptions;
 using System.Linq.Expressions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Infrastracture;
+using Modern.Repositories.Abstractions.Specifications;
+using Modern.Repositories.MongoDB.Specifications;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using MongoDB.Bson;
@@ -459,6 +461,29 @@ public class ModernMongoDbRepository<TEntity, TId> : IModernRepository<TEntity, 
             };
 
             return pagedResult;
+        }
+        catch (Exception ex)
+        {
+            throw CreateProperException(ex);
+        }
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.WhereAsync(Specification{TEntity},System.Threading.CancellationToken)"/>
+    /// </summary>
+    public async Task<List<TEntity>> WhereAsync(Specification<TEntity> specification, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            ArgumentNullException.ThrowIfNull(specification, nameof(specification));
+            cancellationToken.ThrowIfCancellationRequested();
+            
+            var mongoDbSpecification = new MongoDbSpecification<TEntity>(specification);
+
+            var query = MongoCollection.AsQueryable();
+            query = mongoDbSpecification.Apply(query);
+            
+            return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

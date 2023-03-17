@@ -2,17 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Modern.Exceptions;
-using Modern.Repositories.Abstractions;
 
 namespace Modern.Repositories.EFCore.UnitOfWork;
 
 /// <summary>
-/// The <see cref="IModernUnitOfWork{TEntity,TId}"/> implementation
+/// The <see cref="IModernUnitOfWork"/> implementation
 /// </summary>
-public class ModernUnitOfWork<TDbContext, TEntity, TId> : IModernUnitOfWork<TEntity, TId>, IDisposable
+public class ModernUnitOfWork<TDbContext> : IModernUnitOfWork, IDisposable
     where TDbContext : DbContext
-    where TEntity : class
-    where TId : IEquatable<TId>
 {
     private IDbContextTransaction? _transaction;
 
@@ -29,15 +26,9 @@ public class ModernUnitOfWork<TDbContext, TEntity, TId> : IModernUnitOfWork<TEnt
     {
         DbContext = dbContext;
     }
-    
-    /// <summary>
-    /// <inheritdoc cref="IModernUnitOfWork{TEntity,TId}.GetRepository"/>
-    /// </summary>
-    public IModernRepository<TEntity, TId> GetRepository()
-        => new ModernEfCoreRepositoryForUnitOfWork<TDbContext, TEntity, TId>(DbContext);
 
     /// <summary>
-    /// <inheritdoc cref="IModernUnitOfWork{TEntity,TId}.SaveChangesAsync"/>
+    /// <inheritdoc cref="IModernUnitOfWork.SaveChangesAsync"/>
     /// </summary>
     public async Task<int> SaveChangesAsync()
     {
@@ -45,7 +36,7 @@ public class ModernUnitOfWork<TDbContext, TEntity, TId> : IModernUnitOfWork<TEnt
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernUnitOfWork{TEntity,TId}.BeginTransactionAsync"/>
+    /// <inheritdoc cref="IModernUnitOfWork.BeginTransactionAsync"/>
     /// </summary>
     public async Task<IDbContextTransaction> BeginTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken = default)
     {
@@ -54,7 +45,7 @@ public class ModernUnitOfWork<TDbContext, TEntity, TId> : IModernUnitOfWork<TEnt
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernUnitOfWork{TEntity,TId}.CommitTransactionAsync"/>
+    /// <inheritdoc cref="IModernUnitOfWork.CommitTransactionAsync"/>
     /// </summary>
     public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
     {
@@ -67,7 +58,7 @@ public class ModernUnitOfWork<TDbContext, TEntity, TId> : IModernUnitOfWork<TEnt
     }
 
     /// <summary>
-    /// <inheritdoc cref="IModernUnitOfWork{TEntity,TId}.RollbackTransactionAsync"/>
+    /// <inheritdoc cref="IModernUnitOfWork.RollbackTransactionAsync"/>
     /// </summary>
     public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
     {

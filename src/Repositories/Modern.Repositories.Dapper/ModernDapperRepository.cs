@@ -7,6 +7,7 @@ using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions;
 using Modern.Repositories.Abstractions.Infrastracture;
+using Modern.Repositories.Abstractions.Specifications;
 using Modern.Repositories.Dapper.Connection;
 using Modern.Repositories.Dapper.Extensions;
 using Modern.Repositories.Dapper.Mapping;
@@ -455,6 +456,14 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
     /// </summary>
     public virtual Task<PagedResult<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, int pageNumber, int pageSize, EntityIncludeQuery<TEntity>? includeQuery = null,
         CancellationToken cancellationToken = default)
+    {
+        throw new NotSupportedException("Current operation is not supported by ModernDapperRepository");
+    }
+    
+    /// <summary>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.WhereAsync(Specification{TEntity},System.Threading.CancellationToken)"/>
+    /// </summary>
+    public Task<List<TEntity>> WhereAsync(Specification<TEntity> specification, CancellationToken cancellationToken = default)
     {
         throw new NotSupportedException("Current operation is not supported by ModernDapperRepository");
     }

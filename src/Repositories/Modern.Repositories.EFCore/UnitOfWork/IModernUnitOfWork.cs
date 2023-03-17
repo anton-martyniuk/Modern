@@ -1,22 +1,13 @@
 ﻿using System.Data;
 using Microsoft.EntityFrameworkCore.Storage;
-using Modern.Repositories.Abstractions;
 
 namespace Modern.Repositories.EFCore.UnitOfWork;
 
 /// <summary>
 /// The modern unit of work definition
 /// </summary>
-public interface IModernUnitOfWork<TEntity, TId>
-    where TEntity : class
-    where TId : IEquatable<TId>
+public interface IModernUnitOfWork
 {
-    /// <summary>
-    /// Returns a repository that shares the same DbContext as UnitOfWork
-    /// </summary>
-    /// <returns>Modern repository definition</returns>
-    IModernRepository<TEntity, TId> GetRepository();
-    
     /// <summary>
     /// Performs saving changes in the DbContext
     /// </summary>

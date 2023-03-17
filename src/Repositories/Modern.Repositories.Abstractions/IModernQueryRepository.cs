@@ -2,6 +2,7 @@
 using Modern.Data.Paging;
 using Modern.Exceptions;
 using Modern.Repositories.Abstractions.Infrastracture;
+using Modern.Repositories.Abstractions.Specifications;
 
 namespace Modern.Repositories.Abstractions;
 
@@ -127,6 +128,16 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// <returns>A list of entities that match the condition</returns>
     Task<PagedResult<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, int pageNumber, int pageSize, EntityIncludeQuery<TEntity>? includeQuery = null, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Returns all entities from the data store that match the given specification
+    /// </summary>
+    /// <param name="specification">A specification that compiles into a function to test each element for condition</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete</param>
+    /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
+    /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
+    /// <returns>A list of entities that match the condition</returns>
+    Task<List<TEntity>> WhereAsync(Specification<TEntity> specification, CancellationToken cancellationToken = default);
+    
     /// <summary>
     /// Returns <see cref="IQueryable{TEntity}"/> implementation
     /// </summary>
