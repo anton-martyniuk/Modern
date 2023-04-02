@@ -507,6 +507,11 @@ public class ModernMongoDbRepository<TEntity, TId> : IModernRepository<TEntity, 
     }
 
     /// <summary>
+    /// Returns modern collection for internal usage inside MongoDb libraries
+    /// </summary>
+    public virtual IMongoCollection<TEntity> GetMongoCollection() => MongoCollection;
+
+    /// <summary>
     /// Returns filter by "_id" field
     /// </summary>
     /// <param name="id">Id to search for</param>
