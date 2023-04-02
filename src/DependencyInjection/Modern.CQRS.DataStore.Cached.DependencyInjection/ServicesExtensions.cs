@@ -13,7 +13,7 @@ using Modern.Extensions.Microsoft.DependencyInjection.Models;
 namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
-/// Modern.CQRS.DataStore extensions for Microsoft.Extensions.DependencyInjection
+/// Modern.CQRS.DataStore.Cached extensions for Microsoft.Extensions.DependencyInjection
 /// </summary>
 public static class ServicesExtensions
 {

@@ -5,7 +5,7 @@ using Modern.Extensions.Microsoft.DependencyInjection.Models;
 namespace Modern.Extensions.Microsoft.DependencyInjection;
 
 /// <summary>
-/// Modern.Data.Services extensions for Microsoft.Extensions.DependencyInjection
+/// Modern Builder extensions for Microsoft.Extensions.DependencyInjection
 /// </summary>
 public static class ServicesExtensions
 {

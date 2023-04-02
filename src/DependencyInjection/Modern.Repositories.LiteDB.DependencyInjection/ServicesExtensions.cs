@@ -7,7 +7,7 @@ using Modern.Repositories.LiteDB;
 namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
-/// Modern.Repositories.MongoDB extensions for Microsoft.Extensions.DependencyInjection
+/// Modern.Repositories.LiteDB extensions for Microsoft.Extensions.DependencyInjection
 /// </summary>
 public static class ServicesExtensions
 {

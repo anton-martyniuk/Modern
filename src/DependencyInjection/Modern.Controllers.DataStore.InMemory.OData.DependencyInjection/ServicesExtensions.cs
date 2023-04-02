@@ -5,7 +5,7 @@ using Modern.Extensions.Microsoft.DependencyInjection.Models;
 namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
-/// Modern.Services.DataStore.Cached extensions for Microsoft.Extensions.DependencyInjection
+/// Modern.Controllers.DataStore.InMemory.OData extensions for Microsoft.Extensions.DependencyInjection
 /// </summary>
 public static class ServicesExtensions
 {
