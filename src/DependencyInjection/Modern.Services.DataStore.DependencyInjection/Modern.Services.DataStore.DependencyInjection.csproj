@@ -7,7 +7,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.0-beta4</Version>
+		<Version>1.0.0-beta5</Version>
 		<Authors>Anton Martyniuk</Authors>
 		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
 		<Title>Modern Services Extensions for Microsoft Dependency Injection</Title>
@@ -28,7 +28,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Services\Modern.Services.DataStore\Modern.Services.DataStore.csproj" />
-		<ProjectReference Include="..\Definitions\Modern.Services.DependencyInjection.Definitions\Modern.Services.DependencyInjection.Definitions.csproj" />
 		<ProjectReference Include="..\Modern.Extensions.Microsoft.DependencyInjection\Modern.Extensions.Microsoft.DependencyInjection.csproj" />
 	</ItemGroup>
 
