@@ -1,5 +1,5 @@
-﻿using Modern.Cache.DependencyInjection.Definitions.Configuration;
-using Modern.Cache.Redis.Configuration;
+﻿using Modern.Cache.Redis.Configuration;
+using Modern.Cache.Redis.DependencyInjection.Configuration;
 using StackExchange.Redis.Extensions.Core.Configuration;
 
 // ReSharper disable once CheckNamespace
