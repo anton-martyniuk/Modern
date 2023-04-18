@@ -4,8 +4,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Modern.CQRS.DataStore.Abstractions.Commands;
 using Modern.CQRS.DataStore.Abstractions.Queries;
 using Modern.CQRS.DataStore.Cached.CommandHandlers;
+using Modern.CQRS.DataStore.Cached.DependencyInjection.Configuration;
 using Modern.CQRS.DataStore.Cached.QueryHandlers;
-using Modern.CQRS.DependencyInjection.Definitions.Configuration;
 using Modern.Data.Paging;
 using Modern.Extensions.Microsoft.DependencyInjection.Models;
 

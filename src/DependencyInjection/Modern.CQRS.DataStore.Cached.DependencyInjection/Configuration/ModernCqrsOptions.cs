@@ -1,4 +1,4 @@
-﻿using Modern.CQRS.DependencyInjection.Definitions.Configuration;
+﻿using Modern.CQRS.DataStore.Cached.DependencyInjection.Configuration;
 using Modern.Repositories.Abstractions;
 
 // ReSharper disable once CheckNamespace
