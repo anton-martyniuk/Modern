@@ -16,13 +16,11 @@ namespace Modern.Services.DataStore;
 /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
 /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
-/// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
+public class ModernService<TEntityDto, TEntityDbo, TId> :
     IModernService<TEntityDto, TEntityDbo, TId>
     where TEntityDto : class
     where TEntityDbo : class
     where TId : IEquatable<TId>
-    where TRepository : class, IModernQueryRepository<TEntityDbo, TId>, IModernCrudRepository<TEntityDbo, TId>
 {
     private readonly string _entityName = typeof(TEntityDto).Name;
     private readonly string _serviceName = $"{typeof(TEntityDto).Name}Service";
@@ -30,7 +28,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// <summary>
     /// The repository instance
     /// </summary>
-    protected readonly TRepository Repository;
+    protected readonly IModernRepository<TEntityDbo, TId> Repository;
 
     /// <summary>
     /// The repository instance
@@ -42,7 +40,7 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// </summary>
     /// <param name="repository">The generic repository</param>
     /// <param name="logger">The logger</param>
-    public ModernService(TRepository repository, ILogger<ModernService<TEntityDto, TEntityDbo, TId, TRepository>> logger)
+    public ModernService(IModernRepository<TEntityDbo, TId> repository, ILogger<ModernService<TEntityDto, TEntityDbo, TId>> logger)
     {
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
@@ -56,14 +54,30 @@ public class ModernService<TEntityDto, TEntityDbo, TId, TRepository> :
     /// </summary>
     /// <param name="entityDto">Entity Dto</param>
     /// <returns>Entity Dbo</returns>
-    protected virtual TEntityDbo MapToDbo(TEntityDto entityDto) => entityDto.Adapt<TEntityDbo>();
+    protected virtual TEntityDbo MapToDbo(TEntityDto entityDto)
+    {
+        if (typeof(TEntityDbo) == typeof(TEntityDto))
+        {
+            return (TEntityDbo)(object)entityDto;
+        }
+
+        return entityDto.Adapt<TEntityDbo>();
+    }
 
     /// <summary>
     /// Returns <typeparamref name="TEntityDbo"/> mapped from <typeparamref name="TEntityDto"/>
     /// </summary>
     /// <param name="entityDbo">Entity Dbo</param>
     /// <returns>Entity Dto</returns>
-    protected virtual TEntityDto MapToDto(TEntityDbo entityDbo) => entityDbo.Adapt<TEntityDto>();
+    protected virtual TEntityDto MapToDto(TEntityDbo entityDbo)
+    {
+        if (typeof(TEntityDbo) == typeof(TEntityDto))
+        {
+            return (TEntityDto)(object)entityDbo;
+        }
+
+        return entityDbo.Adapt<TEntityDto>();
+    }
 
     /// <summary>
     /// Returns standardized service exception
