@@ -20,14 +20,30 @@ public abstract class BaseMediatorHandler<TEntityDto, TEntityDbo>
     /// </summary>
     /// <param name="entityDto">Entity Dto</param>
     /// <returns>Entity Dbo</returns>
-    protected virtual TEntityDbo MapToDbo(TEntityDto entityDto) => entityDto.Adapt<TEntityDbo>();
+    protected virtual TEntityDbo MapToDbo(TEntityDto entityDto)
+    {
+        if (typeof(TEntityDbo) == typeof(TEntityDto))
+        {
+            return (TEntityDbo)(object)entityDto;
+        }
+
+        return entityDto.Adapt<TEntityDbo>();
+    }
 
     /// <summary>
     /// Returns <typeparamref name="TEntityDbo"/> mapped from <typeparamref name="TEntityDto"/>
     /// </summary>
     /// <param name="entityDbo">Entity Dbo</param>
     /// <returns>Entity Dto</returns>
-    protected virtual TEntityDto MapToDto(TEntityDbo entityDbo) => entityDbo.Adapt<TEntityDto>();
+    protected virtual TEntityDto MapToDto(TEntityDbo entityDbo)
+    {
+        if (typeof(TEntityDbo) == typeof(TEntityDto))
+        {
+            return (TEntityDto)(object)entityDbo;
+        }
+
+        return entityDbo.Adapt<TEntityDto>();
+    }
 
     /// <summary>
     /// Returns standardized handler exception
