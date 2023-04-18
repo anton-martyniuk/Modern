@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-using Modern.Cache.DependencyInjection.Definitions.Configuration;
+using Modern.Cache.InMemory.DependencyInjection.Configuration;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;

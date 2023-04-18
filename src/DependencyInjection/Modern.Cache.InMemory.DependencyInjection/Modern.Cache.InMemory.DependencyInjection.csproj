@@ -7,7 +7,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.0-beta1</Version>
+		<Version>1.0.0-beta2</Version>
 		<Authors>Anton Martyniuk</Authors>
 		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
 		<Title>Modern In Memory Cache Extensions for Microsoft Dependency Injection</Title>
@@ -30,7 +30,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Cache\Modern.Cache.Abstractions\Modern.Cache.Abstractions.csproj" />
 		<ProjectReference Include="..\..\Cache\Modern.Cache.InMemory\Modern.Cache.InMemory.csproj" />
-		<ProjectReference Include="..\Definitions\Modern.Cache.DependencyInjection.Definitions\Modern.Cache.DependencyInjection.Definitions.csproj" />
 		<ProjectReference Include="..\Modern.Extensions.Microsoft.DependencyInjection\Modern.Extensions.Microsoft.DependencyInjection.csproj" />
 	</ItemGroup>
 
