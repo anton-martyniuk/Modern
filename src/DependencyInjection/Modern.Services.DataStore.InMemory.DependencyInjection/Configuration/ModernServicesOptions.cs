@@ -1,5 +1,4 @@
-﻿using Modern.Repositories.Abstractions;
-using Modern.Services.DataStore.InMemory.Configuration;
+﻿using Modern.Services.DataStore.InMemory.Configuration;
 using ModernServiceConcreteSpecification = Modern.Services.DataStore.InMemory.DependencyInjection.Configuration.ModernServiceConcreteSpecification;
 using ModernServiceSpecification = Modern.Services.DataStore.InMemory.DependencyInjection.Configuration.ModernServiceSpecification;
 
@@ -43,19 +42,16 @@ public class ModernServicesOptions
     /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
     /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
-    /// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-    public void AddService<TEntityDto, TEntityDbo, TId, TRepository>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddService<TEntityDto, TEntityDbo, TId>(ServiceLifetime lifetime = ServiceLifetime.Transient)
         where TEntityDto : class
         where TEntityDbo : class
         where TId : IEquatable<TId>
-        where TRepository : class, IModernQueryRepository<TEntityDbo, TId>, IModernCrudRepository<TEntityDbo, TId>
     {
         var configuration = new ModernServiceSpecification
         {
             EntityDtoType = typeof(TEntityDto),
             EntityDboType = typeof(TEntityDbo),
             EntityIdType = typeof(TId),
-            RepositoryType = typeof(TRepository),
             Lifetime = lifetime
         };
 

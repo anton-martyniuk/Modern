@@ -23,11 +23,6 @@ public class ModernServiceSpecification
     public Type EntityIdType { get; set; } = default!;
 
     /// <summary>
-    /// Type of repository used for the entity
-    /// </summary>
-    public Type RepositoryType { get; set; } = default!;
-
-    /// <summary>
     /// Services lifetime in DI
     /// </summary>
     public ServiceLifetime Lifetime { get; set; }
