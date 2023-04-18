@@ -1,4 +1,4 @@
-﻿using Modern.Controllers.DependencyInjection.Definitions.Configuration;
+﻿using Modern.Controllers.DataStore.DependencyInjection.Configuration;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
