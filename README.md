@@ -7,17 +7,40 @@
 [See examples here](./examples)
 
 Modern is a set of modern .NET tools :hammer: :wrench: for fast and efficient development of common backend tasks.
-It allows to create a product ready applications with just a configuration and set of model classes.
+It allows to create a production ready applications with just set of models and configuration which can be further extended.
 Modern tool are flexible, easily changeable and extendable.\
-Modern includes the following components:
+It includes the following components:
 * generic repositories for SQL and NoSQL databases
 * generic services with and without caching support
-* generic in memory services with filtering in memory capabilities
-* in memory and redis generic caches
+* generic in memory services with in-memory filtering capabilities
+* in-memory and redis generic caches
 * generic set of CQRS queries and commands over repository (if you prefer CQRS over services)
 * GraphQL queries and subscriptions
 * generic controllers for all types of services
 * OData controllers for all types of services
+
+---
+
+## List of Modern components :bookmark_tabs:
+
+* [How to get started?](#how-to-get-started)
+* [Roadmap](#roadmap)
+* [Repositories](#repositories)
+* [Repositories for SQL databases](#repositories-for-sql-databases)
+* [Repositories for NoSQL databases](#repositories-for-no-sql-databases)
+* [Services](#services)
+* [Services with caching](#services-with-caching)
+* [Services In Memory](#services-in-memory)
+* [CQRS](#cqrs)
+* [CQRS with caching](#cqrs-with-caching)
+* [CQRS In Memory](#cqrs-in-memory)
+* [GraphQL](#graphql)
+* [GraphQL In Memory](#graphql-in-memory)
+* [Controllers](#controllers)
+* [Controllers CQRS](#controllers-cqrs)
+* [Controllers In Memory](#controllers-in-memory)
+* [OData Controllers](#odata-controllers)
+* [OData Controllers In Memory](#odata-controllers-in-memory)
 
 ## How to get started?
 First, select and install the needed Nuget packages !!!\
@@ -73,28 +96,8 @@ As a result a production ready API will be created:
 **DELETE** :x: :x: \
 `/Airplanes/delete-many`
 
-## List of Modern components :bookmark_tabs:
-
-* [Repositories](#repositories)
-* [Repositories for SQL databases](#repositories-for-sql-databases)
-* [Repositories for NoSQL databases](#repositories-for-no-sql-databases)
-* [Services](#services)
-* [Services with caching](#services-with-caching)
-* [Services In Memory](#services-in-memory)
-* [CQRS](#cqrs)
-* [CQRS with caching](#cqrs-with-caching)
-* [CQRS In Memory](#cqrs-in-memory)
-* [GraphQL](#graphql)
-* [GraphQL In Memory](#graphql-in-memory)
-* [Controllers](#controllers)
-* [Controllers CQRS](#controllers-cqrs)
-* [Controllers In Memory](#controllers-in-memory)
-* [OData Controllers](#odata-controllers)
-* [OData Controllers In Memory](#odata-controllers-in-memory)
-
 ## Roadmap :arrow_right: :date:
 The following features will be implemented in the next releases:
-* Examples
 * Assembly scan in DI packages
 * Unit and integration tests
 * CQRS InMemory
