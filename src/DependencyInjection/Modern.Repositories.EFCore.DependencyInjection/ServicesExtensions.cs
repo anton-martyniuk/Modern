@@ -68,6 +68,6 @@ public static class ServicesExtensions
             EfCoreRepositoryType.DbContext => typeof(ModernEfCoreRepository<,,>).MakeGenericType(c.DbContextType, c.EntityType, c.EntityIdType),
             EfCoreRepositoryType.DbContextFactory => typeof(ModernEfCoreRepositoryWithFactory<,,>).MakeGenericType(c.DbContextType, c.EntityType, c.EntityIdType),
             EfCoreRepositoryType.UnitOfWork => typeof(ModernEfCoreRepositoryForUnitOfWork<,,>).MakeGenericType(c.DbContextType, c.EntityType, c.EntityIdType),
-            _ => throw new UnreachableException($"{c.RepositoryType:G} is not supported")
+            _ => throw new NotSupportedException($"{c.RepositoryType:G} is not supported")
         };
 }
