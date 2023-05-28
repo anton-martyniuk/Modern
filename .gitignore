@@ -6,3 +6,4 @@ obj
 *.bak
 appsettings.development.json
 appsettings.production.json
+*.sln.DotSettings.user
