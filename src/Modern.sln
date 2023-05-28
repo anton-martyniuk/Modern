@@ -155,13 +155,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceGenerators", "SourceG
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.SourceGenerators", "SourceGenerators\Modern.Controllers.SourceGenerators\Modern.Controllers.SourceGenerators.csproj", "{E172DB79-8884-4BC2-A742-63D437C69AD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.Attributes", "SourceGenerators\Modern.Controllers.Attributes\Modern.Controllers.Attributes.csproj", "{539485BE-237C-491F-BC17-C1015124A5F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Controllers.Attributes", "SourceGenerators\Attributes\Modern.Controllers.Attributes\Modern.Controllers.Attributes.csproj", "{539485BE-237C-491F-BC17-C1015124A5F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Repositories.EFCore.Attributes", "SourceGenerators\Modern.Repositories.EFCore.Attributes\Modern.Repositories.EFCore.Attributes.csproj", "{C67EA468-D15E-4C99-9C3C-176C697DF2D8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Repositories.EFCore.Attributes", "SourceGenerators\Attributes\Modern.Repositories.EFCore.Attributes\Modern.Repositories.EFCore.Attributes.csproj", "{C67EA468-D15E-4C99-9C3C-176C697DF2D8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Attributes", "Attributes", "{6EC41DFE-6FB7-4F88-B035-096DF4DA53ED}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Repositories.EFCore.SourceGenerators", "SourceGenerators\Modern.Repositories.EFCore.SourceGenerators\Modern.Repositories.EFCore.SourceGenerators.csproj", "{847B94FD-6A6F-4C69-ACE2-18A00AF3FE2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Repositories.MongoDB.Attributes", "SourceGenerators\Attributes\Modern.Repositories.MongoDB.Attributes\Modern.Repositories.MongoDB.Attributes.csproj", "{7FEF5922-A7D0-439A-9AA8-0CE6D31D072A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Repositories.Dapper.Attributes", "SourceGenerators\Attributes\Modern.Repositories.Dapper.Attributes\Modern.Repositories.Dapper.Attributes.csproj", "{9228CDBD-C122-4841-88F7-548D5AD52CBA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Repositories.LiteDB.Async.Attributes", "SourceGenerators\Attributes\Modern.Repositories.LiteDB.Async.Attributes\Modern.Repositories.LiteDB.Async.Attributes.csproj", "{17B21AD1-D223-4B00-B2DB-F72D583AB8E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Repositories.LiteDB.Attributes", "SourceGenerators\Attributes\Modern.Repositories.LiteDB.Attributes\Modern.Repositories.LiteDB.Attributes.csproj", "{7E9B4F52-972F-4819-8DFB-F558682B1BF2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Repositories.MongoDB.SourceGenerators", "SourceGenerators\Modern.Repositories.MongoDB.SourceGenerators\Modern.Repositories.MongoDB.SourceGenerators.csproj", "{4ADE2681-4749-4114-8D15-027DD5FFC485}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Repositories.Dapper.SourceGenerators", "SourceGenerators\Modern.Repositories.Dapper.SourceGenerators\Modern.Repositories.Dapper.SourceGenerators.csproj", "{1F5A8CC1-ABE6-4F72-A7CC-13A19278CD6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Repositories.LiteDB.Async.SourceGenerators", "SourceGenerators\Modern.Repositories.LiteDB.Async.SourceGenerators\Modern.Repositories.LiteDB.Async.SourceGenerators.csproj", "{5FA3C9A3-9859-4A15-BA11-B3B0DBCB5209}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern.Repositories.LiteDB.SourceGenerators", "SourceGenerators\Modern.Repositories.LiteDB.SourceGenerators\Modern.Repositories.LiteDB.SourceGenerators.csproj", "{8213E526-CFBF-49AE-9EF0-614F36D847D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -413,6 +429,38 @@ Global
 		{847B94FD-6A6F-4C69-ACE2-18A00AF3FE2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{847B94FD-6A6F-4C69-ACE2-18A00AF3FE2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{847B94FD-6A6F-4C69-ACE2-18A00AF3FE2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FEF5922-A7D0-439A-9AA8-0CE6D31D072A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FEF5922-A7D0-439A-9AA8-0CE6D31D072A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FEF5922-A7D0-439A-9AA8-0CE6D31D072A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FEF5922-A7D0-439A-9AA8-0CE6D31D072A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9228CDBD-C122-4841-88F7-548D5AD52CBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9228CDBD-C122-4841-88F7-548D5AD52CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9228CDBD-C122-4841-88F7-548D5AD52CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9228CDBD-C122-4841-88F7-548D5AD52CBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17B21AD1-D223-4B00-B2DB-F72D583AB8E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17B21AD1-D223-4B00-B2DB-F72D583AB8E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17B21AD1-D223-4B00-B2DB-F72D583AB8E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17B21AD1-D223-4B00-B2DB-F72D583AB8E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E9B4F52-972F-4819-8DFB-F558682B1BF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E9B4F52-972F-4819-8DFB-F558682B1BF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E9B4F52-972F-4819-8DFB-F558682B1BF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E9B4F52-972F-4819-8DFB-F558682B1BF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4ADE2681-4749-4114-8D15-027DD5FFC485}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4ADE2681-4749-4114-8D15-027DD5FFC485}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4ADE2681-4749-4114-8D15-027DD5FFC485}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4ADE2681-4749-4114-8D15-027DD5FFC485}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F5A8CC1-ABE6-4F72-A7CC-13A19278CD6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F5A8CC1-ABE6-4F72-A7CC-13A19278CD6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F5A8CC1-ABE6-4F72-A7CC-13A19278CD6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F5A8CC1-ABE6-4F72-A7CC-13A19278CD6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FA3C9A3-9859-4A15-BA11-B3B0DBCB5209}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FA3C9A3-9859-4A15-BA11-B3B0DBCB5209}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FA3C9A3-9859-4A15-BA11-B3B0DBCB5209}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FA3C9A3-9859-4A15-BA11-B3B0DBCB5209}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8213E526-CFBF-49AE-9EF0-614F36D847D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8213E526-CFBF-49AE-9EF0-614F36D847D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8213E526-CFBF-49AE-9EF0-614F36D847D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8213E526-CFBF-49AE-9EF0-614F36D847D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -487,6 +535,14 @@ Global
 		{539485BE-237C-491F-BC17-C1015124A5F5} = {6EC41DFE-6FB7-4F88-B035-096DF4DA53ED}
 		{C67EA468-D15E-4C99-9C3C-176C697DF2D8} = {6EC41DFE-6FB7-4F88-B035-096DF4DA53ED}
 		{847B94FD-6A6F-4C69-ACE2-18A00AF3FE2D} = {83CF0E26-8D46-4297-BA9D-E784FC1618BA}
+		{7FEF5922-A7D0-439A-9AA8-0CE6D31D072A} = {6EC41DFE-6FB7-4F88-B035-096DF4DA53ED}
+		{9228CDBD-C122-4841-88F7-548D5AD52CBA} = {6EC41DFE-6FB7-4F88-B035-096DF4DA53ED}
+		{17B21AD1-D223-4B00-B2DB-F72D583AB8E9} = {6EC41DFE-6FB7-4F88-B035-096DF4DA53ED}
+		{7E9B4F52-972F-4819-8DFB-F558682B1BF2} = {6EC41DFE-6FB7-4F88-B035-096DF4DA53ED}
+		{4ADE2681-4749-4114-8D15-027DD5FFC485} = {83CF0E26-8D46-4297-BA9D-E784FC1618BA}
+		{1F5A8CC1-ABE6-4F72-A7CC-13A19278CD6C} = {83CF0E26-8D46-4297-BA9D-E784FC1618BA}
+		{5FA3C9A3-9859-4A15-BA11-B3B0DBCB5209} = {83CF0E26-8D46-4297-BA9D-E784FC1618BA}
+		{8213E526-CFBF-49AE-9EF0-614F36D847D2} = {83CF0E26-8D46-4297-BA9D-E784FC1618BA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94D244EE-259E-401A-A55F-7D833CA4DC5E}
