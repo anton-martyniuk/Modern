@@ -8,12 +8,12 @@
         <LangVersion>latest</LangVersion>
         <IsRoslynComponent>true</IsRoslynComponent>
 
-        <Version>1.0.0-beta3</Version>
+        <Version>1.0.0-beta2</Version>
         <Authors>Anton Martyniuk</Authors>
         <Copyright>Copyright (c) Anton Martyniuk 2023</Copyright>
-        <Title>Modern Repositories EF Core Source Generators</Title>
-        <Description>A source generators that create a modern EF Core repository interface and implementation for a given entity</Description>
-        <PackageTags>modern;repository;generic;crud;query;efcore;sourcegenerators;generators</PackageTags>
+        <Title>Modern Repositories Dapper Source Generators</Title>
+        <Description>A source generators that create a modern Dapper repository interface and implementation for a given entity</Description>
+        <PackageTags>modern;repository;generic;crud;query;dapper;sourcegenerators;generators</PackageTags>
         <RepositoryUrl>https://github.com/anton-martyniuk/modern</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -26,13 +26,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Attributes\Modern.Repositories.EFCore.Attributes\Modern.Repositories.EFCore.Attributes.csproj" PrivateAssets="All" />
+        <ProjectReference Include="..\Attributes\Modern.Repositories.Dapper.Attributes\Modern.Repositories.Dapper.Attributes.csproj" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-        <None Include="$(OutputPath)\Modern.Repositories.EFCore.Attributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-        <None Include="$(OutputPath)\Modern.Repositories.EFCore.Attributes.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
+        <None Include="$(OutputPath)\Modern.Repositories.Dapper.Attributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+        <None Include="$(OutputPath)\Modern.Repositories.Dapper.Attributes.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
     </ItemGroup>
 
     <Target Name="PostPackNugetDeploy" AfterTargets="Pack" Condition="'$(Configuration)'=='Release'">

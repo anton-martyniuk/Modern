@@ -3,7 +3,7 @@
 namespace Modern.Repositories.EFCore.SourceGenerators;
 
 /// <summary>
-/// An attribute that is used for a source generator to create
+/// A modern EF Core repository with factory attribute that is used for a source generator to create
 /// a repository interface and implementation for a given entity.<br/>
 /// Repository implementation is inherited from ModernEfCoreRepositoryWithFactory.
 /// </summary>

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -77,15 +76,7 @@ public class ModernEfCoreRepositoryGenerator : ISourceGenerator
 
             if (!string.IsNullOrWhiteSpace(source))
             {
-                try
-                {
-                    context.AddSource($"{repositoryName}_gen.cs", SourceText.From(source, Encoding.UTF8));
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
+                context.AddSource($"{repositoryName}_efcore_gen.cs", SourceText.From(source, Encoding.UTF8));
             }
         }
     }
@@ -127,14 +118,14 @@ public class ModernEfCoreRepositoryGenerator : ISourceGenerator
         // Interface
         sb.AppendLine();
         sb.AppendLine($"///<summary>The {entityType} repository definition</summary>");
-        sb.AppendLine($"public interface I{repositoryName} : IModernRepository<{entityType}, {idType}>");
+        sb.AppendLine($"public partial interface I{repositoryName} : IModernRepository<{entityType}, {idType}>");
         sb.AppendLine("{");
         sb.AppendLine("}");
 
         // Class
         sb.AppendLine();
         sb.AppendLine($"///<summary>The {entityType} repository implementation using EF Core</summary>");
-        sb.AppendLine($"public class {repositoryName} : ModernEfCoreRepository<{dbContextType}, {entityType}, {idType}>, I{repositoryName}");
+        sb.AppendLine($"public partial class {repositoryName} : ModernEfCoreRepository<{dbContextType}, {entityType}, {idType}>, I{repositoryName}");
         sb.AppendLine("{");
         sb.AppendLine("     ///<summary>Initializes a new instance of the class</summary>");
         sb.AppendLine($"    public {repositoryName}({dbContextType} dbContext, IOptions<EfCoreRepositoryConfiguration> configuration)");
@@ -160,14 +151,14 @@ public class ModernEfCoreRepositoryGenerator : ISourceGenerator
         // Interface
         sb.AppendLine();
         sb.AppendLine($"///<summary>The {entityType} repository definition</summary>");
-        sb.AppendLine($"public interface I{repositoryName} : IModernRepository<{entityType}, {idType}>");
+        sb.AppendLine($"public partial interface I{repositoryName} : IModernRepository<{entityType}, {idType}>");
         sb.AppendLine("{");
         sb.AppendLine("}");
 
         // Class
         sb.AppendLine();
         sb.AppendLine($"///<summary>The {entityType} repository implementation using EF Core</summary>");
-        sb.AppendLine($"public class {repositoryName} : ModernEfCoreRepositoryWithFactory<{dbContextType}, {entityType}, {idType}>, I{repositoryName}");
+        sb.AppendLine($"public partial class {repositoryName} : ModernEfCoreRepositoryWithFactory<{dbContextType}, {entityType}, {idType}>, I{repositoryName}");
         sb.AppendLine("{");
         sb.AppendLine("     ///<summary>Initializes a new instance of the class</summary>");
         sb.AppendLine($"    public {repositoryName}(IDbContextFactory<{dbContextType}> dbContextFactory, IOptions<EfCoreRepositoryConfiguration> configuration)");
@@ -191,14 +182,14 @@ public class ModernEfCoreRepositoryGenerator : ISourceGenerator
         // Interface
         sb.AppendLine();
         sb.AppendLine($"///<summary>The {entityType} repository definition</summary>");
-        sb.AppendLine($"public interface I{repositoryName} : IModernRepository<{entityType}, {idType}>");
+        sb.AppendLine($"public partial interface I{repositoryName} : IModernRepository<{entityType}, {idType}>");
         sb.AppendLine("{");
         sb.AppendLine("}");
 
         // Class
         sb.AppendLine();
         sb.AppendLine($"///<summary>The {entityType} repository implementation using EF Core</summary>");
-        sb.AppendLine($"public class {repositoryName} : ModernEfCoreRepositoryForUnitOfWork<{dbContextType}, {entityType}, {idType}>, I{repositoryName}");
+        sb.AppendLine($"public partial class {repositoryName} : ModernEfCoreRepositoryForUnitOfWork<{dbContextType}, {entityType}, {idType}>, I{repositoryName}");
         sb.AppendLine("{");
         sb.AppendLine("     ///<summary>Initializes a new instance of the class</summary>");
         sb.AppendLine($"    public {repositoryName}({dbContextType} dbContext)");
@@ -214,10 +205,6 @@ public class ModernEfCoreRepositoryGenerator : ISourceGenerator
 public class RepositorySyntaxReceiver : ISyntaxReceiver
 {
     public List<ClassDeclarationSyntax> RepositoryClasses { get; } = new();
-    
-    // public List<ClassDeclarationSyntax> RepositoryWithFactoryClasses { get; } = new();
-    //
-    // public List<ClassDeclarationSyntax> RepositoryForUnitOfWorkClasses { get; } = new();
 
     public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
     {

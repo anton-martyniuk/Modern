@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Modern.Controllers.Attributes\Modern.Controllers.Attributes.csproj" PrivateAssets="All" />
+        <ProjectReference Include="..\Attributes\Modern.Controllers.Attributes\Modern.Controllers.Attributes.csproj" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
