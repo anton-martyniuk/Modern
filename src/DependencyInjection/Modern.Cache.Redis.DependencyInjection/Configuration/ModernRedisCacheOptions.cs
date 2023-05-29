@@ -39,10 +39,10 @@ public class ModernRedisCacheOptions
     /// <summary>
     /// Adds cache
     /// </summary>
-    /// <param name="lifetime">Cache lifetime in DI</param>
+    /// <param name="lifetime">Repository lifetime in DI (Singleton by default)</param>
     /// <typeparam name="TEntity">Type of entity</typeparam>
     /// <typeparam name="TId">Type of entity identifier</typeparam>
-    public void AddCache<TEntity, TId>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddCache<TEntity, TId>(ServiceLifetime lifetime = ServiceLifetime.Singleton)
         where TEntity : class
         where TId : IEquatable<TId>
     {

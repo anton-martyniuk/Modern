@@ -37,11 +37,11 @@ public class ModernServicesOptions
     /// <summary>
     /// Adds service
     /// </summary>
-    /// <param name="lifetime">Services lifetime in DI</param>
+    /// <param name="lifetime">Services lifetime in DI (Scoped by default)</param>
     /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
     /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
-    public void AddService<TEntityDto, TEntityDbo, TId>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddService<TEntityDto, TEntityDbo, TId>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TEntityDto : class
         where TEntityDbo : class
         where TId : IEquatable<TId>
@@ -60,10 +60,10 @@ public class ModernServicesOptions
     /// <summary>
     /// Adds service
     /// </summary>
-    /// <param name="lifetime">Repository lifetime in DI</param>
+    /// <param name="lifetime">Services lifetime in DI (Scoped by default)</param>
     /// <typeparam name="TServiceInterface">The type of concrete service interface</typeparam>
     /// <typeparam name="TServiceImplementation">The type of concrete service implementation</typeparam>
-    public void AddConcreteService<TServiceInterface, TServiceImplementation>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddConcreteService<TServiceInterface, TServiceImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TServiceInterface : class
         where TServiceImplementation : class, TServiceInterface
     {

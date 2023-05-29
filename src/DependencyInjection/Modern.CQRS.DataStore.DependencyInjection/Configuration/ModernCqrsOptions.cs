@@ -17,12 +17,12 @@ public class ModernCqrsOptions
     /// <summary>
     /// Adds CQRS queries, commands and their handlers for specified Entity type
     /// </summary>
-    /// <param name="lifetime">Services lifetime in DI</param>
+    /// <param name="lifetime">CQRS lifetime in DI (Scoped by default)</param>
     /// <typeparam name="TEntityDto">The type of entity returned from the service</typeparam>
     /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
     /// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-    public void AddQueriesCommandsAndHandlersFor<TEntityDto, TEntityDbo, TId, TRepository>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddQueriesCommandsAndHandlersFor<TEntityDto, TEntityDbo, TId, TRepository>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TEntityDto : class
         where TEntityDbo : class
         where TId : IEquatable<TId>

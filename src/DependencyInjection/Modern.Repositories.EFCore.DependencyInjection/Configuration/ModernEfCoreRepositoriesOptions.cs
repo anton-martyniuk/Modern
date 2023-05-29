@@ -39,11 +39,11 @@ public class ModernEfCoreRepositoriesOptions
     /// Adds repository with injecting DbContext in the constructor.<br/>
     /// When using DbContext repository shares the same database connection during its lifetime
     /// </summary>
-    /// <param name="lifetime">Repository lifetime in DI</param>
+    /// <param name="lifetime">Repository lifetime in DI (Scoped by default)</param>
     /// <typeparam name="TDbContext">The type of EF Core DbContext</typeparam>
     /// <typeparam name="TEntity">The type of entity</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
-    public void AddRepository<TDbContext, TEntity, TId>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddRepository<TDbContext, TEntity, TId>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TDbContext : DbContext
         where TEntity : class
         where TId : IEquatable<TId>
@@ -64,11 +64,11 @@ public class ModernEfCoreRepositoriesOptions
     /// Adds repository with injecting DbContextFactory in the constructor.<br/>
     /// When using DbContextFactory every repository creates and closes a database connection in each method.
     /// </summary>
-    /// <param name="lifetime">Repository lifetime in DI</param>
+    /// <param name="lifetime">Repository lifetime in DI (Scoped by default)</param>
     /// <typeparam name="TDbContext">The type of EF Core DbContext</typeparam>
     /// <typeparam name="TEntity">The type of entity</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
-    public void AddRepositoryWithDbFactory<TDbContext, TEntity, TId>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddRepositoryWithDbFactory<TDbContext, TEntity, TId>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TDbContext : DbContext
         where TEntity : class
         where TId : IEquatable<TId>
@@ -89,11 +89,11 @@ public class ModernEfCoreRepositoriesOptions
     /// Adds repository with injecting DbContextFactory in the constructor.<br/>
     /// When using DbContextFactory every repository creates and closes a database connection in each method.
     /// </summary>
-    /// <param name="lifetime">Repository lifetime in DI</param>
+    /// <param name="lifetime">Repository lifetime in DI (Scoped by default)</param>
     /// <typeparam name="TDbContext">The type of EF Core DbContext</typeparam>
     /// <typeparam name="TEntity">The type of entity</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
-    public void AddRepositoryWithUnitOfWork<TDbContext, TEntity, TId>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddRepositoryWithUnitOfWork<TDbContext, TEntity, TId>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TDbContext : DbContext
         where TEntity : class
         where TId : IEquatable<TId>
@@ -113,10 +113,10 @@ public class ModernEfCoreRepositoriesOptions
     /// <summary>
     /// Adds repository
     /// </summary>
-    /// <param name="lifetime">Repository lifetime in DI</param>
+    /// <param name="lifetime">Repository lifetime in DI (Scoped by default)</param>
     /// <typeparam name="TRepositoryInterface">The type of concrete repository interface</typeparam>
     /// <typeparam name="TRepositoryImplementation">The type of concrete repository implementation</typeparam>
-    public void AddConcreteRepository<TRepositoryInterface, TRepositoryImplementation>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddConcreteRepository<TRepositoryInterface, TRepositoryImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TRepositoryInterface : class
         where TRepositoryImplementation : class, TRepositoryInterface
     {

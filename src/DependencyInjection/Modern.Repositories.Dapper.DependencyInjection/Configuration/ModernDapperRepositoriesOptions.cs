@@ -39,11 +39,11 @@ public class ModernDapperRepositoriesOptions
     /// <summary>
     /// Adds repository
     /// </summary>
-    /// <param name="lifetime">Repository lifetime in DI</param>
+    /// <param name="lifetime">Repository lifetime in DI (Scoped by default)</param>
     /// <typeparam name="TEntityMapping">The type of entity mapping</typeparam>
     /// <typeparam name="TEntity">The type of entity</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
-    public void AddRepository<TEntityMapping, TEntity, TId>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddRepository<TEntityMapping, TEntity, TId>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TEntityMapping : DapperEntityMapping<TEntity>
         where TEntity : class
         where TId : IEquatable<TId>
@@ -62,11 +62,11 @@ public class ModernDapperRepositoriesOptions
     /// <summary>
     /// Adds repository
     /// </summary>
-    /// <param name="lifetime">Repository lifetime in DI</param>
+    /// <param name="lifetime">Repository lifetime in DI (Scoped by default)</param>
     /// <typeparam name="TRepositoryInterface">The type of concrete repository interface</typeparam>
     /// <typeparam name="TRepositoryImplementation">The type of concrete repository implementation</typeparam>
     /// <typeparam name="TEntityMapping">The type of entity mapping</typeparam>
-    public void AddConcreteRepository<TRepositoryInterface, TRepositoryImplementation, TEntityMapping>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddConcreteRepository<TRepositoryInterface, TRepositoryImplementation, TEntityMapping>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TRepositoryInterface : class
         where TRepositoryImplementation : class, TRepositoryInterface
     {

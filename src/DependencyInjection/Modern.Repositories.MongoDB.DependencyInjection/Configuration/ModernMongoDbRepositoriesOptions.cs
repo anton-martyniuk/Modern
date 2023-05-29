@@ -43,10 +43,10 @@ public class ModernMongoDbRepositoriesOptions
     /// </summary>
     /// <param name="databaseName">Name of the database</param>
     /// <param name="collectionName">Name of the collection</param>
-    /// <param name="lifetime">Repository lifetime in DI</param>
+    /// <param name="lifetime">Repository lifetime in DI (Scoped by default)</param>
     /// <typeparam name="TEntity">The type of entity</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
-    public void AddRepository<TEntity, TId>(string databaseName, string collectionName, ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddRepository<TEntity, TId>(string databaseName, string collectionName, ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TEntity : class
         where TId : IEquatable<TId>
     {
@@ -65,10 +65,10 @@ public class ModernMongoDbRepositoriesOptions
     /// <summary>
     /// Adds repository
     /// </summary>
-    /// <param name="lifetime">Repository lifetime in DI</param>
+    /// <param name="lifetime">Repository lifetime in DI (Scoped by default)</param>
     /// <typeparam name="TRepositoryInterface">The type of concrete repository interface</typeparam>
     /// <typeparam name="TRepositoryImplementation">The type of concrete repository implementation</typeparam>
-    public void AddConcreteRepository<TRepositoryInterface, TRepositoryImplementation>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+    public void AddConcreteRepository<TRepositoryInterface, TRepositoryImplementation>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TRepositoryInterface : class
         where TRepositoryImplementation : class, TRepositoryInterface
     {
