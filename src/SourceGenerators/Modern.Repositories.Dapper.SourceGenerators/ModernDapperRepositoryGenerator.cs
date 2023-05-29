@@ -12,6 +12,8 @@ public class ModernDapperRepositoryGenerator : ISourceGenerator
 {
     private const string RepositoryAttributeName = nameof(ModernDapperRepositoryAttribute);
     private const string MappingTypeMemberName = nameof(ModernDapperRepositoryAttribute.MappingType);
+    private const string EntityTypeMemberName = nameof(ModernDapperRepositoryAttribute.EntityType);
+    private const string IdTypeMemberName = nameof(ModernDapperRepositoryAttribute.IdType);
 
     public void Initialize(GeneratorInitializationContext context)
     {
@@ -46,14 +48,19 @@ public class ModernDapperRepositoryGenerator : ISourceGenerator
                 continue;
             }
             
-            var idProperty = classSymbol.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(m => m.Name == "Id");
-            if (idProperty == null)
+            var entityType = attributeData.NamedArguments.SingleOrDefault(a => a.Key == EntityTypeMemberName).Value.Value?.ToString()
+                ?? attributeData.ConstructorArguments[1].Value?.ToString();
+            if (entityType is null)
             {
                 continue;
             }
-
-            var entityType = classSymbol.ToDisplayString();
-            var idType = idProperty.Type.ToDisplayString();
+            
+            var idType = attributeData.NamedArguments.SingleOrDefault(a => a.Key == IdTypeMemberName).Value.Value?.ToString()
+                ?? attributeData.ConstructorArguments[2].Value?.ToString();
+            if (idType is null)
+            {
+                continue;
+            }
 
             // Get rid of Dbo and Dto suffixes
             var className = classSymbol.Name.Replace("Dbo", "").Replace("Dto", "");
@@ -81,7 +88,7 @@ public class ModernDapperRepositoryGenerator : ISourceGenerator
         // Interface
         sb.AppendLine();
         sb.AppendLine($"///<summary>The {entityType} repository definition</summary>");
-        sb.AppendLine($"public partial interface I{repositoryName} : IModernRepository<{entityType}, {idType}>");
+        sb.AppendLine($"public interface I{repositoryName} : IModernRepository<{entityType}, {idType}>");
         sb.AppendLine("{");
         sb.AppendLine("}");
 

@@ -10,12 +10,27 @@ namespace Modern.Repositories.LiteDB.SourceGenerators;
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public sealed class ModernLiteDbRepositoryAttribute : Attribute
 {
-    public ModernLiteDbRepositoryAttribute(string connectionString, string collectionName)
+    public ModernLiteDbRepositoryAttribute(Type entityType, Type idType, string connectionString, string collectionName)
     {
+        EntityType = entityType;
+        IdType = idType;
         ConnectionString = connectionString;
         CollectionName = collectionName;
     }
 
+    /// <summary>
+    /// Type of entity
+    /// </summary>
+    public Type EntityType { get; }
+    
+    /// <summary>
+    /// Type of entity identifier
+    /// </summary>
+    public Type IdType { get; }
+    
+    /// <summary>
+    /// Custom name of the repository
+    /// </summary>
     public string? RepositoryName { get; set; }
 
     /// <summary>

@@ -10,13 +10,23 @@ namespace Modern.Repositories.MongoDB.SourceGenerators;
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public sealed class ModernMongoDbRepositoryAttribute : Attribute
 {
-    public ModernMongoDbRepositoryAttribute(string databaseName, string collectionName)
+    public ModernMongoDbRepositoryAttribute(Type entityType, Type idType, string databaseName, string collectionName)
     {
+        EntityType = entityType;
+        IdType = idType;
         DatabaseName = databaseName;
         CollectionName = collectionName;
     }
-
-    public string? RepositoryName { get; set; }
+    
+    /// <summary>
+    /// Type of entity
+    /// </summary>
+    public Type EntityType { get; }
+    
+    /// <summary>
+    /// Type of entity identifier
+    /// </summary>
+    public Type IdType { get; }
 
     /// <summary>
     /// Name of the MongoDB database
@@ -27,4 +37,9 @@ public sealed class ModernMongoDbRepositoryAttribute : Attribute
     /// Name of the MongoDB collection
     /// </summary>
     public string CollectionName { get; set; }
+    
+    /// <summary>
+    /// Custom name of the repository
+    /// </summary>
+    public string? RepositoryName { get; set; }
 }
