@@ -10,23 +10,11 @@ namespace Modern.Repositories.MongoDB.SourceGenerators;
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public sealed class ModernMongoDbRepositoryAttribute : Attribute
 {
-    public ModernMongoDbRepositoryAttribute(Type entityType, Type idType, string databaseName, string collectionName)
+    public ModernMongoDbRepositoryAttribute(string databaseName, string collectionName)
     {
-        EntityType = entityType;
-        IdType = idType;
         DatabaseName = databaseName;
         CollectionName = collectionName;
     }
-    
-    /// <summary>
-    /// Type of entity
-    /// </summary>
-    public Type EntityType { get; }
-    
-    /// <summary>
-    /// Type of entity identifier
-    /// </summary>
-    public Type IdType { get; }
 
     /// <summary>
     /// Name of the MongoDB database

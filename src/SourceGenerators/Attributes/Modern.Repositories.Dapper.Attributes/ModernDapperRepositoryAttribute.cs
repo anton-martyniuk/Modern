@@ -10,28 +10,16 @@ namespace Modern.Repositories.Dapper.SourceGenerators;
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public sealed class ModernDapperRepositoryAttribute : Attribute
 {
-    public ModernDapperRepositoryAttribute(Type mappingType, Type entityType, Type idType)
+    public ModernDapperRepositoryAttribute(Type mappingType)
     {
         MappingType = mappingType;
-        EntityType = entityType;
-        IdType = idType;
     }
 
     /// <summary>
     /// Type of dapper mapping
     /// </summary>
     public Type MappingType { get; set; }
-    
-    /// <summary>
-    /// Type of entity
-    /// </summary>
-    public Type EntityType { get; }
-    
-    /// <summary>
-    /// Type of entity identifier
-    /// </summary>
-    public Type IdType { get; }
-    
+
     /// <summary>
     /// Custom name of the repository
     /// </summary>

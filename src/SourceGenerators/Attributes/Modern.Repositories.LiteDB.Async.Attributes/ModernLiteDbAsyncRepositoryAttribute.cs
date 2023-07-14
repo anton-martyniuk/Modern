@@ -10,23 +10,11 @@ namespace Modern.Repositories.LiteDB.Async.SourceGenerators;
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public sealed class ModernLiteDbAsyncRepositoryAttribute : Attribute
 {
-    public ModernLiteDbAsyncRepositoryAttribute(Type entityType, Type idType, string connectionString, string collectionName)
+    public ModernLiteDbAsyncRepositoryAttribute(string connectionString, string collectionName)
     {
-        EntityType = entityType;
-        IdType = idType;
         ConnectionString = connectionString;
         CollectionName = collectionName;
     }
-    
-    /// <summary>
-    /// Type of entity
-    /// </summary>
-    public Type EntityType { get; }
-    
-    /// <summary>
-    /// Type of entity identifier
-    /// </summary>
-    public Type IdType { get; }
 
     /// <summary>
     /// Custom name of the repository

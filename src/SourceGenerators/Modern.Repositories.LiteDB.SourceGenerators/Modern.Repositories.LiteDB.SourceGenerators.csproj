@@ -8,7 +8,7 @@
         <LangVersion>latest</LangVersion>
         <IsRoslynComponent>true</IsRoslynComponent>
 
-        <Version>1.0.0-beta2</Version>
+        <Version>1.0.0-beta3</Version>
         <Authors>Anton Martyniuk</Authors>
         <Copyright>Copyright (c) Anton Martyniuk 2023</Copyright>
         <Title>Modern Repositories LiteDB Source Generators</Title>
@@ -22,7 +22,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.0" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>

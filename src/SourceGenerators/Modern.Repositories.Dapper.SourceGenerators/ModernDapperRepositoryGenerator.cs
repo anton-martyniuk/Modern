@@ -12,8 +12,6 @@ public class ModernDapperRepositoryGenerator : ISourceGenerator
 {
     private const string RepositoryAttributeName = nameof(ModernDapperRepositoryAttribute);
     private const string MappingTypeMemberName = nameof(ModernDapperRepositoryAttribute.MappingType);
-    private const string EntityTypeMemberName = nameof(ModernDapperRepositoryAttribute.EntityType);
-    private const string IdTypeMemberName = nameof(ModernDapperRepositoryAttribute.IdType);
 
     public void Initialize(GeneratorInitializationContext context)
     {
@@ -48,33 +46,28 @@ public class ModernDapperRepositoryGenerator : ISourceGenerator
                 continue;
             }
             
-            var entityType = attributeData.NamedArguments.SingleOrDefault(a => a.Key == EntityTypeMemberName).Value.Value?.ToString()
-                ?? attributeData.ConstructorArguments[1].Value?.ToString();
-            if (entityType is null)
-            {
-                continue;
-            }
-            
-            var idType = attributeData.NamedArguments.SingleOrDefault(a => a.Key == IdTypeMemberName).Value.Value?.ToString()
-                ?? attributeData.ConstructorArguments[2].Value?.ToString();
-            if (idType is null)
+            var idProperty = classSymbol.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(m => m.Name == "Id");
+            if (idProperty == null)
             {
                 continue;
             }
 
+            var entityType = classSymbol.ToDisplayString();
+            var idType = idProperty.Type.ToDisplayString();
             // Get rid of Dbo and Dto suffixes
             var className = classSymbol.Name.Replace("Dbo", "").Replace("Dto", "");
-            
+            var namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
+
             // Get repository name
             var repositoryName = attributeData.NamedArguments.FirstOrDefault(a => a.Key == "RepositoryName").Value.Value?.ToString() 
                 ?? $"{className}Repository";
 
-            var source = GenerateRepositoryCode(entityType, idType, mappingType, repositoryName);
+            var source = GenerateRepositoryCode(namespaceName, entityType, idType, mappingType, repositoryName);
             context.AddSource($"{repositoryName}_dapper_gen.cs", SourceText.From(source, Encoding.UTF8));
         }
     }
 
-    private static string GenerateRepositoryCode(string entityType, string idType, string mappingType,
+    private static string GenerateRepositoryCode(string namespaceName, string entityType, string idType, string mappingType,
         string repositoryName)
     {
         var sb = new StringBuilder();
@@ -86,6 +79,8 @@ public class ModernDapperRepositoryGenerator : ISourceGenerator
         sb.AppendLine("using Modern.Repositories.Dapper.Providers;");
 
         // Interface
+        sb.AppendLine();
+        sb.AppendLine($"namespace {namespaceName};");
         sb.AppendLine();
         sb.AppendLine($"///<summary>The {entityType} repository definition</summary>");
         sb.AppendLine($"public interface I{repositoryName} : IModernRepository<{entityType}, {idType}>");
