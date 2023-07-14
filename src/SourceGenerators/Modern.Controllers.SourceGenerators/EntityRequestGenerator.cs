@@ -66,9 +66,7 @@ public class EntityRequestGenerator : ISourceGenerator
         var updateRequestName = (string?)attributeData.NamedArguments.FirstOrDefault(arg => arg.Key == "UpdateRequestName").Value.Value ?? $"Update{className}Request";
             
         var properties = classSymbol.GetMembers().OfType<IPropertySymbol>().ToList();
-        // var createProperties = properties.Where(p => p.Name != "Id").ToList();
-        // var updateProperties = properties.ToList();
-        
+
         var createProperties = properties.Where(p => p.Name != "Id" && p.GetAttributes()
                 .All(a => a.AttributeClass?.ToDisplayString().Contains("IgnoreCreateRequest") is false))
             .ToList();
@@ -78,8 +76,7 @@ public class EntityRequestGenerator : ISourceGenerator
             .ToList();
 
         var sb = new StringBuilder();
-        sb.AppendLine($"namespace {namespaceName}");
-        sb.AppendLine("{");
+        sb.AppendLine($"namespace {namespaceName};");
 
         // Generate type for Create{ClassName}Request
         if (generateCreateRequest)
@@ -114,8 +111,6 @@ public class EntityRequestGenerator : ISourceGenerator
             sb.AppendLine("    }");   
         }
             
-        sb.AppendLine("}");
-
         return sb.ToString();
     }
 }
