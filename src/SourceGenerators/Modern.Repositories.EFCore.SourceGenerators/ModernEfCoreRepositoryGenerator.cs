@@ -67,7 +67,8 @@ public class ModernEfCoreRepositoryGenerator : ISourceGenerator
             }
 
             // Get rid of Dbo and Dto suffixes
-            var className = classSymbol.Name.Replace("Dbo", "").Replace("Dto", "");
+            var className = entityType.Substring(entityType.LastIndexOf('.') + 1).Replace("Dbo", "").Replace("Dto", "");
+            var namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
             
             // Get repository name
             var repositoryName = attributeData.NamedArguments.FirstOrDefault(a => a.Key == "RepositoryName").Value.Value?.ToString() 
@@ -75,9 +76,9 @@ public class ModernEfCoreRepositoryGenerator : ISourceGenerator
 
             var source = data.Value.repositoryType switch
             {
-                RepositoryType.Regular => GenerateRepositoryCode(dbContextType, entityType, idType, repositoryName),
-                RepositoryType.WithFactory => GenerateRepositoryWithFactoryCode(dbContextType, entityType, idType, repositoryName),
-                RepositoryType.UnitOfWork => GenerateRepositoryForUnitOfWorkCode(dbContextType, entityType, idType, repositoryName),
+                RepositoryType.Regular => GenerateRepositoryCode(namespaceName, dbContextType, entityType, idType, repositoryName),
+                RepositoryType.WithFactory => GenerateRepositoryWithFactoryCode(namespaceName, dbContextType, entityType, idType, repositoryName),
+                RepositoryType.UnitOfWork => GenerateRepositoryForUnitOfWorkCode(namespaceName, dbContextType, entityType, idType, repositoryName),
                 _ => string.Empty
             };
 
@@ -111,7 +112,7 @@ public class ModernEfCoreRepositoryGenerator : ISourceGenerator
         return null;
     }
 
-    private static string GenerateRepositoryCode(string dbContextType, string entityType, string idType, string repositoryName)
+    private static string GenerateRepositoryCode(string namespaceName, string dbContextType, string entityType, string idType, string repositoryName)
     {
         var sb = new StringBuilder();
 
@@ -123,6 +124,8 @@ public class ModernEfCoreRepositoryGenerator : ISourceGenerator
         sb.AppendLine("using Modern.Repositories.EFCore.Configuration;");
 
         // Interface
+        sb.AppendLine();
+        sb.AppendLine($"namespace {namespaceName};");
         sb.AppendLine();
         sb.AppendLine($"///<summary>The {entityType} repository definition</summary>");
         sb.AppendLine($"public interface I{repositoryName} : IModernRepository<{entityType}, {idType}>");
@@ -144,7 +147,7 @@ public class ModernEfCoreRepositoryGenerator : ISourceGenerator
         return sb.ToString();
     }
     
-    private static string GenerateRepositoryWithFactoryCode(string dbContextType, string entityType, string idType, string repositoryName)
+    private static string GenerateRepositoryWithFactoryCode(string namespaceName, string dbContextType, string entityType, string idType, string repositoryName)
     {
         var sb = new StringBuilder();
 
@@ -156,6 +159,8 @@ public class ModernEfCoreRepositoryGenerator : ISourceGenerator
         sb.AppendLine("using Modern.Repositories.EFCore.Configuration;");
 
         // Interface
+        sb.AppendLine();
+        sb.AppendLine($"namespace {namespaceName};");
         sb.AppendLine();
         sb.AppendLine($"///<summary>The {entityType} repository definition</summary>");
         sb.AppendLine($"public interface I{repositoryName} : IModernRepository<{entityType}, {idType}>");
@@ -177,7 +182,7 @@ public class ModernEfCoreRepositoryGenerator : ISourceGenerator
         return sb.ToString();
     }
     
-    private static string GenerateRepositoryForUnitOfWorkCode(string dbContextType, string entityType, string idType, string repositoryName)
+    private static string GenerateRepositoryForUnitOfWorkCode(string namespaceName, string dbContextType, string entityType, string idType, string repositoryName)
     {
         var sb = new StringBuilder();
 
@@ -187,6 +192,8 @@ public class ModernEfCoreRepositoryGenerator : ISourceGenerator
         sb.AppendLine("using Modern.Repositories.EFCore;");
 
         // Interface
+        sb.AppendLine();
+        sb.AppendLine($"namespace {namespaceName};");
         sb.AppendLine();
         sb.AppendLine($"///<summary>The {entityType} repository definition</summary>");
         sb.AppendLine($"public interface I{repositoryName} : IModernRepository<{entityType}, {idType}>");
