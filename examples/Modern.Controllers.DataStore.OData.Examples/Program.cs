@@ -8,7 +8,6 @@ using Modern.Controllers.DataStore.OData.Examples.DbContexts;
 using Modern.Controllers.DataStore.OData.Examples.Entities;
 using Modern.Controllers.DataStore.OData.Examples.Models;
 using Modern.Extensions.Microsoft.DependencyInjection;
-using Modern.Repositories.Abstractions;
 using Modern.Services.DataStore.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,7 +51,7 @@ builder.Services
     })
     .AddServices(options =>
     {
-        options.AddService<CityDto, CityDbo, int, IModernRepository<CityDbo, int>>();
+        options.AddService<CityDto, CityDbo, int>();
     })
     .AddControllers(options =>
     {
@@ -77,14 +76,12 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Use EF Core migrations to create a database
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<CityDbContext>();
-    await dbContext.Database.EnsureDeletedAsync();
-    await dbContext.Database.EnsureCreatedAsync();
-}
+using var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<CityDbContext>();
+await dbContext.Database.EnsureDeletedAsync();
+await dbContext.Database.EnsureCreatedAsync();
 
-var service = app.Services.GetRequiredService<IModernService<CityDto, CityDbo, int>>();
+var service = scope.ServiceProvider.GetRequiredService<IModernService<CityDto, CityDbo, int>>();
 
 var count = await service.CountAsync();
 if (count == 0)

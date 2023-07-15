@@ -54,7 +54,7 @@ services
     {
         // Add service by entity type.
         // Use it when an own service is NOT needed
-        options.AddService<CityDto, CityDbo, int, IModernRepository<CityDbo, int>>();
+        options.AddService<CityDto, CityDbo, int>();
         
         // Or specify a concrete repository if available
         //options.AddService<CityDto, CityDbo, int, ICityRepository>();

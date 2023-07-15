@@ -11,7 +11,7 @@
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-        <PackageReference Include="Modern.Repositories.MongoDB.DependencyInjection" Version="1.0.0-beta3" />
+        <PackageReference Include="Modern.Repositories.MongoDB.DependencyInjection" Version="1.0.2" />
     </ItemGroup>
 
     <ItemGroup>

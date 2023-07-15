@@ -57,15 +57,13 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Use EF Core migrations to create a database
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<CityDbContext>();
-    await dbContext.Database.EnsureDeletedAsync();
-    await dbContext.Database.EnsureCreatedAsync();
-}
+using var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<CityDbContext>();
+await dbContext.Database.EnsureDeletedAsync();
+await dbContext.Database.EnsureCreatedAsync();
 
 // Get concrete service
-var service = app.Services.GetRequiredService<ICityInMemoryService>();
+var service = scope.ServiceProvider.GetRequiredService<ICityInMemoryService>();
 
 var count = await service.CountAsync();
 if (count == 0)

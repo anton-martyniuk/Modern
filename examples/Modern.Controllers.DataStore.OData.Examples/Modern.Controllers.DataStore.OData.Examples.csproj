@@ -8,17 +8,17 @@
 
     <ItemGroup>
         <PackageReference Include="Bogus" Version="34.0.2" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.1" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.2">
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.9" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.9">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.2" />
-        <PackageReference Include="Modern.Controllers.DataStore.DependencyInjection" Version="1.0.0-beta2" />
-        <PackageReference Include="Modern.Controllers.DataStore.OData.DependencyInjection" Version="1.0.0-beta4" />
-        <PackageReference Include="Modern.Repositories.EFCore.DependencyInjection" Version="1.0.0-beta5" />
-        <PackageReference Include="Modern.Services.DataStore.DependencyInjection" Version="1.0.0-beta4" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.9" />
+        <PackageReference Include="Modern.Controllers.DataStore.DependencyInjection" Version="1.0.1" />
+        <PackageReference Include="Modern.Controllers.DataStore.OData.DependencyInjection" Version="1.0.1" />
+        <PackageReference Include="Modern.Repositories.EFCore.DependencyInjection" Version="1.0.2" />
+        <PackageReference Include="Modern.Services.DataStore.DependencyInjection" Version="1.0.2" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>
 
 </Project>

@@ -6,14 +6,16 @@ using Modern.Services.DataStore;
 
 namespace Modern.EfCore.UnitOfWork.Examples.Services;
 
-public class CityService : ModernService<CityDto, CityDbo, int, ICityRepository>, ICityService
+public class CityService : ModernService<CityDto, CityDbo, int>, ICityService
 {
     private readonly IModernUnitOfWork _unitOfWork;
+    private readonly ICityRepository _repository;
 
     public CityService(IModernUnitOfWork unitOfWork, ICityRepository repository, ILogger<CityService> logger)
         : base(repository, logger)
     {
         _unitOfWork = unitOfWork;
+        _repository = repository;
     }
 
     public override async Task<CityDto> CreateAsync(CityDto entity, CancellationToken cancellationToken = default)
@@ -38,7 +40,7 @@ public class CityService : ModernService<CityDto, CityDbo, int, ICityRepository>
 
     public async Task<List<CityDto>> UpdateCountryCitiesAsync(string country)
     {
-        var entitiesDbo = await Repository.GetCountryCitiesAsync(country);
+        var entitiesDbo = await _repository.GetCountryCitiesAsync(country);
         foreach (var cityDbo in entitiesDbo)
         {
             cityDbo.Population += 1_000;

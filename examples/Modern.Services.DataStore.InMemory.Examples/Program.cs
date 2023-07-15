@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Modern.Extensions.Microsoft.DependencyInjection;
-using Modern.Repositories.Abstractions;
 using Modern.Services.DataStore.InMemory.Abstractions;
 using Modern.Services.DataStore.InMemory.Examples.DbContexts;
 using Modern.Services.DataStore.InMemory.Examples.Entities;
@@ -44,7 +43,7 @@ services
     {
         // Add service by entity type.
         // Use it when an own service is NOT needed
-        options.AddService<CityDto, CityDbo, int, IModernRepository<CityDbo, int>>();
+        options.AddService<CityDto, CityDbo, int>();
         
         // Or specify a concrete repository if available
         //options.AddService<CityDto, CityDbo, int, ICityRepository>();
