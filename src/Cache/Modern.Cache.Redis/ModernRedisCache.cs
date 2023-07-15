@@ -77,7 +77,7 @@ public class ModernRedisCache<TEntity, TId> : IModernCache<TEntity, TId>
         ArgumentNullException.ThrowIfNull(ids, nameof(ids));
         Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
 
-        var keys = ids.Select(x => GetKey(x)).ToArray();
+        var keys = ids.Select(x => GetKey(x)).ToHashSet();
         var entities = await _redisClient.GetDefaultDatabase().GetAllAsync<TEntity>(keys).ConfigureAwait(false);
         return entities.Values.Where(x => x is not null).ToList()!;
     }

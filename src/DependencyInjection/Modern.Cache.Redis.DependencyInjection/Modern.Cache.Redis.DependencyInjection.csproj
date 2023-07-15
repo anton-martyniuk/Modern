@@ -7,7 +7,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<Authors>Anton Martyniuk</Authors>
 		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
 		<Title>Modern Redis Cache Extensions for Microsoft Dependency Injection</Title>
@@ -24,8 +24,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-		<PackageReference Include="StackExchange.Redis.Extensions.AspNetCore" Version="8.0.5" />
-		<PackageReference Include="StackExchange.Redis.Extensions.Newtonsoft" Version="8.0.5" />
+		<PackageReference Include="StackExchange.Redis.Extensions.AspNetCore" Version="9.1.0" />
+		<PackageReference Include="StackExchange.Redis.Extensions.Newtonsoft" Version="9.1.0" />
 	</ItemGroup>
 
 	<ItemGroup>
