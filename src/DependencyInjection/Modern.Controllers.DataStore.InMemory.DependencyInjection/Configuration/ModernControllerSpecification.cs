@@ -29,4 +29,9 @@ public class ModernControllerSpecification
     /// The type of entity identifier
     /// </summary>
     public Type EntityIdType { get; set; } = default!;
+
+    /// <summary>
+    /// Api route
+    /// </summary>
+    public string ApiRoute { get; set; } = default!;
 }

@@ -39,7 +39,6 @@ public class ModernInMemoryODataController<TEntityDto, TId> : ODataController
     /// <response code="500">Error occurred in the entity service</response>
     [HttpGet]
     [EnableQuery(MaxNodeCount = 1000)]
-    //[ProducesResponseType(typeof(IEnumerable<TEntity>), (int)HttpStatusCode.OK)] TODO: // create attribute
     public virtual IActionResult Get()
     {
         return Ok(_cache.AsEnumerable());

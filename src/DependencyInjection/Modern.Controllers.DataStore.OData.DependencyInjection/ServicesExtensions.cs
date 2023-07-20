@@ -21,7 +21,7 @@ public static class ServicesExtensions
         configure(options);
 
         builder.Services
-            .AddMvc(o => o.Conventions.Add(new GenericControllerRouteConvention()))
+            .AddMvc(o => o.Conventions.Add(new GenericControllerRouteConvention(options.Controllers)))
             .ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new GenericTypeControllerFeatureProvider(options)));
 
         return builder;

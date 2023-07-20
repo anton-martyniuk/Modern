@@ -39,8 +39,7 @@ public class ModernODataController<TEntityDbo, TId> : ODataController
     /// <response code="200">Entities retrieved</response>
     /// <response code="500">Error occurred in the entity service</response>
     [HttpGet]
-    [EnableQuery(MaxNodeCount = 1000)] // TODO: configure this ?!
-    //[ProducesResponseType(typeof(IQueryable<TEntity>), (int)HttpStatusCode.OK)] TODO: // create attribute
+    [EnableQuery(MaxNodeCount = 1000)]
     public virtual IActionResult Get()
     {
         return Ok(_repository.AsQueryable());

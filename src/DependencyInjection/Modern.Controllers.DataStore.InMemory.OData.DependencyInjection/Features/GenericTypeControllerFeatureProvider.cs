@@ -27,6 +27,7 @@ internal class GenericTypeControllerFeatureProvider : IApplicationFeatureProvide
     /// </summary>
     public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
     {
+        // Non concrete controllers
         var controllers = _options.Controllers.Where(x => _options.ConcreteControllers.All(t => !x.GetType().GetTypeInfo().IsInstanceOfType(t))).ToList();
         foreach (var c in controllers)
         {

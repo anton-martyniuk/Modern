@@ -72,7 +72,6 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     /// <param name="entityDto">Entity Dto</param>
     /// <returns>Entity id</returns>
-    // TODO: use source generators for this
     protected virtual TId GetEntityId(TEntityDto entityDto) => (TId)(entityDto.GetType().GetProperty("Id")?.GetValue(entityDto, null) ?? 0);
     
     /// <summary>

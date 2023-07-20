@@ -21,12 +21,13 @@ public class ModernControllersOptions
     /// <summary>
     /// Adds controller
     /// </summary>
+    /// <param name="apiRoute">Api route, for example: api/cities, api/cars</param>
     /// <typeparam name="TCreateRequest">The type of request that creates an entity</typeparam>
     /// <typeparam name="TUpdateRequest">The type of request that updates an entity</typeparam>
     /// <typeparam name="TEntityDto">The type of entity returned from the controller</typeparam>
     /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
-    public void AddController<TCreateRequest, TUpdateRequest, TEntityDto, TEntityDbo, TId>()
+    public void AddController<TCreateRequest, TUpdateRequest, TEntityDto, TEntityDbo, TId>(string apiRoute)
         where TCreateRequest : class
         where TUpdateRequest : class
         where TEntityDto : class
@@ -39,7 +40,8 @@ public class ModernControllersOptions
             UpdateRequestType = typeof(TUpdateRequest),
             EntityDtoType = typeof(TEntityDto),
             EntityDboType = typeof(TEntityDbo),
-            EntityIdType = typeof(TId)
+            EntityIdType = typeof(TId),
+            ApiRoute = apiRoute
         };
 
         Controllers.Add(configuration);

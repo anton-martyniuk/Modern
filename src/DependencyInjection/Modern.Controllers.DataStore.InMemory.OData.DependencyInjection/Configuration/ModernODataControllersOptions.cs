@@ -21,16 +21,18 @@ public class ModernODataControllersOptions
     /// <summary>
     /// Adds controller
     /// </summary>
+    /// <param name="apiRoute">Api route, for example: api/cities, api/cars</param>
     /// <typeparam name="TEntityDto">The type of entity contained in the data store</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
-    public void AddController<TEntityDto, TId>()
+    public void AddController<TEntityDto, TId>(string apiRoute)
         where TEntityDto : class
         where TId : IEquatable<TId>
     {
         var configuration = new ModernControllerSpecification
         {
             EntityDtoType = typeof(TEntityDto),
-            EntityIdType = typeof(TId)
+            EntityIdType = typeof(TId),
+            ApiRoute = apiRoute
         };
 
         Controllers.Add(configuration);

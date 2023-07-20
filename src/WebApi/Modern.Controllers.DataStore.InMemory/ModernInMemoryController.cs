@@ -43,8 +43,7 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     /// <response code="200">Entity was found and returned</response>
     /// <response code="404">Entity was not found in the data store</response>
     /// <response code="500">Error occurred while retrieving entity</response>
-    [HttpGet("get/{id}")]
-    //[ProducesResponseType(typeof(TEntityDto), (int)HttpStatusCode.OK)] // TODO: use Source Generator to create Attribute
+    [HttpGet("{id}")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -68,8 +67,7 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     /// <response code="200">Entities was found and returned</response>
     /// <response code="404">Entities were not found in the data store</response>
     /// <response code="500">Error occurred while retrieving entities</response>
-    [HttpGet("get")]
-    //[ProducesResponseType(typeof(TEntityDto), (int)HttpStatusCode.OK)]
+    [HttpGet]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -86,8 +84,7 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     /// <response code="201">The entity was created</response>
     /// <response code="400">The entity model is invalid</response>
     /// <response code="500">Error occurred while creating entity</response>
-    [HttpPost("create")]
-    //[ProducesResponseType(typeof(TEntityDto), (int)HttpStatusCode.OK)]
+    [HttpPost]
     [ProducesResponseType((int)HttpStatusCode.Created)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -106,7 +103,6 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     /// <response code="400">One of entity models is invalid</response>
     /// <response code="500">Error occurred while creating entities</response>
     [HttpPost("create-many")]
-    //[ProducesResponseType(typeof(TEntityDto), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Created)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -126,11 +122,11 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     /// <response code="400">The entity model is invalid</response>
     /// <response code="404">Entity with the given id not found</response>
     /// <response code="500">Error occurred while updating entity</response>
+    [HttpPut("{id}")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    [HttpPut("update/{id}")]
     public virtual async Task<IActionResult> Update([Required] TId id, [FromBody, Required] TUpdateRequest request)
     {
         try
@@ -154,11 +150,11 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     /// <response code="400">The entity model is invalid</response>
     /// <response code="404">Entity with the given id not found</response>
     /// <response code="500">Error occurred while updating entities</response>
+    [HttpPut("update-many")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    [HttpPut("update-many")]
     public virtual async Task<IActionResult> UpdateMany([FromBody, Required] List<TUpdateRequest> requests)
     {
         try
@@ -183,11 +179,11 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     /// <response code="400">The entity model is invalid</response>
     /// <response code="404">Entity with the given id not found</response>
     /// <response code="500">Error occurred while updating entity</response>
+    [HttpPatch("{id}")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    [HttpPatch("patch/{id}")]
     public virtual async Task<IActionResult> Patch([Required] TId id, [FromBody] JsonPatchDocument<TEntityDto> patch)
     {
         try
@@ -209,10 +205,10 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     /// <response code="204">Entity was found and deleted from the data store</response>
     /// <response code="404">Entity was not found in the data store</response>
     /// <response code="500">Error occurred while deleting entity</response>
+    [HttpDelete("{id}")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    [HttpDelete("delete/{id}")]
     public virtual async Task<IActionResult> Delete([Required] TId id)
     {
         var result = await _service.DeleteAsync(id).ConfigureAwait(false);
@@ -232,10 +228,10 @@ public class ModernInMemoryController<TCreateRequest, TUpdateRequest, TEntityDto
     /// <response code="204">Entity was found and deleted from the data store</response>
     /// <response code="404">Entity was not found in the data store</response>
     /// <response code="500">Error occurred while deleting entity</response>
+    [HttpDelete("delete-many")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    [HttpDelete("delete-many")]
     public virtual async Task<IActionResult> DeleteMany([Required] List<TId> ids)
     {
         var result = await _service.DeleteAsync(ids).ConfigureAwait(false);
