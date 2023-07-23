@@ -55,12 +55,13 @@ builder.Services
     })
     .AddInMemoryControllers(options =>
     {
-        options.AddController<CreateCityRequest, UpdateCityRequest, CityDto, CityDbo, int>();
+        options.AddController<CreateCityRequest, UpdateCityRequest, CityDto, CityDbo, int>("api/cities");
     })
-    .AddInMemoryODataControllers(options =>
-    {
-        options.AddController<CityDto, int>();
-    });
+    // .AddInMemoryODataControllers(options =>
+    // {
+    //     options.AddController<CityDto, int>("api/odata/cities");
+    // })
+    ;
 
 
 var app = builder.Build();

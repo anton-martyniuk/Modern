@@ -42,7 +42,7 @@ builder.Services
     })
     .AddControllers(options =>
     {
-        options.AddController<CreateCityRequest, UpdateCityRequest, CityDto, CityDbo, int>();
+        options.AddController<CreateCityRequest, UpdateCityRequest, CityDto, CityDbo, int>("api/cities");
     });
 
 

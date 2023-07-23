@@ -15,8 +15,8 @@
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.9" />
         <PackageReference Include="Modern.Cache.Redis.DependencyInjection" Version="1.0.2" />
-        <PackageReference Include="Modern.Controllers.CQRS.DataStore.DependencyInjection" Version="1.0.1" />
-        <PackageReference Include="Modern.CQRS.DataStore.Cached.DependencyInjection" Version="1.0.2" />
+        <PackageReference Include="Modern.Controllers.CQRS.DataStore.DependencyInjection" Version="1.0.2" />
+        <PackageReference Include="Modern.CQRS.DataStore.Cached.DependencyInjection" Version="1.0.3" />
         <PackageReference Include="Modern.Repositories.EFCore.DependencyInjection" Version="1.0.2" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>

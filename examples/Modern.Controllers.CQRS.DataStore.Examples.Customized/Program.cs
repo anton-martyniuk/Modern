@@ -12,7 +12,6 @@ using Modern.Extensions.Microsoft.DependencyInjection;
 using Modern.Repositories.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Host.UseDefaultServiceProvider(x => x.ValidateScopes = false);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -31,8 +30,8 @@ builder.Services
     .AddModern()
     .AddRepositoriesEfCore(options =>
     {
-        options.AddRepository<CityDbContext, CityDbo, int>();
-        options.AddConcreteRepository<ICityRepository, CityRepository>();
+        options.AddRepositoryWithDbFactory<CityDbContext, CityDbo, int>(ServiceLifetime.Transient);
+        options.AddConcreteRepository<ICityRepository, CityRepository>(ServiceLifetime.Transient);
     })
     .AddCqrs(options =>
     {
@@ -40,7 +39,7 @@ builder.Services
     })
     .AddCqrsControllers(options =>
     {
-        options.AddController<CreateCityRequest, UpdateCityRequest, CityDto, CityDbo, int>();
+        options.AddController<CreateCityRequest, UpdateCityRequest, CityDto, CityDbo, int>("api/cities");
     });
 
 // Register custom handler

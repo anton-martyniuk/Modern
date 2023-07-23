@@ -10,7 +10,6 @@ using Modern.Extensions.Microsoft.DependencyInjection;
 using Modern.Repositories.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Host.UseDefaultServiceProvider(x => x.ValidateScopes = false);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -30,7 +29,7 @@ builder.Services
     .AddModern()
     .AddRepositoriesEfCore(options =>
     {
-        options.AddRepositoryWithDbFactory<CityDbContext, CityDbo, int>();
+        options.AddRepositoryWithDbFactory<CityDbContext, CityDbo, int>(ServiceLifetime.Transient);
     })
     .AddRedisCache(options =>
     {
@@ -46,7 +45,7 @@ builder.Services
     })
     .AddCqrsControllers(options =>
     {
-        options.AddController<CreateCityRequest, UpdateCityRequest, CityDto, CityDbo, int>();
+        options.AddController<CreateCityRequest, UpdateCityRequest, CityDto, CityDbo, int>("api/cities");
     });
 
 

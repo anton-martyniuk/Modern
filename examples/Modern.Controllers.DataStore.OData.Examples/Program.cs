@@ -55,12 +55,13 @@ builder.Services
     })
     .AddControllers(options =>
     {
-        options.AddController<CreateCityRequest, UpdateCityRequest, CityDto, CityDbo, int>();
+        options.AddController<CreateCityRequest, UpdateCityRequest, CityDto, CityDbo, int>("api/cities");
     })
-    .AddODataControllers(options =>
-    {
-        options.AddController<CityDbo, int>();
-    });
+    // .AddODataControllers(options =>
+    // {
+    //     options.AddController<CityDbo, int>("api/odata/cities");
+    // })
+    ;
 
 
 var app = builder.Build();
