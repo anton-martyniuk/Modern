@@ -22,7 +22,7 @@ public class ModernCqrsOptions
     /// <typeparam name="TEntityDbo">The type of entity contained in the data store</typeparam>
     /// <typeparam name="TId">The type of entity identifier</typeparam>
     /// <typeparam name="TRepository">Type of repository used for the entity</typeparam>
-    public void AddQueriesCommandsAndHandlersFor<TEntityDto, TEntityDbo, TId, TRepository>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    public void AddQueriesCommandsAndHandlersFor<TEntityDto, TEntityDbo, TId, TRepository>(ServiceLifetime lifetime = ServiceLifetime.Transient)
         where TEntityDto : class
         where TEntityDbo : class
         where TId : IEquatable<TId>

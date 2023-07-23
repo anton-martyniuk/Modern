@@ -37,25 +37,25 @@ public static class ServicesExtensions
             var listType = typeof(List<>).MakeGenericType(c.EntityDtoType);
             var pagedType = typeof(PagedResult<>).MakeGenericType(c.EntityDtoType);
 
-            builder.Services.AddDoubleArityRequestAndHandler(typeof(GetByIdQuery<,>), typeof(GetByIdQueryHandler<,,,>), c.EntityDtoType, c);
-            builder.Services.AddDoubleArityRequestAndHandler(typeof(TryGetByIdQuery<,>), typeof(TryGetByIdQueryHandler<,,,>), nullableType, c);
-            builder.Services.AddDoubleArityRequestAndHandler(typeof(GetAllQuery<,>), typeof(GetAllQueryHandler<,,,>), listType, c);
-            builder.Services.AddDoubleArityRequestAndHandler(typeof(GetCountAllQuery<,>), typeof(GetCountAllQueryHandler<,,,>), typeof(long), c);
-            builder.Services.AddDoubleArityRequestAndHandler(typeof(GetCountQuery<,>), typeof(GetCountQueryHandler<,,,>), typeof(long), c);
-            builder.Services.AddDoubleArityRequestAndHandler(typeof(GetExistsQuery<,>), typeof(GetExistsQueryHandler<,,,>), typeof(bool), c);
+            builder.Services.AddDoubleArityRequestAndHandlerForDto(typeof(GetByIdQuery<,>), typeof(GetByIdQueryHandler<,,,>), c.EntityDtoType, c);
+            builder.Services.AddDoubleArityRequestAndHandlerForDto(typeof(TryGetByIdQuery<,>), typeof(TryGetByIdQueryHandler<,,,>), nullableType, c);
+            builder.Services.AddDoubleArityRequestAndHandlerForDto(typeof(GetAllQuery<,>), typeof(GetAllQueryHandler<,,,>), listType, c);
+            builder.Services.AddDoubleArityRequestAndHandlerForDto(typeof(GetCountAllQuery<,>), typeof(GetCountAllQueryHandler<,,,>), typeof(long), c);
+            builder.Services.AddDoubleArityRequestAndHandlerForDbo(typeof(GetCountQuery<,>), typeof(GetCountQueryHandler<,,,>), typeof(long), c);
+            builder.Services.AddDoubleArityRequestAndHandlerForDbo(typeof(GetExistsQuery<,>), typeof(GetExistsQueryHandler<,,,>), typeof(bool), c);
             builder.Services.AddTripleArityRequestAndHandler(typeof(GetFirstOrDefaultQuery<,,>), typeof(GetFirstOrDefaultQueryHandler<,,,>), nullableType, c);
-            builder.Services.AddTripleArityRequestAndHandler(typeof(GetSingleOrDefaultQuery<,,>), typeof(GetSingleOrDefaultQueryHandler<,,,>), nullableType, c); 
+            builder.Services.AddTripleArityRequestAndHandler(typeof(GetSingleOrDefaultQuery<,,>), typeof(GetSingleOrDefaultQueryHandler<,,,>), nullableType, c);
             builder.Services.AddTripleArityRequestAndHandler(typeof(GetWhereQuery<,,>), typeof(GetWhereQueryHandler<,,,>), listType, c);
             builder.Services.AddTripleArityRequestAndHandler(typeof(GetWherePagedQuery<,,>), typeof(GetWherePagedQueryHandler<,,,>), pagedType, c);
 
             builder.Services.AddSingleArityRequestAndHandler(typeof(CreateEntityCommand<>), typeof(CreateEntityCommandHandler<,,,>), c.EntityDtoType, c);
             builder.Services.AddSingleArityRequestAndHandler(typeof(CreateEntitiesCommand<>), typeof(CreateEntitiesCommandHandler<,,,>), listType, c);
-            builder.Services.AddDoubleArityRequestAndHandler(typeof(UpdateEntityCommand<,>), typeof(UpdateEntityCommandHandler<,,,>), c.EntityDtoType, c);
-            builder.Services.AddDoubleArityRequestAndHandler(typeof(UpdateEntityByActionCommand<,>), typeof(UpdateEntityByActionCommandHandler<,,,>), c.EntityDtoType, c);
+            builder.Services.AddDoubleArityRequestAndHandlerForDto(typeof(UpdateEntityCommand<,>), typeof(UpdateEntityCommandHandler<,,,>), c.EntityDtoType, c);
+            builder.Services.AddDoubleArityRequestAndHandlerForDto(typeof(UpdateEntityByActionCommand<,>), typeof(UpdateEntityByActionCommandHandler<,,,>), c.EntityDtoType, c);
             builder.Services.AddSingleArityRequestAndHandler(typeof(UpdateEntitiesCommand<>), typeof(UpdateEntitiesCommandHandler<,,,>), listType, c);
             builder.Services.AddByIdRequestAndHandler(typeof(DeleteEntityCommand<>), typeof(DeleteEntityCommandHandler<,,,>), typeof(bool), c);
             builder.Services.AddByIdRequestAndHandler(typeof(DeleteEntitiesCommand<>), typeof(DeleteEntitiesCommandHandler<,,,>), typeof(bool), c);
-            builder.Services.AddDoubleArityRequestAndHandler(typeof(DeleteAndReturnEntityCommand<,>), typeof(DeleteAndReturnEntityCommandHandler<,,,>), c.EntityDtoType, c);
+            builder.Services.AddDoubleArityRequestAndHandlerForDto(typeof(DeleteAndReturnEntityCommand<,>), typeof(DeleteAndReturnEntityCommandHandler<,,,>), c.EntityDtoType, c);
         }
 
         return builder;
@@ -70,7 +70,16 @@ public static class ServicesExtensions
         services.TryAdd(new ServiceDescriptor(requestHandlerInterfaceType, requestHandlerImplementationType, c.Lifetime));
     }
 
-    private static void AddDoubleArityRequestAndHandler(this IServiceCollection services, Type requestType, Type requestHandlerType, Type returnType, ModernCqrsSpecification c)
+    private static void AddDoubleArityRequestAndHandlerForDbo(this IServiceCollection services, Type requestType, Type requestHandlerType, Type returnType, ModernCqrsSpecification c)
+    {
+        var requestInterfaceType = requestType.MakeGenericType(c.EntityDboType, c.EntityIdType);
+        var requestHandlerInterfaceType = typeof(IRequestHandler<,>).MakeGenericType(requestInterfaceType, returnType);
+        var requestHandlerImplementationType = requestHandlerType.MakeGenericType(c.EntityDtoType, c.EntityDboType, c.EntityIdType, c.RepositoryType);
+
+        services.TryAdd(new ServiceDescriptor(requestHandlerInterfaceType, requestHandlerImplementationType, c.Lifetime));
+    }
+    
+    private static void AddDoubleArityRequestAndHandlerForDto(this IServiceCollection services, Type requestType, Type requestHandlerType, Type returnType, ModernCqrsSpecification c)
     {
         var requestInterfaceType = requestType.MakeGenericType(c.EntityDtoType, c.EntityIdType);
         var requestHandlerInterfaceType = typeof(IRequestHandler<,>).MakeGenericType(requestInterfaceType, returnType);
