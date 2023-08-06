@@ -11,7 +11,6 @@ It includes the following components:
 * generic in memory services with in-memory filtering capabilities
 * in-memory and redis generic caches
 * generic set of CQRS queries and commands over repository (if you prefer CQRS over services)
-* GraphQL queries and subscriptions
 * generic controllers for all types of services
 * OData controllers for all types of services
 
@@ -33,9 +32,6 @@ Examples for all types of components - [see here](./examples).
 * [Services In Memory](#services-in-memory)
 * [CQRS](#cqrs)
 * [CQRS with caching](#cqrs-with-caching)
-* [CQRS In Memory](#cqrs-in-memory)
-* [GraphQL](#graphql)
-* [GraphQL In Memory](#graphql-in-memory)
 * [Controllers](#controllers)
 * [Controllers CQRS](#controllers-cqrs)
 * [Controllers In Memory](#controllers-in-memory)
@@ -103,9 +99,7 @@ As a result a production ready API will be created:
 The following features will be implemented in the next releases:
 * Assembly scan in DI packages
 * Unit and integration tests
-* CQRS InMemory
-* GraphQL tools
-* MinimalsApis using FastEndpoints
+* MinimalsApis
 * Reflection improvements
 
 ## Repositories
