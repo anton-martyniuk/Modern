@@ -2,10 +2,6 @@
 
 ## What is Modern?
 
-[See full documentation here](https://github.com/anton-martyniuk/Modern/wiki)
-
-[See examples here](./examples)
-
 Modern is a set of modern .NET tools :hammer: :wrench: for fast and efficient development of common backend tasks.
 It allows to create a production ready applications with just set of models and configuration which can be further extended.
 Modern tool are flexible, easily changeable and extendable.\
@@ -19,9 +15,13 @@ It includes the following components:
 * generic controllers for all types of services
 * OData controllers for all types of services
 
+For more information - [see full documentation here](https://github.com/anton-martyniuk/Modern/wiki).
+
+Examples for all types of components - [see here](./examples).
+
 ---
 
-## List of Modern components :bookmark_tabs:
+## Table of contents :bookmark_tabs:
 
 * [How to get started?](#how-to-get-started)
 * [Roadmap](#roadmap)
@@ -43,14 +43,17 @@ It includes the following components:
 * [OData Controllers In Memory](#odata-controllers-in-memory)
 
 ## How to get started?
-First, select and install the needed Nuget packages !!!\
-Lets consider the following example: repository, service and controller.
-Install the following Nuget packages:
-* Modern.Repositories.EFCore.DependencyInjection
-* Modern.Services.DataStore.DependencyInjection
-* Modern.Controllers.DataStore.DependencyInjection
+Lets create a Web Api with CRUD operations over Airplane entities.
+We need a repository, service and controller.
+1. Install the following Nuget packages:
+* [Modern.Repositories.EFCore.DependencyInjection](https://www.nuget.org/packages/Modern.Repositories.EFCore.DependencyInjection)
+* [Modern.Services.DataStore.DependencyInjection](https://www.nuget.org/packages/Modern.Services.DataStore.DependencyInjection)
+* [Modern.Controllers.DataStore.DependencyInjection](https://www.nuget.org/packages/Modern.Controllers.DataStore.DependencyInjection)
 
-Register the Modern builder in DI and add the following components:
+2. Create classes for the following models: AirplaneDto and AirplaneDbo.
+3. Create an EF Core DbContext for accessing the AirplaneDbo.
+
+4. Register the Modern builder in DI and add the following components:
 ```csharp
 builder.Services
     .AddModern()
