@@ -26,7 +26,7 @@ public class ModernInMemoryServiceGenerator : ISourceGenerator
             return;
         }
 
-        foreach (var classDeclaration in receiver.RepositoryClasses)
+        foreach (var classDeclaration in receiver.ServiceClasses)
         {
             var model = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
             if (model.GetDeclaredSymbol(classDeclaration) is not INamedTypeSymbol classSymbol)
@@ -110,7 +110,7 @@ public class ModernInMemoryServiceGenerator : ISourceGenerator
 
 public class RepositorySyntaxReceiver : ISyntaxReceiver
 {
-    public List<ClassDeclarationSyntax> RepositoryClasses { get; } = new();
+    public List<ClassDeclarationSyntax> ServiceClasses { get; } = new();
 
     public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
     {
@@ -121,7 +121,7 @@ public class RepositorySyntaxReceiver : ISyntaxReceiver
         
         if (classDeclarationSyntax.AttributeLists.Any(a => a.Attributes.Any(x => x.Name.ToString().Contains("ModernInMemoryService"))))
         {
-            RepositoryClasses.Add(classDeclarationSyntax);
+            ServiceClasses.Add(classDeclarationSyntax);
         }
     }
 }
