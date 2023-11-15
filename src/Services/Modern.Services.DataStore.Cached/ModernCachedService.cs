@@ -127,11 +127,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<TEntityDto> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(id, nameof(id));
-            cancellationToken.ThrowIfCancellationRequested();
-
             if (Logger.IsEnabled(LogLevel.Trace))
             {
                 Logger.LogTrace("{ServiceName}.{Method} id: {Id}", _serviceName, nameof(GetByIdAsync), id);
@@ -162,11 +162,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<TEntityDto?> TryGetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(id, nameof(id));
-            cancellationToken.ThrowIfCancellationRequested();
-
             if (Logger.IsEnabled(LogLevel.Trace))
             {
                 Logger.LogTrace("{ServiceName}.{Method} id: {Id}", _serviceName, nameof(TryGetByIdAsync), id);
@@ -201,10 +201,10 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<List<TEntityDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             LogMethod(nameof(GetAllAsync));
 
             var entitiesDbo = await Repository.GetAllAsync(null, cancellationToken).ConfigureAwait(false);
@@ -222,10 +222,10 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<long> CountAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             if (Logger.IsEnabled(LogLevel.Trace))
             {
                 Logger.LogTrace("{ServiceName}.{Method} of all entities", _serviceName, nameof(CountAsync));
@@ -245,11 +245,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<long> CountAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
-            cancellationToken.ThrowIfCancellationRequested();
-
             LogMethod(nameof(CountAsync));
 
             return await Repository.CountAsync(predicate, null, cancellationToken).ConfigureAwait(false);
@@ -266,11 +266,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<bool> ExistsAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
-            cancellationToken.ThrowIfCancellationRequested();
-
             LogMethod(nameof(ExistsAsync));
 
             return await Repository.ExistsAsync(predicate, null, cancellationToken).ConfigureAwait(false);
@@ -287,11 +287,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<TEntityDto?> FirstOrDefaultAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
-            cancellationToken.ThrowIfCancellationRequested();
-
             LogMethod(nameof(FirstOrDefaultAsync));
 
             var entityDbo = await Repository.FirstOrDefaultAsync(predicate, null, cancellationToken).ConfigureAwait(false);
@@ -309,11 +309,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<TEntityDto?> SingleOrDefaultAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
-            cancellationToken.ThrowIfCancellationRequested();
-
             LogMethod(nameof(SingleOrDefaultAsync));
 
             var entityDbo = await Repository.SingleOrDefaultAsync(predicate, null, cancellationToken).ConfigureAwait(false);
@@ -331,11 +331,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<List<TEntityDto>> WhereAsync(Expression<Func<TEntityDbo, bool>> predicate, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
-            cancellationToken.ThrowIfCancellationRequested();
-
             LogMethod(nameof(WhereAsync));
 
             var entitiesDbo = await Repository.WhereAsync(predicate, null, cancellationToken).ConfigureAwait(false);
@@ -353,13 +353,13 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<PagedResult<TEntityDto>> WhereAsync(Expression<Func<TEntityDbo, bool>> predicate, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
+        Guard.Against.NegativeOrZero(pageNumber, nameof(pageNumber));
+        Guard.Against.NegativeOrZero(pageSize, nameof(pageSize));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
-            Guard.Against.NegativeOrZero(pageNumber, nameof(pageNumber));
-            Guard.Against.NegativeOrZero(pageSize, nameof(pageSize));
-            cancellationToken.ThrowIfCancellationRequested();
-
             if (Logger.IsEnabled(LogLevel.Trace))
             {
                 Logger.LogTrace("{ServiceName}.{Method}. Page number: {PageNumber}, page size: {PageSize}", _serviceName, nameof(WhereAsync), pageNumber, pageSize);
@@ -404,11 +404,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<TEntityDto> CreateAsync(TEntityDto entity, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(entity, nameof(entity));
-            cancellationToken.ThrowIfCancellationRequested();
-
             Logger.LogTrace("{ServiceName}.{Method} entity: {@Entity}", _serviceName, nameof(CreateAsync), entity);
 
             Logger.LogDebug("Creating {Name} entity in db...", _entityName);
@@ -442,12 +442,12 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<List<TEntityDto>> CreateAsync(List<TEntityDto> entities, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(entities, nameof(entities));
+        Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(entities, nameof(entities));
-            Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
-            cancellationToken.ThrowIfCancellationRequested();
-
             Logger.LogTrace("{ServiceName}.{Method} entities: {@Entities}", _serviceName, nameof(CreateAsync), entities);
 
             Logger.LogDebug("Creating {Name} entities in db...", _entityName);
@@ -481,12 +481,12 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<TEntityDto> UpdateAsync(TId id, TEntityDto entity, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(id, nameof(id));
-            ArgumentNullException.ThrowIfNull(entity, nameof(entity));
-            cancellationToken.ThrowIfCancellationRequested();
-
             Logger.LogTrace("{ServiceName}.{Method} id: {Id}, entity: {@Entity}", _serviceName, nameof(UpdateAsync), id, entity);
 
             var entityDbo = MapToDbo(entity);
@@ -520,12 +520,12 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<List<TEntityDto>> UpdateAsync(List<TEntityDto> entities, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(entities, nameof(entities));
+        Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(entities, nameof(entities));
-            Guard.Against.NegativeOrZero(entities.Count, nameof(entities));
-            cancellationToken.ThrowIfCancellationRequested();
-
             Logger.LogTrace("{ServiceName}.{Method} entities: {@Entities}", _serviceName, nameof(UpdateAsync), entities);
 
             var entitiesDbo = entities.ConvertAll(MapToDbo);
@@ -560,12 +560,12 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<TEntityDto> UpdateAsync(TId id, Action<TEntityDto> update, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+        ArgumentNullException.ThrowIfNull(update, nameof(update));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(id, nameof(id));
-            ArgumentNullException.ThrowIfNull(update, nameof(update));
-            cancellationToken.ThrowIfCancellationRequested();
-
             Logger.LogTrace("{ServiceName}.{Method} id: {Id}", _serviceName, nameof(UpdateAsync), id);
 
             var entityDbo = await Repository.GetByIdAsync(id, null, cancellationToken).ConfigureAwait(false);
@@ -604,11 +604,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<bool> DeleteAsync(TId id, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(id, nameof(id));
-            cancellationToken.ThrowIfCancellationRequested();
-
             Logger.LogTrace("{ServiceName}.{Method} id: {Id}", _serviceName, nameof(DeleteAsync), id);
             Logger.LogDebug("Deleting {Name} entity with id '{Id}' in db...", _entityName, id);
 
@@ -639,12 +639,12 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<bool> DeleteAsync(List<TId> ids, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(ids, nameof(ids));
+        Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(ids, nameof(ids));
-            Guard.Against.NegativeOrZero(ids.Count, nameof(ids));
-            cancellationToken.ThrowIfCancellationRequested();
-
             Logger.LogTrace("{ServiceName}.{Method} ids: {@Ids}", _serviceName, nameof(DeleteAsync), ids);
             Logger.LogDebug("Updating {Name} entities in db...", _entityName);
 
@@ -675,11 +675,11 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
     /// </summary>
     public virtual async Task<TEntityDto> DeleteAndReturnAsync(TId id, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+        cancellationToken.ThrowIfCancellationRequested();
+        
         try
         {
-            ArgumentNullException.ThrowIfNull(id, nameof(id));
-            cancellationToken.ThrowIfCancellationRequested();
-
             Logger.LogTrace("{ServiceName}.{Method} id: {Id}", _serviceName, nameof(DeleteAndReturnAsync), id);
 
             Logger.LogDebug("Deleting {Name} entity with id '{Id}' in db...", _entityName, id);

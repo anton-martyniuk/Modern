@@ -7,9 +7,9 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<Authors>Anton Martyniuk</Authors>
-		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
+		<Copyright>Copyright (c) Anton Martyniuk 2023</Copyright>
 		<Title>Modern In Memory Services</Title>
 		<Description>A generic in memory service implementation for CRUD and Query operations in a data store</Description>
 		<PackageTags>modern;service;generic;memory;crud;query</PackageTags>

@@ -7,9 +7,9 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<Authors>Anton Martyniuk</Authors>
-		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
+		<Copyright>Copyright (c) Anton Martyniuk 2023</Copyright>
 		<Title>Modern Dapper Repositories</Title>
 		<Description>A generic repository implementation using Dapper for CRUD and Query operations</Description>
 		<PackageTags>modern;repository;generic;crud;query;dapper</PackageTags>
