@@ -24,15 +24,27 @@ public class AndSpecification<TEntity> : Specification<TEntity>
         var leftExpression = left.FilterQuery;
         var rightExpression = right.FilterQuery;
 
-        if (leftExpression is null || rightExpression is null)
+        if (leftExpression is null && rightExpression is null)
         {
+            return;
+        }
+        
+        if (leftExpression is not null && rightExpression is null)
+        {
+            AddFilteringQuery(leftExpression);
+            return;
+        }
+        
+        if (leftExpression is null && rightExpression is not null)
+        {
+            AddFilteringQuery(rightExpression);
             return;
         }
 
         var parameterExpression = Expression.Parameter(typeof(TEntity));
         var visitor = new SpecificationExpressionVisitor(parameterExpression);
 
-        var andExpression = Expression.AndAlso(leftExpression.Body, rightExpression.Body);
+        var andExpression = Expression.AndAlso(leftExpression!.Body, rightExpression!.Body);
         andExpression = (BinaryExpression)visitor.Visit(andExpression);
 
         var lambda = Expression.Lambda<Func<TEntity, bool>>(andExpression, parameterExpression);
