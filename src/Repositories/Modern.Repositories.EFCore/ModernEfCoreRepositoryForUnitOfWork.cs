@@ -473,9 +473,9 @@ public class ModernEfCoreRepositoryForUnitOfWork<TDbContext, TEntity, TId> : IMo
     }
     
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.WhereAsync(Specification{TEntity},System.Threading.CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.WhereAsync(ISpecification{TEntity},System.Threading.CancellationToken)"/>
     /// </summary>
-    public async Task<List<TEntity>> WhereAsync(Specification<TEntity> specification, CancellationToken cancellationToken = default)
+    public async Task<List<TEntity>> WhereAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default)
     {
         try
         {

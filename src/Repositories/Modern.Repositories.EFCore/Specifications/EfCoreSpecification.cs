@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Modern.Repositories.Abstractions.Specifications;
+using Modern.Repositories.EFCore.Specifications.Base;
 
 namespace Modern.Repositories.EFCore.Specifications;
 
@@ -13,7 +14,7 @@ public class EfCoreSpecification<TEntity> : Specification<TEntity>
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    public EfCoreSpecification(Specification<TEntity> specification) : base(specification)
+    public EfCoreSpecification(ISpecification<TEntity> specification) : base(specification)
     {
     }
 

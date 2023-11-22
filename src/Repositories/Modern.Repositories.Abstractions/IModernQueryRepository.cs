@@ -136,7 +136,7 @@ public interface IModernQueryRepository<TEntity, in TId>
     /// <exception cref="ArgumentNullException">Thrown if provided predicate is null</exception>
     /// <exception cref="RepositoryErrorException">Thrown if an error occurred while retrieving entities from the data store</exception>
     /// <returns>A list of entities that match the condition</returns>
-    Task<List<TEntity>> WhereAsync(Specification<TEntity> specification, CancellationToken cancellationToken = default);
+    Task<List<TEntity>> WhereAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default);
     
     /// <summary>
     /// Returns <see cref="IQueryable{TEntity}"/> implementation

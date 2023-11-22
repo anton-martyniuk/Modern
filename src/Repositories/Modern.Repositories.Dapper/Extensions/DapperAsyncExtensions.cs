@@ -88,7 +88,7 @@ internal static class DapperAsyncExtensions
     /// <param name="commandType">Type of command</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Entity that matches the given sql query or <see langword="null"/> if entity not found</returns>
-    public static async Task<T> QuerySingleOrDefaultWithTokenAsync<T>(this IDbConnection connection,
+    public static async Task<T?> QuerySingleOrDefaultWithTokenAsync<T>(this IDbConnection connection,
         string sql,
         object? param = null,
         IDbTransaction? transaction = null,
@@ -134,7 +134,7 @@ internal static class DapperAsyncExtensions
     /// <param name="commandType">Type of command</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Entity that matches the given sql query or <see langword="null"/> if entity not found</returns>
-    public static async Task<T> QueryFirstOrDefaultWithTokenAsync<T>(this IDbConnection connection,
+    public static async Task<T?> QueryFirstOrDefaultWithTokenAsync<T>(this IDbConnection connection,
         string sql,
         object? param = null,
         IDbTransaction? transaction = null,
