@@ -598,3 +598,13 @@ builder.Services
 Specify the type of dto entity model and primary key.\
 OData Controller requires one of modern repositories to be registered.\
 Remember to configure OData in DI as mentioned in see [OData Controllers](#odata-controllers)
+
+## Support My Work :star2:
+
+If you find this package helpful, consider supporting my work by buying me a coffee :coffee:!\
+Your support is greatly appreciated and helps me continue developing and maintaining this project.\
+You can also give me a :star: on github to make my package more relevant to others.
+
+[![Buy me a coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/antonmartyniuk)
+
+Thank you for your support!
