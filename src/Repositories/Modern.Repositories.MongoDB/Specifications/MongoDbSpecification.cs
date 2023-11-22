@@ -1,4 +1,5 @@
 ﻿using Modern.Repositories.Abstractions.Specifications;
+using Modern.Repositories.MongoDB.Specifications.Base;
 using MongoDB.Driver.Linq;
 
 namespace Modern.Repositories.MongoDB.Specifications;
@@ -13,7 +14,7 @@ public class MongoDbSpecification<TEntity> : Specification<TEntity>
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    public MongoDbSpecification(Specification<TEntity> specification) : base(specification)
+    public MongoDbSpecification(ISpecification<TEntity> specification) : base(specification)
     {
     }
 

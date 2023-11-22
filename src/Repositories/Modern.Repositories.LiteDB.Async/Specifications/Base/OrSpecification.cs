@@ -1,12 +1,12 @@
 ﻿using System.Linq.Expressions;
 
-namespace Modern.Repositories.Abstractions.Specifications;
+namespace Modern.Repositories.LiteDB.Async.Specifications.Base;
 
 /// <summary>
-/// Represents an expression that combines two specifications with a logical "and"
+/// Represents an expression that combines two specifications with a logical "or"
 /// </summary>
 /// <typeparam name="TEntity">Type of the entity</typeparam>
-public class AndSpecification<TEntity> : Specification<TEntity>
+public class OrSpecification<TEntity> : Specification<TEntity>
     where TEntity : class
 {
     /// <summary>
@@ -14,7 +14,7 @@ public class AndSpecification<TEntity> : Specification<TEntity>
     /// </summary>
     /// <param name="left">A left operand expression to combine to</param>
     /// <param name="right">A right operand expression to combine with</param>
-    public AndSpecification(Specification<TEntity> left, Specification<TEntity> right)
+    public OrSpecification(Specification<TEntity> left, Specification<TEntity> right)
     {
         RegisterFilteringQuery(left, right);
     }
@@ -43,11 +43,11 @@ public class AndSpecification<TEntity> : Specification<TEntity>
 
         var parameterExpression = Expression.Parameter(typeof(TEntity));
         var visitor = new SpecificationExpressionVisitor(parameterExpression);
-
-        var andExpression = Expression.AndAlso(leftExpression!.Body, rightExpression!.Body);
-        andExpression = (BinaryExpression)visitor.Visit(andExpression);
-
-        var lambda = Expression.Lambda<Func<TEntity, bool>>(andExpression, parameterExpression);
+        
+        var orExpression = Expression.OrElse(leftExpression!.Body, rightExpression!.Body);
+        orExpression = (BinaryExpression)visitor.Visit(orExpression);
+        
+        var lambda = Expression.Lambda<Func<TEntity, bool>>(orExpression, parameterExpression);
         AddFilteringQuery(lambda);
     }
 }

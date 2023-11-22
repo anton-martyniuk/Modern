@@ -1,5 +1,6 @@
 ﻿using LiteDB;
 using Modern.Repositories.Abstractions.Specifications;
+using Modern.Repositories.LiteDB.Specifications.Base;
 
 namespace Modern.Repositories.LiteDB.Specifications;
 
@@ -13,7 +14,7 @@ public class LiteDbSpecification<TEntity> : Specification<TEntity>
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    public LiteDbSpecification(Specification<TEntity> specification) : base(specification)
+    public LiteDbSpecification(ISpecification<TEntity> specification) : base(specification)
     {
     }
 

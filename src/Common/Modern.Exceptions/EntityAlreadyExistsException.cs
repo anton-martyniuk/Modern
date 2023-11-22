@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Modern.Exceptions;
+﻿namespace Modern.Exceptions;
 
 /// <summary>
 /// The exception that is thrown when entity is not created because of the existence of a similar entity

@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Modern.Exceptions;
+﻿namespace Modern.Exceptions;
 
 /// <summary>
 /// The exception that is thrown when entity is not updated because of concurrent update issue.<br/>

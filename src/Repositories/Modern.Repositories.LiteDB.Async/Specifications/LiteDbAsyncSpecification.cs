@@ -1,5 +1,6 @@
 ﻿using LiteDB.Async;
 using Modern.Repositories.Abstractions.Specifications;
+using Modern.Repositories.LiteDB.Async.Specifications.Base;
 
 namespace Modern.Repositories.LiteDB.Async.Specifications;
 
@@ -13,7 +14,7 @@ public class LiteDbAsyncSpecification<TEntity> : Specification<TEntity>
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    public LiteDbAsyncSpecification(Specification<TEntity> specification) : base(specification)
+    public LiteDbAsyncSpecification(ISpecification<TEntity> specification) : base(specification)
     {
     }
 

@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Modern.Repositories.Abstractions.Specifications;
+namespace Modern.Repositories.MongoDB.Specifications.Base;
 
 /// <summary>
 /// The specification expression visitor that replaces parameter expression

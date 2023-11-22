@@ -461,9 +461,9 @@ public class ModernDapperRepository<TEntityMapping, TEntity, TId> : IModernRepos
     }
     
     /// <summary>
-    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.WhereAsync(Specification{TEntity},System.Threading.CancellationToken)"/>
+    /// <inheritdoc cref="IModernQueryRepository{TEntity,TId}.WhereAsync(ISpecification{TEntity},System.Threading.CancellationToken)"/>
     /// </summary>
-    public Task<List<TEntity>> WhereAsync(Specification<TEntity> specification, CancellationToken cancellationToken = default)
+    public Task<List<TEntity>> WhereAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default)
     {
         throw new NotSupportedException("Current operation is not supported by ModernDapperRepository");
     }

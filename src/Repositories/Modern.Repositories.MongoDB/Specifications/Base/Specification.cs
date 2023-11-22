@@ -1,12 +1,13 @@
 ﻿using System.Linq.Expressions;
+using Modern.Repositories.Abstractions.Specifications;
 
-namespace Modern.Repositories.Abstractions.Specifications;
+namespace Modern.Repositories.MongoDB.Specifications.Base;
 
 /// <summary>
 /// The search specification definition
 /// </summary>
 /// <typeparam name="TEntity">Type of the entity</typeparam>
-public abstract class Specification<TEntity>
+public abstract class Specification<TEntity> : ISpecification<TEntity>
     where TEntity : class
 {
     private List<Expression<Func<TEntity, object>>>? _includeQueries;
@@ -53,7 +54,7 @@ public abstract class Specification<TEntity>
     /// Initializes a new instance of the class
     /// </summary>
     /// <param name="specification">A specification to be built</param>
-    protected Specification(Specification<TEntity> specification)
+    protected Specification(ISpecification<TEntity> specification)
     {
         FilterQuery = specification.FilterQuery;
 

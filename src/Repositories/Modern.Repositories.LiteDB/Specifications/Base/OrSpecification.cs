@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Modern.Repositories.Abstractions.Specifications;
+namespace Modern.Repositories.LiteDB.Specifications.Base;
 
 /// <summary>
 /// Represents an expression that combines two specifications with a logical "or"
