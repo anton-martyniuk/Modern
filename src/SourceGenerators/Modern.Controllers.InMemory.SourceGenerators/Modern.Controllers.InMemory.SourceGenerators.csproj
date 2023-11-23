@@ -10,7 +10,7 @@
 
         <Version>1.0.0-beta3</Version>
         <Authors>Anton Martyniuk</Authors>
-        <Copyright>Copyright (c) Anton Martyniuk 2023</Copyright>
+        <Copyright>Copyright (c) Anton Martyniuk 2024</Copyright>
         <Title>Modern Controllers Source Generators</Title>
         <Description>
             A source generators that create a webapi request to create and update a given entity for modern controllers.

@@ -7,9 +7,9 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.1</Version>
+		<Version>2.0.0-beta1</Version>
 		<Authors>Anton Martyniuk</Authors>
-		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
+		<Copyright>Copyright (c) Anton Martyniuk 2024</Copyright>
 		<Title>Modern In Memory Cache</Title>
 		<Description>The Modern Cache implementation using in-memory cache</Description>
 		<PackageTags>modern;cache;memory</PackageTags>
@@ -36,10 +36,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="README.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Include="README.md" Pack="true" PackagePath="\"/>
 	</ItemGroup>
 
 	<Target Name="PostPackNugetDeploy" AfterTargets="Pack" Condition="'$(Configuration)'=='Release'">

@@ -7,9 +7,9 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.2</Version>
+		<Version>2.0.0-beta1</Version>
 		<Authors>Anton Martyniuk</Authors>
-		<Copyright>Copyright (c) Anton Martyniuk 2023</Copyright>
+		<Copyright>Copyright (c) Anton Martyniuk 2024</Copyright>
 		<Title>Modern EF Core Repositories</Title>
 		<Description>A generic repository implementation using EF Core for CRUD and Query operations. Includes version of EF Core Repository with DbContext and IDbContextFactory</Description>
 		<PackageTags>modern;repository;generic;crud;query;efcore</PackageTags>
@@ -41,10 +41,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="README.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Include="README.md" Pack="true" PackagePath="\"/>
 	</ItemGroup>
 
 	<Target Name="PostPackNugetDeploy" AfterTargets="Pack" Condition="'$(Configuration)'=='Release'">

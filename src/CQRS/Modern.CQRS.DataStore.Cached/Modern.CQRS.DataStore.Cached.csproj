@@ -7,9 +7,9 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.2</Version>
+		<Version>2.0.0-beta1</Version>
 		<Authors>Anton Martyniuk</Authors>
-		<Copyright>Copyright (c) Anton Martyniuk 2023</Copyright>
+		<Copyright>Copyright (c) Anton Martyniuk 2024</Copyright>
 		<Title>Modern CQRS Commands and Queries</Title>
 		<Description>A generic CQRS Commands and Queries implementation for CRUD and Query operations in a data store with caching. Supported caches: MemoryCache and Redis</Description>
 		<PackageTags>modern;cqrs;cache;memory;redis;generic;crud;query;commands;queries</PackageTags>
@@ -38,10 +38,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="README.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Include="README.md" Pack="true" PackagePath="\"/>
 	</ItemGroup>
 
 	<Target Name="PostPackNugetDeploy" AfterTargets="Pack" Condition="'$(Configuration)'=='Release'">

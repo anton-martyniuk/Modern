@@ -7,9 +7,9 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.0</Version>
+		<Version>1.1.0</Version>
 		<Authors>Anton Martyniuk</Authors>
-		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
+		<Copyright>Copyright (c) Anton Martyniuk 2024</Copyright>
 		<Title>Modern Exceptions</Title>
 		<Description>A list of exceptions for modern tools</Description>
 		<PackageTags>modern;exceptions</PackageTags>

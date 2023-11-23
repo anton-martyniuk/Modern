@@ -7,9 +7,9 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.0.0</Version>
+		<Version>1.1.0</Version>
 		<Authors>Anton Martyniuk</Authors>
-		<Copyright>Copyright (c) Anton Martyniuk 2022</Copyright>
+		<Copyright>Copyright (c) Anton Martyniuk 2024</Copyright>
 		<Title>Modern Extensions for Microsoft Dependency Injection</Title>
 		<Description>Modern Extensions for Microsoft Dependency Injection that add ModernServicesBuilder into DI. This builder is a building block for all Modern components</Description>
 		<PackageTags>modern;extensions;dependencyinjection</PackageTags>

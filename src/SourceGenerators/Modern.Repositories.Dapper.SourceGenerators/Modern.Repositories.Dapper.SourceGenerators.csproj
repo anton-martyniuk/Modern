@@ -10,7 +10,7 @@
 
         <Version>1.0.0-beta4</Version>
         <Authors>Anton Martyniuk</Authors>
-        <Copyright>Copyright (c) Anton Martyniuk 2023</Copyright>
+        <Copyright>Copyright (c) Anton Martyniuk 2024</Copyright>
         <Title>Modern Repositories Dapper Source Generators</Title>
         <Description>A source generators that create a modern Dapper repository interface and implementation for a given entity</Description>
         <PackageTags>modern;repository;generic;crud;query;dapper;sourcegenerators;generators</PackageTags>
