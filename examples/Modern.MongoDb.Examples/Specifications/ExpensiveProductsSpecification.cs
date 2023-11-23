@@ -1,5 +1,5 @@
 ﻿using Modern.MongoDb.Examples.Entities;
-using Modern.Repositories.Abstractions.Specifications;
+using Modern.Repositories.MongoDB.Specifications.Base;
 
 namespace Modern.MongoDb.Examples.Specifications;
 

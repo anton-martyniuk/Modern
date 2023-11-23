@@ -1,5 +1,5 @@
 ﻿using Modern.LiteDb.Examples.Entities;
-using Modern.Repositories.Abstractions.Specifications;
+using Modern.Repositories.LiteDB.Specifications.Base;
 
 namespace Modern.LiteDb.Examples.Specifications;
 

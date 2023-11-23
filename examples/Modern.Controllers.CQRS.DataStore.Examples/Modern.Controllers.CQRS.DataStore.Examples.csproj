@@ -14,9 +14,9 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.9" />
-        <PackageReference Include="Modern.Controllers.CQRS.DataStore.DependencyInjection" Version="1.0.2" />
-        <PackageReference Include="Modern.CQRS.DataStore.DependencyInjection" Version="1.0.3" />
-        <PackageReference Include="Modern.Repositories.EFCore.DependencyInjection" Version="1.0.2" />
+        <PackageReference Include="Modern.Controllers.CQRS.DataStore" Version="2.0.0-beta1" />
+        <PackageReference Include="Modern.CQRS.DataStore" Version="2.0.0-beta1" />
+        <PackageReference Include="Modern.Repositories.EFCore" Version="2.0.0-beta1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>
 

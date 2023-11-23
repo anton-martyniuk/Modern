@@ -10,7 +10,7 @@
     <ItemGroup>
         <PackageReference Include="Bogus" Version="34.0.2" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-        <PackageReference Include="Modern.Cache.InMemory.DependencyInjection" Version="1.0.2" />
+        <PackageReference Include="Modern.Cache.InMemory" Version="2.0.0-beta1" />
     </ItemGroup>
 
 </Project>

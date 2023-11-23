@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Modern.Extensions.Microsoft.DependencyInjection;
-using Modern.Repositories.Abstractions;
 using Modern.Services.DataStore.Abstractions;
 using Modern.Services.DataStore.Cached.Examples.DbContexts;
 using Modern.Services.DataStore.Cached.Examples.Entities;

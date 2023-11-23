@@ -1,5 +1,5 @@
 ﻿using Modern.EfCore.Examples.Entities;
-using Modern.Repositories.Abstractions.Specifications;
+using Modern.Repositories.EFCore.Specifications.Base;
 
 namespace Modern.EfCore.Examples.Specifications;
 
