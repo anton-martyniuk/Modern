@@ -40,14 +40,13 @@ public class AndSpecification<TEntity> : Specification<TEntity>
             AddFilteringQuery(rightExpression);
             return;
         }
+        
+        var replaceVisitor = new ReplaceExpressionVisitor(rightExpression!.Parameters.Single(), leftExpression!.Parameters.Single());
+        var replacedBody = replaceVisitor.Visit(rightExpression.Body);
 
-        var parameterExpression = Expression.Parameter(typeof(TEntity));
-        var visitor = new SpecificationExpressionVisitor(parameterExpression);
+        var andExpression = Expression.AndAlso(leftExpression.Body, replacedBody);
+        var lambda = Expression.Lambda<Func<TEntity, bool>>(andExpression, leftExpression.Parameters.Single());
 
-        var andExpression = Expression.AndAlso(leftExpression!.Body, rightExpression!.Body);
-        andExpression = (BinaryExpression)visitor.Visit(andExpression);
-
-        var lambda = Expression.Lambda<Func<TEntity, bool>>(andExpression, parameterExpression);
         AddFilteringQuery(lambda);
     }
 }
