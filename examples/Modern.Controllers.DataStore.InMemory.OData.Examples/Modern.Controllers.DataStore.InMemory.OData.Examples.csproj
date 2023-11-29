@@ -14,10 +14,10 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.9" />
-        <PackageReference Include="Modern.Controllers.DataStore.InMemory" Version="2.0.0-beta1" />
-        <PackageReference Include="Modern.Controllers.DataStore.InMemory.OData" Version="2.0.0-beta1" />
-        <PackageReference Include="Modern.Repositories.EFCore" Version="2.0.0-beta1" />
-        <PackageReference Include="Modern.Services.DataStore.InMemory" Version="2.0.0-beta1" />
+        <PackageReference Include="Modern.Controllers.DataStore.InMemory" Version="2.0.0" />
+        <PackageReference Include="Modern.Controllers.DataStore.InMemory.OData" Version="2.0.0" />
+        <PackageReference Include="Modern.Repositories.EFCore" Version="2.0.0" />
+        <PackageReference Include="Modern.Services.DataStore.InMemory" Version="2.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>
 
