@@ -5,22 +5,21 @@ namespace Modern.Repositories.LiteDB.Specifications.Base;
 /// <summary>
 /// The specification expression visitor that replaces parameter expression
 /// </summary>
-public class SpecificationExpressionVisitor : ExpressionVisitor
+internal class ReplaceExpressionVisitor : ExpressionVisitor
 {
-    private readonly ParameterExpression _parameter;
+    private readonly Expression _oldValue;
+    private readonly Expression _newValue;
 
     /// <summary>
     /// Initializes a new instance of the class
     /// </summary>
-    /// <param name="parameter">Parameter expression</param>
-    internal SpecificationExpressionVisitor(ParameterExpression parameter)
+    /// <param name="oldValue">Old expression to be replaced</param>
+    /// <param name="newValue">A new expression that replaces the old one</param>
+    public ReplaceExpressionVisitor(Expression oldValue, Expression newValue)
     {
-        _parameter = parameter;
+        _oldValue = oldValue;
+        _newValue = newValue;
     }
 
-    /// <summary>
-    /// <inheritdoc cref="ExpressionVisitor.VisitParameter"/>
-    /// </summary>
-    protected override Expression VisitParameter(ParameterExpression node)
-        => base.VisitParameter(_parameter);
+    public override Expression Visit(Expression? node) => (node == _oldValue ? _newValue : base.Visit(node))!;
 }

@@ -40,14 +40,13 @@ public class OrSpecification<TEntity> : Specification<TEntity>
             AddFilteringQuery(rightExpression);
             return;
         }
+        
+        var replaceVisitor = new ReplaceExpressionVisitor(rightExpression!.Parameters.Single(), leftExpression!.Parameters.Single());
+        var replacedBody = replaceVisitor.Visit(rightExpression.Body);
 
-        var parameterExpression = Expression.Parameter(typeof(TEntity));
-        var visitor = new SpecificationExpressionVisitor(parameterExpression);
-        
-        var orExpression = Expression.OrElse(leftExpression!.Body, rightExpression!.Body);
-        orExpression = (BinaryExpression)visitor.Visit(orExpression);
-        
-        var lambda = Expression.Lambda<Func<TEntity, bool>>(orExpression, parameterExpression);
+        var andExpression = Expression.OrElse(leftExpression.Body, replacedBody);
+        var lambda = Expression.Lambda<Func<TEntity, bool>>(andExpression, leftExpression.Parameters.Single());
+
         AddFilteringQuery(lambda);
     }
 }
