@@ -497,6 +497,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
             
             if (!_options.Value.AddOrUpdateInCacheWhenEntityIsUpdated)
             {
+                await Cache.DeleteAsync(id).ConfigureAwait(false);
                 return MapToDto(entityDbo);
             }
 
@@ -536,6 +537,8 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
             
             if (!_options.Value.AddOrUpdateInCacheWhenEntityIsUpdated)
             {
+                var ids = entities.Select(GetEntityId).ToList();
+                await Cache.DeleteAsync(ids).ConfigureAwait(false);
                 return entitiesDbo.ConvertAll(MapToDto);
             }
 
@@ -583,6 +586,7 @@ public class ModernCachedService<TEntityDto, TEntityDbo, TId> :
             
             if (!_options.Value.AddOrUpdateInCacheWhenEntityIsUpdated)
             {
+                await Cache.DeleteAsync(id).ConfigureAwait(false);
                 return entityDto;
             }
 
