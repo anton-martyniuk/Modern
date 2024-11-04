@@ -1,6 +1,5 @@
 ﻿using Modern.Repositories.MongoDB.DI.Configuration;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -33,7 +32,6 @@ public class ModernMongoDbRepositoriesOptions
     public void ConfigureMongoDbClient(string connectionString, Action<MongoClientSettings>? updateSettings = null)
     {
         MongoClientSettings = MongoClientSettings.FromConnectionString(connectionString);
-        MongoClientSettings.LinqProvider = LinqProvider.V3;
 
         updateSettings?.Invoke(MongoClientSettings);
     }
