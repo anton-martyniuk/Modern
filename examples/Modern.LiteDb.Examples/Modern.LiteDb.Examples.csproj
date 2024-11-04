@@ -9,7 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-      <PackageReference Include="Modern.Repositories.LiteDB" Version="2.0.0" />
+      <PackageReference Include="Modern.Repositories.LiteDB" Version="2.1.1" />
     </ItemGroup>
 
 </Project>
