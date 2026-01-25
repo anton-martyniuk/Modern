@@ -23,7 +23,7 @@ public class MongoDbSpecification<TEntity> : Specification<TEntity>
     /// IMPORTANT: MongoDb Specification doesn't support IncludeQueries
     /// </summary>
     /// <returns>Expression</returns>
-    public virtual IMongoQueryable<TEntity> Apply(IMongoQueryable<TEntity> queryable)
+    public virtual IQueryable<TEntity> Apply(IQueryable<TEntity> queryable)
     {
         if (FilterQuery is not null)
         {
