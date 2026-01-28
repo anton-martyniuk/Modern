@@ -7,9 +7,9 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>10.0.0-alpha1</Version>
+		<Version>10.0.0</Version>
 		<Authors>Anton Martyniuk</Authors>
-		<Copyright>Copyright (c) Anton Martyniuk 2024</Copyright>
+		<Copyright>Copyright (c) Anton Martyniuk 2026</Copyright>
 		<Title>Modern MongoDB Repositories</Title>
 		<Description>A generic repository implementation using MongoDB for CRUD and Query operations</Description>
 		<PackageTags>modern;repository;generic;crud;query;mongodb</PackageTags>

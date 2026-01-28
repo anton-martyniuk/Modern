@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net10.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>1.2.0</Version>
+		<Version>10.0.0</Version>
 		<Authors>Anton Martyniuk</Authors>
-		<Copyright>Copyright (c) Anton Martyniuk 2024</Copyright>
+		<Copyright>Copyright (c) Anton Martyniuk 2026</Copyright>
 		<Title>Modern Extensions for Microsoft Dependency Injection</Title>
 		<Description>Modern Extensions for Microsoft Dependency Injection that add ModernServicesBuilder into DI. This builder is a building block for all Modern components</Description>
 		<PackageTags>modern;extensions;dependencyinjection</PackageTags>
@@ -20,9 +20,13 @@
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
-
-	<ItemGroup>
+	
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net10.0' ">
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.2" />
 	</ItemGroup>
 
 	<Target Name="PostPackNugetDeploy" AfterTargets="Pack" Condition="'$(Configuration)'=='Release'">

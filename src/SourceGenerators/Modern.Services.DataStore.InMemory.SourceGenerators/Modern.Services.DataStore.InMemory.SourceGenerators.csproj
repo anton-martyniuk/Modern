@@ -10,7 +10,7 @@
 
         <Version>1.0.0-beta1</Version>
         <Authors>Anton Martyniuk</Authors>
-        <Copyright>Copyright (c) Anton Martyniuk 2024</Copyright>
+        <Copyright>Copyright (c) Anton Martyniuk 2026</Copyright>
         <Title>Modern InMemory Service Source Generators</Title>
         <Description>A source generators that create a modern in memory service interface and implementation for a given entity</Description>
         <PackageTags>modern;service;generic;memory;crud;query;sourcegenerators;generators</PackageTags>

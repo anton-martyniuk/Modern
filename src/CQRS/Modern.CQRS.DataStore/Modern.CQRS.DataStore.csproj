@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net10.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>2.1.0</Version>
+		<Version>10.0.0</Version>
 		<Authors>Anton Martyniuk</Authors>
-		<Copyright>Copyright (c) Anton Martyniuk 2024</Copyright>
+		<Copyright>Copyright (c) Anton Martyniuk 2026</Copyright>
 		<Title>Modern CQRS Commands and Queries</Title>
 		<Description>A generic CQRS Commands and Queries implementation for CRUD and Query operations in a data store</Description>
 		<PackageTags>modern;cqrs;generic;crud;query;commands;queries</PackageTags>
@@ -23,17 +23,24 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Mapster" Version="7.4.0" />
+		<PackageReference Include="MediatR" Version="12.5.0" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net10.0' ">
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\..\Common\Modern.Data\Modern.Data.csproj" />
 		<ProjectReference Include="..\..\Common\Modern.Exceptions\Modern.Exceptions.csproj" />
 		<ProjectReference Include="..\..\Common\Modern.Extensions.Microsoft.DependencyInjection\Modern.Extensions.Microsoft.DependencyInjection.csproj" />
 		<ProjectReference Include="..\..\Repositories\Modern.Repositories.Abstractions\Modern.Repositories.Abstractions.csproj" />
 		<ProjectReference Include="..\Modern.CQRS.DataStore.Abstractions\Modern.CQRS.DataStore.Abstractions.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Mapster" Version="7.4.0" />
-		<PackageReference Include="MediatR" Version="12.4.1" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
 	</ItemGroup>
 
 	<ItemGroup>
